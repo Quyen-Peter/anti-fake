@@ -1,0 +1,31 @@
+.home-container {
+  margin-top: 80px;
+}
+
+.home-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  margin: 0 0 0 20px;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .home-layout {
+    flex-direction: column;
+    gap: 30px;
+    margin: 0;
+  }
+}
+
+/* Tablet */
+@media (max-width: 820px) {
+}
+
+/* iPad Pro */
+@media (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (max-width: 1200px) {
+}

@@ -1,5 +1,4 @@
 import "../../css/components/live/liveShopCard.css";
-import { BadgeCheck, Eye } from "lucide-react";
 import type { LiveShop } from "../../type/live";
 
 type Props = {

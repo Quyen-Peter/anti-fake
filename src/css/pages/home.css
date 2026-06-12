@@ -1,10 +1,10 @@
 .home-container {
-  margin-top: 80px;
+  margin-top: 70px;
 }
 
 .home-layout {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
   gap: 24px;
   margin: 0 0 0 20px;
 }
@@ -12,8 +12,9 @@
 /* Mobile */
 @media (max-width: 576px) {
   .home-layout {
+    display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 10px;
     margin: 0;
   }
 }

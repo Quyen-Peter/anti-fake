@@ -24,7 +24,7 @@ export default function FeaturedCategories() {
 
       <div className="category-list">
         {categories
-          .filter((item) => item.riskTier === "high")
+          // .filter((item) => item.riskTier === "high" )
           .slice(0, 10)
           .map((item) => (
             <div key={item.id} className="category-item">

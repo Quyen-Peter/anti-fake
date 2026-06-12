@@ -62,7 +62,7 @@
 /* Tablet */
 @media (max-width: 820px) {
   .banner-slider {
-    height: 250px;
+    height: 210px;
   }
   .dot {
     width: 7px;

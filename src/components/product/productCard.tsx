@@ -1,0 +1,51 @@
+import "../../css/components/product/productCard.css";
+import { BadgeCheck, Package } from "lucide-react";
+import type { ProductView } from "../../type/product";
+import { formatSale } from "../../ultil/format";
+
+type Props = {
+  product: ProductView;
+};
+
+export default function ProductCard({ product }: Props) {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("vi-VN").format(price);
+
+  return (
+    <div className="product-card">
+      <div className="product-image-wrapper">
+        <img
+          src={product.thumbnailUrl}
+          alt={product.title}
+          className="product-image"
+        />
+
+        <span className="product-status">
+          {product.salesMode === "WHOLESALE" ? "Bán sỉ" : "Bán lẻ"}
+        </span>
+      </div>
+
+      <div className="product-content">
+        <span className="product-category">{product.categoryName}</span>
+
+        <h3 className="product-title">{product.title}</h3>
+
+        <div className="product-price">{formatPrice(product.price)}đ</div>
+
+        <div className="product-meta">
+          <span>
+            <Package size={14} />
+            Đã bán  {formatSale(product.soldQuantity)}
+          </span>
+
+          {product.verificationLevel === "standard" && (
+            <span className="verified">
+              <BadgeCheck size={14} />
+              Đã xác minh
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -63,15 +63,16 @@ export default function Header() {
       icon: Users,
     },
     {
-      label: "Affiliate",
-      path: "/affiliate",
-      icon: Handshake,
-    },
-    {
       label: "QR",
       path: "/qr",
       icon: ScanLine,
     },
+    {
+      label: "Affiliate",
+      path: "/affiliate",
+      icon: Handshake,
+    },
+
     {
       label: "Tôi",
       path: "/profile",

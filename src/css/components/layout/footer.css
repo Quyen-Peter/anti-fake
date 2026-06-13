@@ -1,0 +1,188 @@
+.footer {
+  margin-top: 60px;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 60px;
+
+  padding: 60px 20px;
+}
+
+.footer-brand h2 {
+  margin-bottom: 18px;
+
+  color: #d92525;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.footer-brand p {
+  line-height: 1.8;
+  color: #666;
+  max-width: 420px;
+}
+
+.footer-social {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.footer-social a {
+  width: 46px;
+  height: 46px;
+
+  border: 1px solid #f0c8c8;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #666;
+
+  transition: all 0.25s ease;
+}
+
+.footer-links h3,
+.footer-newsletter h3 {
+  margin-bottom: 20px;
+
+  font-size: 22px;
+  color: #222;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-links a {
+  color: #666;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+
+.footer-subscribe {
+  display: flex;
+  margin-top: 12px;
+}
+
+.footer-subscribe input {
+  flex: 1;
+  height: 48px;
+
+  border: 1px solid #f0c8c8;
+  border-radius: 10px 0 0 10px;
+
+  padding: 0 16px;
+  outline: none;
+}
+
+.footer-subscribe button {
+  width: 70px;
+
+  border: none;
+  background: #c8102e;
+
+  color: white;
+  font-weight: 600;
+
+  border-radius: 0 10px 10px 0;
+
+  cursor: pointer;
+}
+
+
+
+.footer-bottom {
+  border-top: 1px solid #eee;
+
+  text-align: center;
+
+  padding: 24px 20px;
+
+  color: #666;
+  font-size: 14px;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 40px 20px;
+  }
+
+  .footer-brand,
+  .footer-links,
+  .footer-newsletter {
+    width: 100%;
+  }
+
+  .footer-subscribe {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-subscribe input,
+  .footer-subscribe button {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .footer-subscribe input{
+    padding: 10px 6px;
+  }
+
+  .footer-subscribe button {
+    height: 30px;
+  }
+
+  .footer-brand h2 {
+    font-size: 28px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 30px;
+    padding: 50px 20px;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+
+  .footer-brand p {
+    max-width: 100%;
+  }
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 40px;
+    padding: 50px 20px;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+
+  .footer-brand p {
+    max-width: 100%;
+  }
+}

@@ -7,6 +7,7 @@ import "../../css/pages/home.css";
 import type { shopCard } from "../../type/shop";
 import type { ProductView } from "../../type/product";
 import ProductCard from "../../components/product/productCard";
+import Footer from "../../components/layout/footer";
 
 export default function HomePage() {
   const mockShops: shopCard[] = [
@@ -293,7 +294,7 @@ export default function HomePage() {
         ))}
       </div>
      </div>
-      
+      <Footer/>
     </div>
   );
 }

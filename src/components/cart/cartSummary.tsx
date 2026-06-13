@@ -1,0 +1,49 @@
+type Props = {
+  subtotal: number;
+  discount: number;
+  total: number;
+};
+
+export default function CartSummary({ subtotal, discount, total }: Props) {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("vi-VN").format(price);
+  return (
+    <div className="cart-summary">
+      <h2>Tóm tắt đơn hàng</h2>
+
+      <div className="summary-row">
+        <span>Tạm tính</span>
+        <b>3{formatPrice(subtotal)}đ</b>
+      </div>
+
+      <div className="summary-row">
+        <span>Giảm giá sản phẩm</span>
+        <span className="discount">-{formatPrice(discount)}đ</span>
+      </div>
+
+      <div className="summary-row">
+        <span>Phí vận chuyển</span>
+        <span className="free">Miễn phí</span>
+      </div>
+
+      <hr />
+
+      <div className="summary-total">
+        <span>Tổng cộng</span>
+        <b>{formatPrice(total)}đ</b>
+      </div>
+      <div className="cart-bnt-payment">
+        <div className="coupon-box">
+          <label>MÃ GIẢM GIÁ</label>
+
+          <div className="coupon-input">
+            <input placeholder="Nhập mã..." />
+            <button>Áp dụng</button>
+          </div>
+        </div>
+
+        <button className="checkout-btn">Tiến hành thanh toán</button>
+      </div>
+    </div>
+  );
+}

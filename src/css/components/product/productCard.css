@@ -81,6 +81,11 @@
   color: #0d9488;
 }
 
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 /* Mobile */
 @media (max-width: 576px) {
   .product-title {

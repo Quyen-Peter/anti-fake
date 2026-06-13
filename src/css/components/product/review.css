@@ -1,0 +1,81 @@
+.pd-review {
+  padding: 24px;
+}
+
+.pd-review h2 {
+  margin-bottom: 20px;
+}
+
+.pd-review-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.pd-review-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pd-review-rating {
+  color: #f59e0b;
+}
+
+.pd-review-item p {
+  margin: 0 0 10px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.pd-review-item span {
+  color: #999;
+  font-size: 13px;
+}
+
+.pd-review-empty,
+.pd-review-loading {
+  text-align: center;
+  padding: 40px 0;
+  color: #888;
+}
+
+/* Phân trang css */
+
+.pd-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.pd-page-btn {
+  min-width: 40px;
+  height: 40px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #fff;
+  color: #333;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.pd-page-btn:hover:not(:disabled) {
+  border-color: #ee4d2d;
+  color: #ee4d2d;
+}
+
+.pd-page-btn.active {
+  background: #ee4d2d;
+  border-color: #ee4d2d;
+  color: #fff;
+}
+
+.pd-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -116,7 +116,7 @@ export default function HomePage() {
 
   const mockProducts: ProductView[] = [
     {
-      id: "product-001",
+      id: "06b5f15b",
       title: "Kem chống nắng SPF50+ PA++++",
       price: 150000,
       currency: "VND",

@@ -11,12 +11,14 @@ import QRPage from "./pages/qr";
 import SearchPage from "./pages/search";
 import WishlistPage from "./pages/wishlish";
 import "../src/App.css";
+import ProductDetail from "./pages/product/productDetail";
+
 
 function App() {
   return (
     <BrowserRouter>
       <div>
-        <Header/>
+        <Header />
 
         <div className="app-container">
           <Routes>
@@ -30,6 +32,7 @@ function App() {
             <Route path="/qr" element={<QRPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
           </Routes>
         </div>
       </div>

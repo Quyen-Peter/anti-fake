@@ -89,12 +89,12 @@ export default function ProductDetail() {
         <div className="pd-shop-right">
           <button className="pd-chat-btn">
             <MessageCircle size={18} />
-            Nhắn tin
+            <span>Nhắn tin</span>
           </button>
 
           <button className="pd-view-shop-btn">
             <Store size={18} />
-            Xem Shop
+            <span>Xem Shop</span>
           </button>
         </div>
       </div>

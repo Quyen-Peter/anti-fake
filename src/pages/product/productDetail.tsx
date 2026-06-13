@@ -48,8 +48,6 @@ export default function ProductDetail() {
       "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800",
       "https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=800",
       "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800",
-      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800",
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800",
     ],
 
     shippingMethods: [

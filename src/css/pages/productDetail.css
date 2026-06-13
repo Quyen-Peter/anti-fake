@@ -178,6 +178,10 @@
   border-bottom-right-radius: 20px;
   min-height: 400px;
 }
+.pd-description h2,
+p {
+  margin-bottom: 10px;
+}
 
 .pd-spec {
   background: white;
@@ -383,13 +387,16 @@
   .pd-top,
   .pd-content {
     grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
   }
 
+
   .pd-main-image {
-    height: 350px;
+    height: 300px;
   }
   .pd-info h1 {
-    font-size: 20px;
+    font-size: 18px;
   }
   .pd-shop-right {
     display: flex;
@@ -405,6 +412,16 @@
     font-weight: 600;
     gap: 3px;
   }
+  .pd-thumb-list{
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+
+  .pd-thumb-list img {
+    width: 50px;
+    height: 50px;
+
+  }
 }
 
 /* Tablet */
@@ -412,6 +429,7 @@
   .pd-top,
   .pd-content {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .pd-main-image {
@@ -441,6 +459,7 @@
   .pd-top,
   .pd-content {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .pd-main-image {

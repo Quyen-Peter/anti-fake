@@ -12,7 +12,9 @@ import SearchPage from "./pages/search";
 import WishlistPage from "./pages/wishlish";
 import "../src/App.css";
 import ProductDetail from "./pages/product/productDetail";
-
+import OrdersPage from "./pages/profile/ordersPage";
+import SettingsPage from "./pages/profile/settingsPage";
+import UserProfile from "./pages/profile/userProfile";
 
 function App() {
   return (
@@ -24,7 +26,11 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProfilePage />}>
+              <Route index element={<UserProfile />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
             <Route path="/affiliate" element={<AffiliatePage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/notification" element={<NotificationPage />} />

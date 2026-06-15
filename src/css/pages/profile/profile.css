@@ -62,3 +62,10 @@
 /* Laptop */
 @media (min-width: 1025px) and (max-width: 1440px) {
 }
+
+@media (min-width: 1440px) {
+  .profile-container {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}

@@ -264,7 +264,7 @@ export default function HomePage() {
         <FeaturedCategories />
         <BannerSlider />
       </div>
-      <div>
+      <div className="home-flash-sale">
         <FlashSale />
       </div>
       <div className="home-content">
@@ -287,7 +287,7 @@ export default function HomePage() {
         </div>
       </div>
 
-     <div>
+     <div className="home-product">
       <div className="product-grid">
         {mockProducts.map((product) => (
           <ProductCard key={product.id} product={product} />

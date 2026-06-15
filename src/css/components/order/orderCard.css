@@ -1,0 +1,135 @@
+.order-card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.order-code {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ADABAA;
+}
+
+.order-status {
+  color: #d92525;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.order-shop {
+  padding: 8px 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-product {
+  display: flex;
+  gap: 20px;
+  padding: 8px 70px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.order-product-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.order-product-info {
+  flex: 1;
+}
+
+.order-product-info h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.order-product-info p {
+  margin: 10px 0;
+  color: #888;
+  font-size: 13px;
+}
+
+.order-product-info span {
+  font-weight: 600;
+}
+
+.order-other-products {
+  margin-top: 11px;
+  color: #d92525;
+  font-weight: 600;
+}
+
+.order-product-price {
+  min-width: 180px;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.order-product-price strong {
+  color: #d92525;
+  font-size: 17px;
+}
+
+.order-product-price small {
+  color: #999;
+  margin-top: 6px;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 10px 24px;
+}
+
+.order-payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-payment-info div {
+  display: flex;
+  gap: 20px;
+}
+
+.order-payment-info span {
+  color: #666;
+  min-width: 160px;
+  font-size: 14px;
+}
+
+.order-payment-info b {
+  color: #222;
+    font-size: 15px;
+}
+
+.order-detail-btn {
+  border: none;
+  background: #d92525;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.order-detail-btn:hover {
+  opacity: 0.9;
+}

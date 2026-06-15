@@ -15,6 +15,7 @@ import ProductDetail from "./pages/product/productDetail";
 import OrdersPage from "./pages/profile/ordersPage";
 import SettingsPage from "./pages/profile/settingsPage";
 import UserProfile from "./pages/profile/userProfile";
+import OrderDetailPage from "./components/order/orderDetail";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route index element={<UserProfile />} />
               <Route path="orders" element={<OrdersPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="/profile/orders/:id" element={<OrderDetailPage />} />
             </Route>
             <Route path="/affiliate" element={<AffiliatePage />} />
             <Route path="/cart" element={<CartPage />} />

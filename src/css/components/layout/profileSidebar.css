@@ -119,11 +119,11 @@
     padding-bottom: 3px;
   }
   .profile-sidebar-header h3 {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .profile-sidebar-header p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .profile-logout-laptop {
     display: none;

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import OrderCard from "../../components/order/orderCard";
 
 export default function OrdersPage() {
@@ -62,6 +63,10 @@ export default function OrdersPage() {
       otherProducts: 1,
     },
   ];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>

@@ -1,10 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../css/components/order/orderDetail.css";
 import type { OrderDetail } from "../../type/order";
 import { ArrowLeft, MapPin, Phone, ShieldCheck, User } from "lucide-react";
+import { useEffect } from "react";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   console.log(id);
   const mockOrderDetail: OrderDetail = {
     id: "1",
@@ -139,6 +141,9 @@ export default function OrderDetailPage() {
   };
   const order = mockOrderDetail;
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
 
@@ -146,9 +151,16 @@ export default function OrderDetailPage() {
     <div className="order-detail-page">
       {/* Header */}
       <div className="od-section od-header">
-        <ArrowLeft size={26} />
+        <button
+          className="od-back-btn"
+          onClick={() => navigate("/profile/orders")}
+        >
+          <ArrowLeft size={26} />
+        </button>
         <div>
-          <h1 className="od-order-code">Chi tiết đơn hàng: #{order.orderCode}</h1>
+          <h1 className="od-order-code">
+            Chi tiết đơn hàng: #{order.orderCode}
+          </h1>
           <p className="od-created">Ngày đặt hàng: {order.createdAt}</p>
         </div>
       </div>
@@ -320,8 +332,6 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="od-actions">
-        <button className="od-btn">Xác thực QR</button>
-
         <button className="od-btn primary">Mua lại</button>
       </div>
     </div>

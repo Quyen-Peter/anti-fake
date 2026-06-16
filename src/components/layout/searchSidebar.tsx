@@ -1,4 +1,3 @@
-import { ShieldCheck, BadgeCheck, Star } from "lucide-react";
 import "../../css/components/layout/searchSidebar.css";
 import { useEffect, useState } from "react";
 import { fetchCategories } from "../../services/category.api";

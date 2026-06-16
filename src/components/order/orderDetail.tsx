@@ -148,7 +148,7 @@ export default function OrderDetailPage() {
       <div className="od-section od-header">
         <ArrowLeft size={26} />
         <div>
-          <h1>Chi tiết đơn hàng: #{order.orderCode}</h1>
+          <h1 className="od-order-code">Chi tiết đơn hàng: #{order.orderCode}</h1>
           <p className="od-created">Ngày đặt hàng: {order.createdAt}</p>
         </div>
       </div>

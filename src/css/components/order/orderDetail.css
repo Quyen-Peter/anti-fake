@@ -40,7 +40,6 @@
 .od-progress {
   display: flex;
   align-items: center;
-
 }
 
 .od-step {
@@ -147,17 +146,21 @@
 .od-item-info h3 {
   margin: 0 0 8px;
   font-size: 17px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 }
 
 .od-item-info p {
   margin: 0 0 6px;
   color: #6b7280;
-   font-size: 13px;
+  font-size: 13px;
 }
 
 .od-item-info span {
   color: #6b7280;
-   font-size: 13px;
+  font-size: 13px;
 }
 
 .od-item-price {
@@ -212,22 +215,95 @@
   border: none;
 }
 
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 576px) {
+  .order-detail-page {
+    margin: 0px auto 20px;
+    padding: 0 10px;
+    gap: 10px;
+  }
+  .od-section {
+    padding: 10px 10px;
+  }
   .od-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
+  }
+  .od-section h1 {
+    font-size: 16px;
+  }
+  .od-created {
+    font-size: 13px;
+  }
+  .od-step {
+    min-width: 35px;
   }
 
-  .od-progress {
-    overflow-x: auto;
+  .od-step-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .od-line {
+    height: 3px;
+    margin-top: -20px;
+  }
+  .od-step span {
+    font-size: 11px;
+  }
+  .od-info-item span {
+    font-size: 14px;
+  }
+  .od-row span {
+    font-size: 14px;
+  }
+  .od-row b {
+    font-size: 14px;
+  }
+  .od-shop-title {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .od-item {
+    gap: 10px;
+    padding: 6px 10px;
   }
 
-  .od-actions {
-    flex-direction: column;
+  .od-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
+  .od-item-info h3 {
+    font-size: 15px;
   }
 
-  .od-btn {
-    width: 100%;
+  .od-item-info p {
+    font-size: 12px;
   }
+
+  .od-item-info span {
+    font-size: 12px;
+  }
+
+  .od-item-price {
+    font-size: 14px;
+  }
+  .od-item-price {
+    font-size: 14px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
 }

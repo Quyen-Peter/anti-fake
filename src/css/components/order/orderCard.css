@@ -17,7 +17,7 @@
 .order-code {
   font-size: 13px;
   font-weight: 600;
-  color: #ADABAA;
+  color: #adabaa;
 }
 
 .order-status {
@@ -54,6 +54,10 @@
 .order-product-info h3 {
   margin: 0;
   font-size: 17px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 }
 
 .order-product-info p {
@@ -74,7 +78,6 @@
 
 .order-product-price {
   min-width: 180px;
-  
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -117,7 +120,7 @@
 
 .order-payment-info b {
   color: #222;
-    font-size: 15px;
+  font-size: 15px;
 }
 
 .order-detail-btn {
@@ -132,4 +135,93 @@
 
 .order-detail-btn:hover {
   opacity: 0.9;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .order-code {
+    font-size: 12px;
+  }
+
+  .order-status {
+    font-size: 12px;
+  }
+  .order-shop {
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .order-product {
+    gap: 10px;
+    padding: 6px 20px;
+  }
+
+  .order-product-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
+  .order-product-info h3 {
+    font-size: 15px;
+  }
+
+  .order-product-info p {
+    margin: 10px 0;
+    color: #888;
+    font-size: 12px;
+  }
+
+  .order-product-info span {
+    font-size: 13px;
+  }
+  .order-other-products {
+    font-size: 13px;
+  }
+
+  .order-product-price {
+    min-width: 90px;
+  }
+  .order-product-price strong {
+    font-size: 14px;
+  }
+  .order-product-price small {
+    font-size: 12px;
+  }
+  .order-footer {
+    padding: 8px 12px;
+  }
+  .order-payment-info {
+    gap: 8px;
+  }
+  .order-payment-info div {
+    gap: 5px;
+  }
+
+  .order-payment-info span {
+    font-size: 13px;
+  }
+
+  .order-payment-info b {
+    font-size: 14px;
+  }
+  .order-detail-btn {
+    padding: 5px 18px;
+    font-size: 12px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
 }

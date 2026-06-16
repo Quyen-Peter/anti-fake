@@ -1,0 +1,264 @@
+.search-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #ffffff;
+  position: fixed;
+  height: fit-content;
+  padding-top: 70px;
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 100vh;
+}
+
+/* Section */
+
+.filter-section {
+  border-bottom: 1px solid #ececec;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.filter-section h4 {
+  margin: 0 0 16px;
+
+  font-size: 13px;
+
+  color: #888;
+
+  font-weight: 700;
+}
+
+/* Category */
+
+.s-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 14px;
+}
+
+.s-category-item {
+  display: flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  margin-bottom: 9px;
+  margin-left: 10px;
+}
+
+.s-category-item:hover {
+  color: #e53935;
+}
+
+.s-category-item span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Checkbox */
+
+.filter-section label {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+}
+
+.filter-section input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* Price */
+
+.price-range {
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.price-range-from {
+  margin-bottom: 8px;
+}
+
+.price-range input {
+  flex: 1;
+  height: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+.price-range input:focus {
+  outline: none;
+  border-color: #ddd;
+  box-shadow: none;
+}
+
+.apply-btn {
+  width: 100%;
+  margin-top: 12px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: #c1121f;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .search-sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    background: #ffffff;
+    display: flex;
+    gap: 50px;
+    height: fit-content;
+  }
+  .filter-section {
+    border-bottom: none;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+  }
+  .price-range {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-range input {
+    flex: 1;
+    height: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .price-range-from {
+    margin-bottom: 0px;
+  }
+  .filter-section h4 {
+    font-size: 12px;
+  }
+  .s-category-item {
+    margin-left: 0px;
+  }
+
+  .s-category-item span {
+    font-size: 12px;
+  }
+  .filter-section label {
+    font-size: 12px;
+  }
+  .filter-section input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+  }
+  .apply-btn {
+    width: 100%;
+    margin-top: 10px;
+    height: 25px;
+    font-size: 12px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  .search-sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    background: #ffffff;
+    display: flex;
+    gap: 50px;
+    height: fit-content;
+  }
+  .filter-section {
+    border-bottom: none;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+  }
+  .price-range {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-range input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .price-range-from {
+    margin-bottom: 0px;
+  }
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+  .search-sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    background: #ffffff;
+    display: flex;
+    gap: 50px;
+    height: fit-content;
+  }
+  .filter-section {
+    border-bottom: none;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+  }
+  .price-range {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-range input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .price-range-from {
+    margin-bottom: 0px;
+  }
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+  .search-sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    background: #ffffff;
+    display: flex;
+    gap: 50px;
+    height: fit-content;
+  }
+  .filter-section {
+    border-bottom: none;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+  }
+  .price-range {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-range input {
+    flex: 1;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .price-range-from {
+    margin-bottom: 0px;
+  }
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

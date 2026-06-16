@@ -388,8 +388,11 @@ p {
 /* Mobile */
 @media (max-width: 576px) {
   .product-detail-page {
-    margin-left: -13px;
-    margin-right: -13px;
+    /* margin-left: -13px;
+    margin-right: -13px; */
+    padding-top: 55px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .pd-top,
   .pd-content {

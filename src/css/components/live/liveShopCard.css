@@ -40,7 +40,7 @@
   position: absolute;
   left: 8px;
   right: 8px;
-  bottom: 8px;
+  bottom: 1px;
 
   color: #fff;
   font-size: 13px;
@@ -91,6 +91,7 @@
   }
   .live-title {
     font-size: 10px;
+    bottom: 0px;
   }
   .live-badge {
     font-size: 5px;

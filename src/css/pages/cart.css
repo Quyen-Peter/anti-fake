@@ -2,8 +2,10 @@
   display: grid;
   grid-template-columns: 1fr 470px;
   gap: 24px;
-  margin-top: 80px;
+  padding-top: 80px;
   align-items: start;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .cart-right {
@@ -32,6 +34,24 @@
 
 /* ================= ITEM ================= */
 
+.cart-shop {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #ececec;
+}
+
+.cart-shop-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  border-bottom: 1px solid #f3f3f3;
+}
+
 .cart-item {
   background: #ffffff;
   border-radius: 20px;
@@ -42,7 +62,8 @@
   margin-bottom: 18px;
 }
 
-.cart-item input[type="checkbox"] {
+.cart-item input[type="checkbox"],
+.cart-shop-header input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: #c8102e;
@@ -173,7 +194,7 @@
 
 .summary-total {
   margin-top: 20px;
-  font-size: 24px;
+  font-size: 21px;
   font-weight: 700;
   color: #c8102e;
 }
@@ -266,6 +287,8 @@
     grid-template-columns: 1fr;
     gap: 17px;
     padding-bottom: 120px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .cart-right {
     position: fixed;
@@ -292,6 +315,13 @@
   .cart-summary h2 {
     display: none;
   }
+  .cart-shop-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    font-size: 14px;
+  }
   .cart-item {
     margin-bottom: 13px;
     gap: 6px;
@@ -302,7 +332,8 @@
   .cart-header span {
     font-size: 12px;
   }
-  .cart-item input[type="checkbox"] {
+  .cart-item input[type="checkbox"],
+  .cart-shop-header input[type="checkbox"] {
     width: 13px;
     height: 13px;
   }
@@ -333,7 +364,7 @@
     font-size: 14px;
   }
   .summary-total {
-    font-size: 18px;
+    font-size: 17px;
     margin-top: 10px;
   }
   .detail-btn {
@@ -446,7 +477,8 @@
     font-size: 13px;
   }
 
-  .cart-item input[type="checkbox"] {
+  .cart-item input[type="checkbox"],
+  .cart-shop-header input[type="checkbox"] {
     width: 14px;
     height: 14px;
   }
@@ -514,7 +546,8 @@
     font-size: 14px;
   }
 
-  .cart-item input[type="checkbox"] {
+  .cart-item input[type="checkbox"],
+  .cart-shop-header input[type="checkbox"] {
     width: 16px;
     height: 16px;
   }

@@ -1,6 +1,5 @@
 import {
   Image,
-  Paperclip,
   SendHorizonal,
   Smile,
   X,

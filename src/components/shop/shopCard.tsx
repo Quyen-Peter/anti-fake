@@ -2,17 +2,17 @@ import "../../css/components/shop/shopCard.css";
 import { BadgeCheck, Package, Star } from "lucide-react";
 import type { shopCard } from "../../type/shop";
 import { formatSale } from "../../ultil/format";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   shop: shopCard;
 };
 
-
-
 export default function ShopCard({ shop }: Props) {
+  const navigate = useNavigate();
   return (
-    <div className="shop-card">
-      <div className="shop-info">
+    <div className="shop-card" >
+      <div className="shop-info" onClick={() => navigate(`/shop/${shop.id}`)}>
         <img src={shop.avatarUrl} alt="shop" className="shop-avatar" />
 
         <div className="shop-content">
@@ -36,8 +36,6 @@ export default function ShopCard({ shop }: Props) {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

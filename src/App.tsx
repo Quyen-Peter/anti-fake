@@ -16,6 +16,10 @@ import OrdersPage from "./pages/profile/ordersPage";
 import SettingsPage from "./pages/profile/settingsPage";
 import UserProfile from "./pages/profile/userProfile";
 import OrderDetailPage from "./components/order/orderDetail";
+import ShopPage from "./pages/shop";
+import ShopProducts from "./components/shop/shopProducts";
+import ShopCategories from "./components/shop/shopCategories";
+import ShopReviews from "./components/shop/shopReviews";
 
 function App() {
   return (
@@ -41,6 +45,11 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/shop/:id" element={<ShopPage />}>
+              <Route index element={<ShopReviews />} />
+              <Route path="products" element={<ShopProducts />} />
+              <Route path="categories" element={<ShopCategories />} />
+            </Route>
           </Routes>
         </div>
       </div>

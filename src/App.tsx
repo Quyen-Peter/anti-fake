@@ -20,7 +20,6 @@ import ShopPage from "./pages/shop";
 import ShopProducts from "./components/shop/shopProducts";
 import ShopCategories from "./components/shop/shopCategories";
 import ShopReviews from "./components/shop/shopReviews";
-import MessageRoomPage from "./pages/message/room";
 
 function App() {
   return (

@@ -33,10 +33,6 @@ export default function MessageSidebar({ rooms }: Props) {
 
   return (
     <aside className="message-sidebar">
-      <div className="message-sidebar-header">
-        <h2>Tin nhắn</h2>
-      </div>
-
       <div className="message-search">
         <Search size={18} />
 

@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, Phone, Video } from "lucide-react";
+import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { MessageRoom } from "../../type/message";
 
@@ -36,16 +36,6 @@ export default function ChatHeader({ room }: Props) {
               : "Không hoạt động"}
           </span>
         </div>
-      </div>
-
-      <div className="chat-header-actions">
-        <button>
-          <Phone size={18} />
-        </button>
-
-        <button>
-          <Video size={18} />
-        </button>
       </div>
     </div>
   );

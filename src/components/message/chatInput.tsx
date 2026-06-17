@@ -1,9 +1,4 @@
-import {
-  Image,
-  SendHorizonal,
-  Smile,
-  X,
-} from "lucide-react";
+import { Image, SendHorizonal, X } from "lucide-react";
 import { useRef, useState } from "react";
 
 export default function ChatInput() {
@@ -24,6 +19,7 @@ export default function ChatInput() {
     setPreview(undefined);
   };
 
+ 
   return (
     <>
       {/* Preview ảnh */}
@@ -65,9 +61,7 @@ export default function ChatInput() {
           <Image size={20} />
         </button>
 
-        <button className="chat-input-icon">
-          <Smile size={20} />
-        </button>
+
 
         <input
           type="text"
@@ -81,10 +75,7 @@ export default function ChatInput() {
           }}
         />
 
-        <button
-          className="chat-send-btn"
-          onClick={handleSend}
-        >
+        <button className="chat-send-btn" onClick={handleSend}>
           <SendHorizonal size={18} />
         </button>
       </div>

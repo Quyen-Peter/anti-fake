@@ -100,9 +100,7 @@ export default function CartPage() {
 
     if (!shop) return false;
 
-    return (
-      shop.items.length > 0 && shop.items.every((item: any) => item.selected)
-    );
+    return shop.items.some((item: any) => item.selected);
   };
 
   const toggleShopSelect = (shopId: string) => {

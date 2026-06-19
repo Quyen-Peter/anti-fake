@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   subtotal: number;
@@ -9,13 +10,14 @@ type Props = {
 
 export default function CartSummary({ subtotal, discount, total }: Props) {
   const [showDetail, setShowDetail] = useState(false);
+  const navigate = useNavigate();
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
   return (
     <div className="cart-summary">
       <button className="detail-btn" onClick={() => setShowDetail(!showDetail)}>
         {showDetail ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
-      </button>     
+      </button>
       <h2>Tóm tắt đơn hàng</h2>
       <div className={`summary-detail ${showDetail ? "show" : ""}`}>
         <div className="summary-row">
@@ -51,7 +53,9 @@ export default function CartSummary({ subtotal, discount, total }: Props) {
           </div>
         </div>
       </div>
-      <button className="checkout-btn">Tiến hành thanh toán</button>
+      <button className="checkout-btn" onClick={() => navigate("/checkout")}>
+        Tiến hành thanh toán
+      </button>
     </div>
   );
 }

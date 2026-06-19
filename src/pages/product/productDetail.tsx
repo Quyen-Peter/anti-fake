@@ -8,6 +8,7 @@ import { MessageCircle, Store } from "lucide-react";
 import { fetchOfferDetail } from "../../services/product.api";
 import { useParams } from "react-router-dom";
 import { fetchShopByOffer } from "../../services/shop.api";
+import LoadingOverlay from "../../components/loadingOverlay";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -16,8 +17,6 @@ export default function ProductDetail() {
   const [shop, setShop] = useState<any>();
 
   useEffect(() => {
-    console.log("id:", id);
-
     if (!id) return;
 
     const loadProduct = async () => {
@@ -27,6 +26,7 @@ export default function ProductDetail() {
         setProduct(data);
       } catch (error) {
         console.error(error);
+      } finally {
       }
     };
 
@@ -39,6 +39,7 @@ export default function ProductDetail() {
         setShop(shop);
       } catch (error) {
         console.error(error);
+      } finally {
       }
     };
 
@@ -46,18 +47,17 @@ export default function ProductDetail() {
     loadProduct();
   }, [id]);
 
- 
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <div><LoadingOverlay /></div>;
   }
 
   return (
     <div className="product-detail-page">
+
       <div className="pd-top">
         {/* <ProductGallery images={product.thumbnailUrl} /> */}
 

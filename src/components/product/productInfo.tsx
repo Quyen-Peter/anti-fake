@@ -1,4 +1,4 @@
-import { QrCode, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
+import { QrCode, ShieldCheck, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { addToCart } from "../../services/cart.api";
 import { toast } from "sonner";

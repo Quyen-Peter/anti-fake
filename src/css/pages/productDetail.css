@@ -130,16 +130,7 @@
   justify-content: center;
 }
 
-.pd-shipping-box {
-  margin-top: 24px;
-  padding: 16px;
-  background: #f2f0f0;
-  border-radius: 12px;
-}
 
-.pd-shipping-box h4 {
-  margin-bottom: 8px;
-}
 
 .pd-action-buttons {
   display: flex;

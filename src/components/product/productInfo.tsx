@@ -82,17 +82,6 @@ export default function ProductInfo({ product }: any) {
         <span>sản phẩm có sẵn</span>
       </div>
 
-      <div className="pd-shipping-box">
-        <h4>Vận chuyển</h4>
-
-        {product.shippingMethods.map((item: any) => (
-          <div key={item.providerName}>
-            <Truck size={20} /> {item.providerName} •{" "}
-            {formatPrice(item.shippingFee)}đ • {item.estimatedDays}
-          </div>
-        ))}
-      </div>
-
       <div className="pd-action-buttons">
         <button className="pd-cart-btn" onClick={handleAddToCart}>
           <ShoppingCart size={20} /> Thêm vào giỏ hàng

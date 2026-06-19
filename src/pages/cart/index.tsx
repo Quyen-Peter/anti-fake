@@ -1,66 +1,108 @@
-import { useState } from "react";
-import CartItem from "../../components/cart/cartItem";
-import CartSummary from "../../components/cart/cartSummary";
-import "../../css/pages/cart.css";
+import { useEffect, useState } from "react";
 import { Store } from "lucide-react";
 
-export default function CartPage() {
-  const [cartShops, setCartShops] = useState([
-    {
-      shopId: "shop-1",
-      shopName: "Apple Official Store",
-      items: [
-        {
-          id: "1",
-          name: "iPhone 15 Pro Max 256GB iPhone 15 Pro",
-          image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569",
-          price: 28990000,
-          oldPrice: 34990000,
-          quantity: 1,
-          selected: true,
-        },
-        {
-          id: "2",
-          name: "AirPods Pro Gen 2",
-          image: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1",
-          price: 5990000,
-          oldPrice: 6990000,
-          quantity: 1,
-          selected: true,
-        },
-      ],
-    },
+import CartItem from "../../components/cart/cartItem";
+import CartSummary from "../../components/cart/cartSummary";
 
-    {
-      shopId: "shop-2",
-      shopName: "Sony Official Store",
-      items: [
-        {
-          id: "3",
-          name: "Sony WH-1000XM5",
-          image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b",
-          price: 6490000,
-          oldPrice: 8190000,
-          quantity: 1,
-          selected: true,
-        },
-        {
-          id: "4",
-          name: "Sony WF-1000XM5",
-          image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b",
-          price: 4990000,
-          oldPrice: 5990000,
-          quantity: 1,
-          selected: true,
-        },
-      ],
-    },
-  ]);
+import "../../css/pages/cart.css";
+
+import {
+  deleteCartItem,
+  fetchCart,
+  updateCartItemQuantity,
+} from "../../services/cart.api";
+import { getToken } from "../../ultil/auth";
+import { toast } from "sonner";
+
+export default function CartPage() {
+  const [cartShops, setCartShops] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const token = getToken();
+
+        if (!token) return;
+
+        const data = await fetchCart(token);
+
+        setCartShops(
+          (data.shops || []).map((shop: any) => ({
+            ...shop,
+            items: shop.items.map((item: any) => ({
+              ...item,
+              selected: false,
+            })),
+          })),
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  const handleQuantityChange = async (itemId: string, quantity: number) => {
+    try {
+      const token = getToken();
+
+      if (!token) return;
+
+      if (quantity < 1) return;
+
+      await updateCartItemQuantity(itemId, quantity, token);
+
+      setCartShops((prev) =>
+        prev.map((shop) => ({
+          ...shop,
+          items: shop.items.map((item: any) =>
+            item.id === itemId
+              ? {
+                  ...item,
+                  quantity,
+                }
+              : item,
+          ),
+        })),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    try {
+      const token = getToken();
+
+      if (!token) {
+        return;
+      }
+
+      await deleteCartItem(itemId, token);
+
+      setCartShops((prev) =>
+        prev
+          .map((shop) => ({
+            ...shop,
+            items: shop.items.filter((item: any) => item.id !== itemId),
+          }))
+          .filter((shop) => shop.items.length > 0),
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Xóa thất bại!");
+    }
+  };
 
   const isShopSelected = (shopId: string) => {
     const shop = cartShops.find((s) => s.shopId === shopId);
+
     if (!shop) return false;
-    return shop.items.some((item) => item.selected);
+
+    return (
+      shop.items.length > 0 && shop.items.every((item: any) => item.selected)
+    );
   };
 
   const toggleShopSelect = (shopId: string) => {
@@ -68,11 +110,11 @@ export default function CartPage() {
       prev.map((shop) => {
         if (shop.shopId !== shopId) return shop;
 
-        const allSelected = shop.items.every((item) => item.selected);
+        const allSelected = shop.items.every((item: any) => item.selected);
 
         return {
           ...shop,
-          items: shop.items.map((item) => ({
+          items: shop.items.map((item: any) => ({
             ...item,
             selected: !allSelected,
           })),
@@ -85,8 +127,13 @@ export default function CartPage() {
     setCartShops((prev) =>
       prev.map((shop) => ({
         ...shop,
-        items: shop.items.map((item) =>
-          item.id === id ? { ...item, selected: !item.selected } : item,
+        items: shop.items.map((item: any) =>
+          item.id === id
+            ? {
+                ...item,
+                selected: !item.selected,
+              }
+            : item,
         ),
       })),
     );
@@ -96,29 +143,23 @@ export default function CartPage() {
     (shopSum, shop) =>
       shopSum +
       shop.items
-        .filter((item) => item.selected)
-        .reduce((itemSum, item) => itemSum + item.price * item.quantity, 0),
-    0,
-  );
-
-  const discount = cartShops.reduce(
-    (shopSum, shop) =>
-      shopSum +
-      shop.items
-        .filter((item) => item.selected)
+        .filter((item: any) => item.selected)
         .reduce(
-          (itemSum, item) =>
-            itemSum + (item.oldPrice - item.price) * item.quantity,
+          (itemSum: number, item: any) =>
+            itemSum + item.unitPriceSnapshot * item.quantity,
           0,
         ),
     0,
   );
 
+  const discount = 0;
+
+  const total = subtotal - discount;
+
   const totalItems = cartShops.reduce(
     (sum, shop) => sum + shop.items.length,
     0,
   );
-  const total = subtotal;
 
   return (
     <div className="cart-page">
@@ -136,16 +177,25 @@ export default function CartPage() {
                 checked={isShopSelected(shop.shopId)}
                 onChange={() => toggleShopSelect(shop.shopId)}
               />
+
               <Store size={18} />
+
               <span>{shop.shopName}</span>
             </div>
 
-            {shop.items.map((item) => (
-              <CartItem key={item.id} item={item} toggleSelect={toggleSelect} />
+            {shop.items.map((item: any) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                toggleSelect={toggleSelect}
+                onQuantityChange={handleQuantityChange}
+                onDelete={handleDeleteItem}
+              />
             ))}
           </div>
         ))}
       </div>
+
       <div className="cart-right">
         <CartSummary subtotal={subtotal} discount={discount} total={total} />
       </div>

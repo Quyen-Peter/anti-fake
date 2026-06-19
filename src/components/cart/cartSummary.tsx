@@ -20,7 +20,7 @@ export default function CartSummary({ subtotal, discount, total }: Props) {
       <div className={`summary-detail ${showDetail ? "show" : ""}`}>
         <div className="summary-row">
           <span>Tạm tính</span>
-          <b>3{formatPrice(subtotal)}đ</b>
+          <b>{formatPrice(subtotal)}đ</b>
         </div>
 
         <div className="summary-row">

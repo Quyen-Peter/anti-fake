@@ -346,10 +346,11 @@
     padding-top: 60px;
     padding-left: 10px;
     padding-right: 10px;
+    gap: 10px;
   }
   .live-chat {
     position: static;
-    height: 400px;
+    height: 350px;
   }
   .stream-live-header {
     top: 5px;

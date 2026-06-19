@@ -49,6 +49,38 @@
   padding-right: 20px;
 }
 
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.load-more-btn {
+  padding: 12px 32px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #c91c1c;
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background: #b11717;
+  transform: translateY(-2px);
+}
+
+.load-more-btn:active {
+  transform: translateY(0);
+}
+
 /* Mobile */
 @media (max-width: 576px) {
   .home-layout {

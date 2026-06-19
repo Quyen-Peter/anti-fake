@@ -145,6 +145,14 @@ export default function HomePage() {
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+        <div className="load-more-wrapper">
+          <button
+            className="load-more-btn"
+            onClick={() => setPage((prev) => prev + 1)}
+          >
+            Xem thêm sản phẩm
+          </button>
+        </div>
       </div>
       <Footer />
     </div>

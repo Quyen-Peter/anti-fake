@@ -13,7 +13,7 @@ export default function ShopCard({ shop }: Props) {
   return (
     <div className="shop-card" >
       <div className="shop-info" onClick={() => navigate(`/shop/${shop.id}`)}>
-        <img src={shop.avatarUrl} alt="shop" className="shop-avatar" />
+        <img src={shop.avatarUrl || "https://i.pravatar.cc/100?img=3"} alt="shop" className="shop-avatar" />
 
         <div className="shop-content">
           <div className="shop-name-row">

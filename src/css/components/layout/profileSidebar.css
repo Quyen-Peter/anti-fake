@@ -24,12 +24,6 @@
   color: #666;
 }
 
-.profile-sidebar-divider {
-  height: 1px;
-  background: #ece1e1;
-  margin: 14px 0;
-}
-
 .profile-sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -70,40 +64,26 @@
   stroke-width: 2.3;
 }
 
-.profile-logout-btn {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 12px 14px;
-
-  border: none;
-  background: transparent;
-
-  color: #e33434;
-  font-size: 15px;
-  font-weight: 500;
-
-  cursor: pointer;
-
-  border-radius: 10px;
-
-  transition: all 0.2s ease;
-}
-
-.profile-logout-btn:hover {
-  background: #fff2f2;
-}
-
-.profile-logout-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
 .profile-menu-btn {
   display: none;
+}
+
+.profile-logout-link {
+  width: auto;
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: #ef4444;
+}
+
+.profile-logout-link svg {
+  color: #ef4444;
+}
+
+.profile-logout-link:hover svg {
+  color: #dc2626;
 }
 
 /* Mobile */
@@ -125,9 +105,7 @@
   .profile-sidebar-header p {
     font-size: 13px;
   }
-  .profile-logout-laptop {
-    display: none;
-  }
+
   .profile-sidebar-link {
     gap: 10px;
     padding: 6px 10px;
@@ -156,9 +134,6 @@
     gap: 4px;
     flex-wrap: wrap;
   }
-  .profile-sidebar-divider {
-    display: none;
-  }
 }
 
 /* Tablet */
@@ -176,16 +151,11 @@
     border: 1px solid #eadede;
     border-radius: 0;
   }
-  .profile-logout-laptop {
-    display: none;
-  }
+
   .profile-sidebar-link {
     gap: 10px;
     padding: 8px 10px;
     font-size: 12px;
-  }
-  .profile-sidebar-divider {
-    margin: 11px 0;
   }
 }
 
@@ -203,16 +173,11 @@
     border: 1px solid #eadede;
     border-radius: 0;
   }
-  .profile-logout-laptop {
-    display: none;
-  }
+
   .profile-sidebar-link {
     gap: 10px;
     padding: 9px 10px;
     font-size: 13px;
-  }
-  .profile-sidebar-divider {
-    margin: 11px 0;
   }
 }
 
@@ -230,16 +195,11 @@
     border: 1px solid #eadede;
     border-radius: 0;
   }
-  .profile-logout-laptop {
-    display: none;
-  }
+
   .profile-sidebar-link {
     gap: 10px;
     padding: 10px 12px;
     font-size: 14px;
-  }
-  .profile-sidebar-divider {
-    margin: 12px 0;
   }
 }
 

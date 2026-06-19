@@ -20,27 +20,53 @@ import ShopPage from "./pages/shop";
 import ShopProducts from "./components/shop/shopProducts";
 import ShopCategories from "./components/shop/shopCategories";
 import ShopReviews from "./components/shop/shopReviews";
+import { Toaster } from "sonner";
+import ProtectedRoute from "./routes/protectedRoute";
+import AuthPage from "./pages/auth";
+import LiveRoomPage from "./pages/live";
 
 function App() {
   return (
     <BrowserRouter>
       <div>
         <Header />
-
+        <Toaster richColors position="top-center" />
         <div className="app-container">
           <Routes>
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/profile" element={<ProfilePage />}>
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<UserProfile />} />
               <Route path="orders" element={<OrdersPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="/profile/orders/:id" element={<OrderDetailPage />} />
             </Route>
             <Route path="/affiliate" element={<AffiliatePage />} />
-            <Route path="/cart" element={<CartPage />} />
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <CartPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/notification" element={<NotificationPage />} />
-            <Route path="/messages" element={<MessagePage />} />
+            <Route
+              path="/messages"
+              element={
+                <ProtectedRoute>
+                  <MessagePage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/messages/:roomId" element={<MessagePage />} />
             <Route path="/qr" element={<QRPage />} />
             <Route path="/search" element={<SearchPage />} />
@@ -51,6 +77,7 @@ function App() {
               <Route path="products" element={<ShopProducts />} />
               <Route path="categories" element={<ShopCategories />} />
             </Route>
+            <Route path="/live/:id" element={<LiveRoomPage />} />
           </Routes>
         </div>
       </div>

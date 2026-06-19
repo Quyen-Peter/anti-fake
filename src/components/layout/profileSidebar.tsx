@@ -11,6 +11,7 @@ import {
 import { NavLink } from "react-router-dom";
 import "../../css/components/layout/profileSidebar.css";
 import { useState } from "react";
+import { logout } from "../../services/auth.api";
 
 const menus = [
   {
@@ -42,6 +43,11 @@ const menus = [
     label: "Cài đặt tài khoản",
     path: "/profile/settings",
     icon: Settings,
+  },
+  {
+    label: "Đăng xuất",
+    path: "/logout",
+    icon: LogOut,
   },
 ];
 
@@ -76,7 +82,18 @@ export default function ProfileSidebar() {
           >
             {menus.map((item) => {
               const Icon = item.icon;
-
+              if (item.path === "/logout") {
+                return (
+                  <button
+                    key={item.path}
+                    className="profile-sidebar-link profile-logout-link"
+                    onClick={logout}
+                  >
+                    <Icon size={18} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              }
               return (
                 <NavLink
                   key={item.path}
@@ -95,15 +112,6 @@ export default function ProfileSidebar() {
               );
             })}
           </nav>
-        </div>
-
-        <div className="profile-logout-laptop">
-          <div className="profile-sidebar-divider" />
-
-          <button className="profile-logout-btn">
-            <LogOut size={18} />
-            <span>Đăng xuất</span>
-          </button>
         </div>
       </aside>
     </>

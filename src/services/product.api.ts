@@ -1,0 +1,44 @@
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export const fetchOffers = async (page: number, pageSize: number) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/api/products/offers?page=${page}&pageSize=${pageSize}`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+     throw error;
+  }
+};
+
+export const fetchOfferDetail = async (id: string) => {
+  const response = await fetch(
+    `${BASE_URL}/api/products/offers/${id}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Không thể lấy chi tiết sản phẩm");
+  }
+
+  const data = response.json();
+  return data;
+};

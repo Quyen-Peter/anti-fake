@@ -1,89 +1,72 @@
 import { useEffect, useState } from "react";
-import ProductGallery from "../../components/product/productGallery";
 import ProductInfo from "../../components/product/productInfo";
 import ProductSpecification from "../../components/product/productSpecification";
 import "../../css/pages/productDetail.css";
 import Review from "../../components/product/review";
-import type { shopCard } from "../../type/shop";
 import ShopCard from "../../components/shop/shopCard";
 import { MessageCircle, Store } from "lucide-react";
+import { fetchOfferDetail } from "../../services/product.api";
+import { useParams } from "react-router-dom";
+import { fetchShopByOffer } from "../../services/shop.api";
 
 export default function ProductDetail() {
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState("description");
+  const [product, setProduct] = useState<any>();
+  const [shop, setShop] = useState<any>();
 
-  const product = {
-    id: "06b5f15b",
-    title:
-      "Kem chống nắng SPF50 - Lô 2026 Kem chống nắng SPF50 - Lô 2026 Kem chống nắng SPF50 - Lô 2026",
-    description:
-      "Kem chống nắng SPF50 giúp bảo vệ da khỏi tia UV, dưỡng ẩm và chống lão hóa.",
+  useEffect(() => {
+    console.log("id:", id);
 
-    price: 150000,
-    currency: "VND",
+    if (!id) return;
 
-    salesMode: "WHOLESALE",
-    minWholesaleQty: 50,
+    const loadProduct = async () => {
+      try {
+        const data = await fetchOfferDetail(id);
+        console.log(data);
+        setProduct(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    itemCondition: "new",
+    const loadShop = async () => {
+      try {
+        const shop = await fetchShopByOffer(id);
 
-    availableQuantity: 500,
-    soldQuantity: 120,
+        console.log("shop:", shop);
 
-    parcelWeightGrams: 500,
-    parcelLengthCm: 20,
-    parcelWidthCm: 12,
-    parcelHeightCm: 8,
+        setShop(shop);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    verificationLevel: "standard",
-    verificationPolicy: "manual_review",
+    loadShop();
+    loadProduct();
+  }, [id]);
 
-    categoryName: "Mỹ phẩm",
-
-    gtin: 8938505970012,
-
-    productModelName: "Kem chống nắng SPF50",
-
-    thumbnailUrl: [
-      "https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=800",
-      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800",
-      "https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=800",
-      "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800",
-    ],
-
-    shippingMethods: [
-      {
-        providerName: "Giao Hàng Nhanh",
-        shippingFee: 25000,
-        estimatedDays: "2-3 ngày",
-      },
-    ],
-  };
-
-  const mockShops: shopCard = {
-    id: "shop-001",
-    name: "TechWorld Official",
-    avatarUrl: "https://i.pravatar.cc/150?img=1",
-    isVerified: true,
-    rating: 4.9,
-    totalReviews: 12500,
-    totalSale: 1200,
-  };
+ 
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="product-detail-page">
       <div className="pd-top">
-        <ProductGallery images={product.thumbnailUrl} />
+        {/* <ProductGallery images={product.thumbnailUrl} /> */}
 
         <ProductInfo product={product} />
       </div>
 
       <div className="pd-shop-box">
         <div className="pd-shop-left">
-          <ShopCard shop={mockShops} />
+          <ShopCard shop={shop} />
         </div>
 
         <div className="pd-shop-right">

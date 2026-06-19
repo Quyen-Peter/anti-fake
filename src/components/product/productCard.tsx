@@ -17,7 +17,7 @@ export default function ProductCard({ product }: Props) {
       <div className="product-card">
         <div className="product-image-wrapper">
           <img
-            src={product.thumbnailUrl}
+            src={product.thumbnailUrl || "https://picsum.photos/600/400?random=1"}
             alt={product.title}
             className="product-image"
           />
@@ -32,7 +32,7 @@ export default function ProductCard({ product }: Props) {
 
           <h3 className="product-title">{product.title}</h3>
 
-          <div className="product-price">{formatPrice(product.price)}đ</div>
+          <div className="product-price">{formatPrice(product.price)} {product.currency}</div>
 
           <div className="product-meta">
             <span>
@@ -40,7 +40,7 @@ export default function ProductCard({ product }: Props) {
               Đã bán {formatSale(product.soldQuantity)}
             </span>
 
-            {product.verificationLevel === "standard" && (
+            {product.verificationLevel === "verified" && (
               <span className="verified">
                 <BadgeCheck size={14} />
                 Đã xác minh

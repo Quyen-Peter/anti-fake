@@ -1,16 +1,9 @@
 import { useEffect } from "react";
 import "../../css/pages/profile/userProfile.css";
+import { getUser } from "../../ultil/auth";
 
 export default function UserProfile() {
-  const user = {
-    username: "minhnguyen_antifake",
-    fullName: "Nguyễn Văn Minh",
-    email: "mi********@gmail.com",
-    phone: "********89",
-    gender: "Nam",
-    birthday: "15/06/1995",
-    avatar: "https://i.pravatar.cc/300?img=12",
-  };
+  const user = getUser();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,12 +20,12 @@ export default function UserProfile() {
         <div className="profile-info">
           <div className="profile-item">
             <span className="profile-label">Tên tài khoản</span>
-            <span>{user.username}</span>
+            <span>{user.displayName}</span>
           </div>
 
           <div className="profile-item">
             <span className="profile-label">Họ và tên</span>
-            <span>{user.fullName}</span>
+            <span>{user.displayName}</span>
           </div>
 
           <div className="profile-item">

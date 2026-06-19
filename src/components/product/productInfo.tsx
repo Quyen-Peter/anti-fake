@@ -1,5 +1,7 @@
 import { QrCode, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
 import { useState } from "react";
+import { addToCart } from "../../services/cart.api";
+import { toast } from "sonner";
 
 export default function ProductInfo({ product }: any) {
   const [quantity, setQuantity] = useState(
@@ -8,6 +10,19 @@ export default function ProductInfo({ product }: any) {
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
+
+  const handleAddToCart = async () => {
+    try {
+      const result = await addToCart(product.id, quantity);
+
+      console.log(result);
+
+      toast.success("Đã thêm vào giỏ hàng");
+    } catch (error) {
+      console.error(error);
+      toast.error("Thêm giỏ hàng thất bại");
+    }
+  };
 
   return (
     <div className="pd-info">
@@ -72,14 +87,16 @@ export default function ProductInfo({ product }: any) {
 
         {product.shippingMethods.map((item: any) => (
           <div key={item.providerName}>
-            <Truck size={20} /> {item.providerName} • {formatPrice(item.shippingFee)}đ •{" "}
-            {item.estimatedDays}
+            <Truck size={20} /> {item.providerName} •{" "}
+            {formatPrice(item.shippingFee)}đ • {item.estimatedDays}
           </div>
         ))}
       </div>
 
       <div className="pd-action-buttons">
-        <button className="pd-cart-btn"> <ShoppingCart size={20} /> Thêm vào giỏ hàng</button>
+        <button className="pd-cart-btn" onClick={handleAddToCart}>
+          <ShoppingCart size={20} /> Thêm vào giỏ hàng
+        </button>
 
         <button className="pd-buy-btn">Mua ngay</button>
       </div>

@@ -1,18 +1,36 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type Props = {
   subtotal: number;
   discount: number;
   total: number;
+  selectedShops: any[];
 };
 
-export default function CartSummary({ subtotal, discount, total }: Props) {
+export default function CartSummary({ subtotal, discount, total, selectedShops, }: Props) {
   const [showDetail, setShowDetail] = useState(false);
   const navigate = useNavigate();
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
+
+  
+    const handleCheckout = () => {
+    if (selectedShops.length === 0) {
+      toast.error("vui lòng chọn ít nhất một sản phẩm");
+      return;
+    }
+
+    navigate("/checkout", {
+      state: {
+        shops: selectedShops,
+      },
+    });
+  };
+
+
   return (
     <div className="cart-summary">
       <button className="detail-btn" onClick={() => setShowDetail(!showDetail)}>
@@ -30,30 +48,12 @@ export default function CartSummary({ subtotal, discount, total }: Props) {
           <span className="discount">-{formatPrice(discount)}đ</span>
         </div>
 
-        <div className="summary-row">
-          <span>Phí vận chuyển</span>
-          <span className="free">Miễn phí</span>
-        </div>
-
-        <hr />
       </div>
       <div className="summary-total">
         <span>Tổng cộng</span>
         <b>{formatPrice(total)}đ</b>
       </div>
-      <div className={`summary-detail ${showDetail ? "show" : ""}`}>
-        <div className="cart-bnt-payment">
-          <div className="coupon-box">
-            <label>MÃ GIẢM GIÁ</label>
-
-            <div className="coupon-input">
-              <input placeholder="Nhập mã..." />
-              <button>Áp dụng</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button className="checkout-btn" onClick={() => navigate("/checkout")}>
+      <button className="checkout-btn" onClick={handleCheckout}>
         Tiến hành thanh toán
       </button>
     </div>

@@ -159,6 +159,12 @@ export default function CartPage() {
     0,
   );
 
+  const selectedShops = cartShops
+    .map((shop) => ({
+      ...shop,
+      items: shop.items.filter((item: any) => item.selected),
+    }))
+    .filter((shop) => shop.items.length > 0);
   return (
     <div className="cart-page">
       <div className="cart-left">
@@ -195,7 +201,12 @@ export default function CartPage() {
       </div>
 
       <div className="cart-right">
-        <CartSummary subtotal={subtotal} discount={discount} total={total} />
+        <CartSummary
+          subtotal={subtotal}
+          discount={discount}
+          total={total}
+          selectedShops={selectedShops}
+        />
       </div>
     </div>
   );

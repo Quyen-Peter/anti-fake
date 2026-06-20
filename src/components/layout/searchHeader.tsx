@@ -3,30 +3,54 @@ import "../../css/components/layout/searchHeader.css";
 import SearchSidebar from "./searchSidebar";
 import { useState } from "react";
 
-export default function SearchHeader() {
+interface Props {
+  sortType: string;
+  setSortType: (value: string) => void;
+}
+
+export default function SearchHeader({ sortType, setSortType }: Props) {
   const [showFilter, setShowFilter] = useState(false);
   const [priceSort, setPriceSort] = useState<"none" | "asc" | "desc">("none");
+  
   const handlePriceSort = () => {
-    setPriceSort((prev) => {
-      if (prev === "none") return "asc";
-      if (prev === "asc") return "desc";
-      return "none";
-    });
+    if (priceSort === "none") {
+      setPriceSort("asc");
+      setSortType("priceAsc");
+    } else if (priceSort === "asc") {
+      setPriceSort("desc");
+      setSortType("priceDesc");
+    } else {
+      setPriceSort("none");
+      setSortType("all");
+    }
   };
-  //   const handleNewest = () => {
-  //   setPriceSort("none");
-  //   setSortType("newest");
-  // };
+
+
   return (
     <div className="search-header">
       <button className="filter-btn" onClick={() => setShowFilter(true)}>
         <SlidersHorizontal size={18} />
       </button>
       <div className="search-sort">
-        <button className="active">Tất cả</button>
-        <button>Mới nhất</button>
+        <button
+          className={sortType === "all" ? "active" : ""}
+          onClick={() => setSortType("all")}
+        >
+          Tất cả
+        </button>
+        <button
+          className={sortType === "newest" ? "active" : ""}
+          onClick={() => setSortType("newest")}
+        >
+          Mới nhất
+        </button>
 
-        <button>Bán chạy</button>
+        <button
+          className={sortType === "bestSelling" ? "active" : ""}
+          onClick={() => setSortType("bestSelling")}
+        >
+          Bán chạy
+        </button>
         <div className="price-sort">
           <button
             className={priceSort !== "none" ? "active" : ""}
@@ -39,8 +63,18 @@ export default function SearchHeader() {
         </div>
 
         <div className="price-dropdown">
-          <button>Giá thấp → cao</button>
-          <button>Giá cao → thấp</button>
+          <button
+            className={sortType === "priceAsc" ? "active" : ""}
+            onClick={() => setSortType("priceAsc")}
+          >
+            Giá ↑
+          </button>
+          <button
+            className={sortType === "priceDesc" ? "active" : ""}
+            onClick={() => setSortType("priceDesc")}
+          >
+            Giá ↓
+          </button>
         </div>
       </div>
       {showFilter && (

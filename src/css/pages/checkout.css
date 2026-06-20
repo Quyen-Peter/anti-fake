@@ -188,7 +188,7 @@
 }
 
 .summary-row,
-.summary-total {
+.summary-total-checkout {
   display: flex;
   justify-content: space-between;
   margin-top: 14px;
@@ -198,12 +198,12 @@
   color: #d32f2f;
 }
 
-.summary-total {
+.summary-total-checkout {
   border-top: 1px solid #eee;
   padding-top: 18px;
 }
 
-.summary-total strong {
+.summary-total-checkout strong {
   color: #b00020;
   font-size: 20px;
 }
@@ -260,6 +260,13 @@
   }
   .product-info {
     padding: 5px;
+  }
+  .checkout-product img {
+    width: 50px;
+    height: 50px;
+  }
+  .product-info h4 {
+    font-size: 14px;
   }
 }
 

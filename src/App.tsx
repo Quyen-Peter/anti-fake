@@ -25,6 +25,7 @@ import ProtectedRoute from "./routes/protectedRoute";
 import AuthPage from "./pages/auth";
 import LiveRoomPage from "./pages/live";
 import CheckoutPage from "./pages/checkout";
+import OrderSuccessPage from "./components/checkout/orderSuccessPage";
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
             </Route>
             <Route path="/live/:id" element={<LiveRoomPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/order-success" element={<OrderSuccessPage />} />
           </Routes>
         </div>
       </div>

@@ -17,7 +17,6 @@ export const fetchCategories = async () => {
     throw new Error("Lấy danh mục thất bại");
   }
   const data = await response.json();
-  console.log("Fetched categories:", data);
   return data;
 
 };

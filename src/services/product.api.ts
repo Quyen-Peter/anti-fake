@@ -1,5 +1,15 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+
+interface SearchParams {
+  q?: string;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  pageSize?: number;
+}
+
 export const fetchOffers = async (page: number, pageSize: number) => {
   try {
     const response = await fetch(
@@ -40,5 +50,42 @@ export const fetchOfferDetail = async (id: string) => {
   }
 
   const data = response.json();
+  return data;
+};
+
+export const searchOffers = async ({
+  q,
+  categoryId,
+  minPrice,
+  maxPrice,
+  page = 1,
+  pageSize = 20,
+}: SearchParams = {}) => {
+  const params = new URLSearchParams();
+
+  if (q) params.append("q", q);
+  if (categoryId) params.append("categoryId", String(categoryId));
+  if (minPrice !== undefined)
+    params.append("minPrice", String(minPrice));
+  if (maxPrice !== undefined)
+    params.append("maxPrice", String(maxPrice));
+
+  params.append("page", String(page));
+  params.append("pageSize", String(pageSize));
+
+  const response = await fetch(
+    `${BASE_URL}/api/products/offers?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Không thể tải danh sách sản phẩm");
+  }
+  const data = response.json()
   return data;
 };

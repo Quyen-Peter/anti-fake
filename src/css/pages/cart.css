@@ -193,7 +193,6 @@
 }
 
 .summary-total {
-  margin-top: 20px;
   font-size: 21px;
   font-weight: 700;
   color: #c8102e;
@@ -314,7 +313,6 @@
   }
   .summary-total {
     font-size: 17px;
-    margin-top: 10px;
   }
   .detail-btn {
     display: block;

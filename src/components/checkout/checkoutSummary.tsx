@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   subtotal: number;
@@ -13,6 +13,8 @@ export default function CheckoutSummary({
   discount,
   total,
 }: Props) {
+  const navigate = useNavigate();
+
   return (
     <div className="summary-card">
       <h3>Tóm tắt đơn hàng</h3>
@@ -38,15 +40,17 @@ export default function CheckoutSummary({
         <span>-{discount.toLocaleString()}đ</span>
       </div>
 
-      <div className="summary-total">
+      <div className="summary-total-checkout">
         <span>Tổng cộng</span>
 
         <strong>{total.toLocaleString()}đ</strong>
       </div>
 
-      <button className="checkout-btn">
+      <button
+        className="checkout-btn"
+        onClick={() => navigate("/order-success")}
+      >
         Đặt hàng
-        <ArrowRight size={18} />
       </button>
     </div>
   );

@@ -50,6 +50,11 @@
   color: #e53935;
 }
 
+.s-category-item.active {
+  color: #c1121f;
+  font-weight: 600;
+}
+
 .s-category-item span {
   font-size: 14px;
   font-weight: 500;
@@ -70,7 +75,7 @@
   font-size: 14px;
 }
 
-.filter-section input[type="checkbox"] {
+.filter-section input[type="radio"] {
   width: 16px;
   height: 16px;
 }
@@ -154,7 +159,7 @@
   .filter-section label {
     font-size: 12px;
   }
-  .filter-section input[type="checkbox"] {
+  .filter-section input[type="radio"] {
     width: 14px;
     height: 14px;
   }

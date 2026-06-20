@@ -1,5 +1,3 @@
-// components/checkout/CheckoutShipping.tsx
-
 import { Truck } from "lucide-react";
 
 interface Props {

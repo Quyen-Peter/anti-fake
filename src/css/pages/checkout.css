@@ -256,6 +256,12 @@
   .shipping-list {
     flex-direction: column;
   }
+  .checkout-product {
+    gap: 5px;
+  }
+  .product-info {
+    padding: 5px;
+}
 }
 
 /* Tablet */

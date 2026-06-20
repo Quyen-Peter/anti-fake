@@ -2,13 +2,14 @@ import { useState } from "react";
 import { ShieldCheck } from "lucide-react";
 
 import "../../css/pages/checkout.css";
+
+import { useLocation } from "react-router-dom";
+import type { CheckoutShop } from "../../type/checkout";
 import CheckoutAddress from "../../components/checkout/checkoutAddress";
 import CheckoutProducts from "../../components/checkout/CheckoutProducts";
 import CheckoutShipping from "../../components/checkout/CheckoutShipping";
 import CheckoutPayment from "../../components/checkout/checkoutPayment";
 import CheckoutSummary from "../../components/checkout/checkoutSummary";
-import { useLocation } from "react-router-dom";
-import type { CheckoutShop } from "../../type/checkout";
 
 export default function CheckoutPage() {
   const [shipping, setShipping] = useState("fast");

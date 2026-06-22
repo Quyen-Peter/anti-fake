@@ -3,7 +3,6 @@ import {
   MapPin,
   ShoppingBag,
   QrCode,
-  ShieldAlert,
   Settings,
   LogOut,
   Menu,

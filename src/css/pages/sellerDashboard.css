@@ -1,0 +1,197 @@
+.seller-dashboard {
+  padding: 20px;
+  padding-top: 60px;
+}
+
+.seller-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+}
+
+.seller-stat-card,
+.seller-chart-card,
+.seller-top-card,
+.seller-orders-card {
+  background: #fff;
+  border: 1px solid #eadede;
+  border-radius: 16px;
+}
+
+.seller-stat-card {
+  padding: 13px;
+}
+
+.seller-stat-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.seller-stat-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff1f1;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #c91c1c;
+}
+
+.seller-stat-change {
+  color: #16a34a;
+  font-size: 13px;
+}
+
+.seller-dashboard-middle {
+  margin-top: 18px;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+}
+
+.seller-chart-card {
+  padding: 20px;
+}
+
+.seller-top-card {
+  padding: 20px;
+}
+
+.seller-top-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.seller-top-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.seller-top-info {
+  flex: 1;
+}
+
+.seller-top-info h4 {
+  margin: 0;
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.seller-top-info span {
+  font-size: 12px;
+  color: #888;
+}
+
+.seller-orders-card {
+  margin-top: 18px;
+  padding: 20px;
+}
+
+.seller-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.seller-orders-table th,
+.seller-orders-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.seller-status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f4f0ff;
+  color: #722ed1;
+  font-size: 12px;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .seller-dashboard {
+    padding: 10px;
+    padding-top: 60px;
+  }
+  .seller-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .seller-dashboard-middle {
+    margin-top: 18px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .seller-chart-card {
+    padding-left: 0px;
+    padding-right: 2px;
+  }
+  .seller-card-header {
+    padding-left: 20px;
+    padding-bottom: 5px;
+  }
+  .seller-action-recent-order {
+    display: none;
+  }
+  .seller-orders-card {
+    padding: 10px;
+  }
+  .seller-orders-table th,
+  .seller-orders-table td {
+    font-size: 13px;
+    padding: 6px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  .seller-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+  .seller-dashboard-middle {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+  .seller-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+  .seller-dashboard-middle {
+    margin-top: 18px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

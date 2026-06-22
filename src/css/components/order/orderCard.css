@@ -1,4 +1,4 @@
-.order-card {
+.order-card-user {
   background: #fff;
   border: 1px solid #ececec;
   border-radius: 18px;
@@ -6,7 +6,7 @@
   margin-bottom: 15px;
 }
 
-.order-header {
+.order-header-user {
   display: flex;
   justify-content: space-between;
   align-items: center;

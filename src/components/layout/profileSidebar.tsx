@@ -7,6 +7,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  Store,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import "../../css/components/layout/profileSidebar.css";
@@ -35,9 +36,9 @@ const menus = [
     icon: QrCode,
   },
   {
-    label: "Báo cáo hàng giả",
-    path: "/profile/report",
-    icon: ShieldAlert,
+    label: "Cửa hàng của tôi",
+    path: "/seller/dashboard",
+    icon: Store,
   },
   {
     label: "Cài đặt tài khoản",

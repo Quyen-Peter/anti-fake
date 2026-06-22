@@ -12,8 +12,8 @@ export default function OrderCard({ order }: Props) {
     new Intl.NumberFormat("vi-VN").format(price);
 
   return (
-    <div className="order-card">
-      <div className="order-header">
+    <div className="order-card-user">
+      <div className="order-header-user">
         <span className="order-code">#{order.orderCode}</span>
 
         <span className="order-status">{order.status}</span>

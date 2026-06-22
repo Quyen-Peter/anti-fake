@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Header from "./components/layout/header";
 import HomePage from "./pages/home";
 import CommunityPage from "./pages/community";
 import ProfilePage from "./pages/profile";
@@ -26,62 +25,75 @@ import AuthPage from "./pages/auth";
 import LiveRoomPage from "./pages/live";
 import CheckoutPage from "./pages/checkout";
 import OrderSuccessPage from "./components/checkout/orderSuccessPage";
+import MainLayout from "./layouts/mainLayout";
+import SellerLayout from "./layouts/sellerLayout";
+import SellerDashboard from "./seller/dashboard";
 
 function App() {
   return (
     <BrowserRouter>
       <div>
-        <Header />
         <Toaster richColors position="top-center" />
         <div className="app-container">
           <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/community" element={<CommunityPage />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<UserProfile />} />
-              <Route path="orders" element={<OrdersPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="/profile/orders/:id" element={<OrderDetailPage />} />
+            {/* USER */}
+            <Route element={<MainLayout />}>
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/community" element={<CommunityPage />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<UserProfile />} />
+                <Route path="orders" element={<OrdersPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route
+                  path="/profile/orders/:id"
+                  element={<OrderDetailPage />}
+                />
+              </Route>
+              <Route path="/affiliate" element={<AffiliatePage />} />
+              <Route
+                path="/cart"
+                element={
+                  <ProtectedRoute>
+                    <CartPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/notification" element={<NotificationPage />} />
+              <Route
+                path="/messages"
+                element={
+                  <ProtectedRoute>
+                    <MessagePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/messages/:roomId" element={<MessagePage />} />
+              <Route path="/qr" element={<QRPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/shop/:id" element={<ShopPage />}>
+                <Route index element={<ShopReviews />} />
+                <Route path="products" element={<ShopProducts />} />
+                <Route path="categories" element={<ShopCategories />} />
+              </Route>
+              <Route path="/live/:id" element={<LiveRoomPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/order-success" element={<OrderSuccessPage />} />
             </Route>
-            <Route path="/affiliate" element={<AffiliatePage />} />
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <CartPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/notification" element={<NotificationPage />} />
-            <Route
-              path="/messages"
-              element={
-                <ProtectedRoute>
-                  <MessagePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/messages/:roomId" element={<MessagePage />} />
-            <Route path="/qr" element={<QRPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/wishlist" element={<WishlistPage />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/shop/:id" element={<ShopPage />}>
-              <Route index element={<ShopReviews />} />
-              <Route path="products" element={<ShopProducts />} />
-              <Route path="categories" element={<ShopCategories />} />
+
+            {/* seller */}
+            <Route path="/seller" element={<SellerLayout />}>
+              <Route path="dashboard" element={<SellerDashboard />} />
             </Route>
-            <Route path="/live/:id" element={<LiveRoomPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/order-success" element={<OrderSuccessPage />} />
           </Routes>
         </div>
       </div>

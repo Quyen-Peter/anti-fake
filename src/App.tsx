@@ -28,6 +28,7 @@ import OrderSuccessPage from "./components/checkout/orderSuccessPage";
 import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
 import SellerDashboard from "./seller/dashboard";
+import ProductManagement from "./seller/productManagement";
 
 function App() {
   return (
@@ -93,6 +94,7 @@ function App() {
             {/* seller */}
             <Route path="/seller" element={<SellerLayout />}>
               <Route path="dashboard" element={<SellerDashboard />} />
+              <Route path="products" element={<ProductManagement />} />
             </Route>
           </Routes>
         </div>

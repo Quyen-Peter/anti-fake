@@ -1,0 +1,277 @@
+.seller-product-card {
+  background: #fff;
+  border: 1px solid #f1dada;
+  border-radius: 18px;
+  padding: 18px;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.seller-product-card:hover {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.seller-product-card-top {
+  display: flex;
+  gap: 18px;
+}
+
+.seller-product-card-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.seller-product-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.seller-product-card-header h3 {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-product-card-meta {
+  margin-top: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.seller-product-card-sku {
+  background: #fff0f0;
+  color: #555;
+
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  font-size: 14px;
+}
+
+.seller-product-card-category {
+  color: #666;
+  font-size: 15px;
+}
+
+.seller-product-card-price {
+  margin-top: 14px;
+
+  color: #b00020;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.seller-product-card-footer {
+  margin-top: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.seller-product-card-stock {
+  font-size: 16px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+/* STATUS */
+
+.seller-product-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 120px;
+
+  padding: 8px 16px;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Trên kệ */
+
+.seller-product-status-active {
+  background: #dff7e5;
+  color: #138a36;
+}
+
+/* Còn ít */
+
+.seller-product-status-low {
+  background: #fff0c7;
+  color: #b26a00;
+}
+
+/* Đang xét duyệt */
+
+.seller-product-status-review {
+  background: #dce8ff;
+  color: #165dff;
+}
+
+/* Không thành công */
+
+.seller-product-status-failed {
+  background: #ffdcdc;
+  color: #e53935;
+}
+
+/* Đã vô hiệu hóa */
+
+.seller-product-status-disabled {
+  background: #efefef;
+  color: #666;
+}
+
+/* ACTION */
+
+.seller-product-card-actions {
+  margin-top: 18px;
+  padding-top: 18px;
+
+  border-top: 1px solid #f1dada;
+
+  display: flex;
+  gap: 12px;
+}
+
+.seller-product-action-btn {
+  flex: 1;
+
+  height: 50px;
+
+  border: 1px solid #f1dada;
+  border-radius: 12px;
+
+  background: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-product-action-btn:hover {
+  background: #fafafa;
+}
+
+.seller-product-delete-btn {
+  width: 70px;
+  height: 50px;
+
+  border: 1px solid #f1dada;
+  border-radius: 12px;
+
+  background: #fff;
+  color: #c1121f;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-product-delete-btn:hover {
+  background: #fff3f3;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .seller-product-card-top {
+    gap: 8px;
+  }
+  .seller-product-card-image {
+    width: 70px;
+    height: 70px;
+  }
+  .seller-product-card-header h3 {
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .seller-product-card-meta {
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .seller-product-card-sku {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .seller-product-card-category {
+    font-size: 14px;
+  }
+  .seller-product-card-price {
+    margin-top: 13px;
+    font-size: 18px;
+  }
+  .seller-product-card-footer {
+    margin-top: 13px;
+  }
+
+  .seller-product-card-stock {
+    font-size: 14px;
+  }
+
+  .seller-product-status {
+    padding: 6px 10px;
+  }
+  .seller-product-card-actions {
+    margin-top: 10px;
+    padding-top: 10px;
+    gap: 10px;
+  }
+
+  .seller-product-action-btn {
+    height: 30px;
+    border-radius: 10px;
+    gap: 8px;
+  }
+  .seller-product-delete-btn {
+    width: 70px;
+    height: 30px;
+    border-radius: 10px;
+  }
+  .seller-product-card {
+    border-radius: 15px;
+    padding: 8px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import "../../css/components/layout/sellerHeader.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 export default function SellerHeader() {
   const navigate = useNavigate();
@@ -28,30 +28,65 @@ export default function SellerHeader() {
         </div>
 
         <nav className="seller-header-menu">
-          <a className="seller-header-menu-item seller-header-menu-item-active">
+          <NavLink
+            to="dashboard"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
-          </a>
+          </NavLink>
 
-          <a className="seller-header-menu-item">
+          <NavLink
+            to="products"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
             <Package size={18} />
             <span>Sản phẩm</span>
-          </a>
+          </NavLink>
 
-          <a className="seller-header-menu-item">
+          <NavLink
+            to="orders"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
             <ShoppingCart size={18} />
             <span>Đơn hàng</span>
-          </a>
+          </NavLink>
 
-          <a className="seller-header-menu-item">
+          <NavLink
+            to="wallet"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
             <Wallet size={18} />
             <span>Ví</span>
-          </a>
+          </NavLink>
 
-          <a className="seller-header-menu-item">
+          <NavLink
+            to="statistics"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
             <BarChart3 size={18} />
             <span>Thống kê</span>
-          </a>
+          </NavLink>
         </nav>
       </div>
 

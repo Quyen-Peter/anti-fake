@@ -47,7 +47,7 @@
 
 .seller-dashboard-middle {
   margin-top: 18px;
-
+  margin-bottom: 20px;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 15px;
@@ -95,30 +95,15 @@
 
 .seller-orders-card {
   margin-top: 18px;
-  padding: 20px;
+  padding: 10px;
+}
+
+.seller-orders-card h3{
+  margin-left: 10px;
 }
 
 
 
-.seller-orders-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.seller-orders-table th,
-.seller-orders-table td {
-  padding: 14px;
-  border-bottom: 1px solid #eee;
-  text-align: left;
-}
-
-.seller-status {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #f4f0ff;
-  color: #722ed1;
-  font-size: 12px;
-}
 
 /* Mobile */
 @media (max-width: 576px) {
@@ -152,11 +137,7 @@
   .seller-orders-card {
     padding: 10px;
   }
-  .seller-orders-table th,
-  .seller-orders-table td {
-    font-size: 14px;
-    padding: 10px 6px;
-  }
+ 
   .seller-stat-icon {
     width: 35px;
     height: 35px;

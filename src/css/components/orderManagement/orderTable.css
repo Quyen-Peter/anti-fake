@@ -1,0 +1,99 @@
+.seller-order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.seller-order-table th {
+  text-align: left;
+  padding: 14px;
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.seller-order-table td {
+  padding: 18px 14px;
+  border-top: 1px solid #f1f1f1;
+}
+
+.seller-order-id {
+  color: #b00020;
+  font-weight: 600;
+}
+
+.seller-order-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seller-order-customer .avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  background: #ffe8e8;
+  color: #b00020;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+}
+
+.seller-order-customer h4 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.seller-order-customer span {
+  color: #999;
+  font-size: 12px;
+}
+
+
+.seller-order-table-actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* STATUS */
+
+.seller-order-status-processing,
+.seller-order-status-shipping,
+.seller-order-status-completed,
+.seller-order-status-cancelled {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seller-order-status-processing {
+  background: #f4f0ff;
+  color: #722ed1;
+}
+
+.seller-order-status-shipping {
+  background: #e6f7ff;
+  color: #08979c;
+}
+
+.seller-order-status-completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.seller-order-status-cancelled {
+  background: #fff1f0;
+  color: #cf1322;
+}
+
+.seller-order-empty {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 15px;
+}

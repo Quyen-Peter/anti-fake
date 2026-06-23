@@ -1,0 +1,29 @@
+.seller-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 24px;
+}
+
+.seller-pagination button {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  background: white;
+  cursor: pointer;
+}
+
+.seller-pagination button.active {
+  background: #8b0016;
+  color: white;
+  border-color: #8b0016;
+}
+
+.seller-pagination span {
+  color: #888;
+}

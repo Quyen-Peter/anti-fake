@@ -1,0 +1,84 @@
+.seller-order-page {
+  padding: 24px;
+  padding-top: 60px;
+}
+
+.seller-order-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.seller-order-top h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.seller-order-top p {
+  margin-top: 6px;
+  color: #666;
+}
+
+.seller-order-table-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #eee;
+  padding: 20px;
+}
+.seller-mobile-orders-card {
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .seller-order-page {
+    padding: 10px;
+    padding-top: 60px;
+  }
+  .seller-order-table-card {
+    padding: 10px;
+  }
+  .seller-mobile-orders-card {
+    display: block;
+  }
+  .seller-laptop-orders-table {
+    display: none;
+  }
+  .seller-order-top h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  .seller-order-page {
+    padding: 10px;
+    padding-top: 60px;
+  }
+  .seller-order-table-card {
+    padding: 10px;
+  }
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+  .seller-order-page {
+    padding: 10px;
+    padding-top: 60px;
+  }
+  .seller-order-table-card {
+    padding: 10px;
+  }
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

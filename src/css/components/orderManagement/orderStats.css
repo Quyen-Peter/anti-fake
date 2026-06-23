@@ -1,0 +1,75 @@
+.seller-order-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.seller-order-stat-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 15px;
+}
+
+.seller-order-stat-card .icon {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff0f0;
+  color: #8b0016;
+}
+
+.seller-order-stat-card span {
+  display: block;
+  margin-top: 14px;
+  color: #777;
+  font-size: 14px;
+}
+
+.seller-order-stat-card h2 {
+  margin: 10px 0 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .seller-order-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .seller-order-stat-card .icon {
+    width: 40px;
+    height: 40px;
+  }
+  .seller-order-stat-card h2 {
+    margin: 10px 0 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

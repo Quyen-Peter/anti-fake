@@ -29,6 +29,7 @@ import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
 import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
+import OrderManagement from "./seller/orderManagement";
 
 function App() {
   return (
@@ -95,6 +96,7 @@ function App() {
             <Route path="/seller" element={<SellerLayout />}>
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<ProductManagement />} />
+               <Route path="orders" element={<OrderManagement />} />
             </Route>
           </Routes>
         </div>

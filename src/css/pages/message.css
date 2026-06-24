@@ -270,7 +270,7 @@
   background: #fafafa;
 }
 
-.chat-message {
+.chat-message-community {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -313,6 +313,7 @@
   border-radius: 12px;
   display: block;
 }
+
 
 .chat-meta {
   display: flex;

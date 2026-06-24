@@ -1,0 +1,78 @@
+.wallet-balance-card {
+  background: #fff;
+  border: 1px solid #f0e4e4;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hình tròn nền mờ bên phải */
+.wallet-balance-card::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: #f7f0f0;
+  border-radius: 50%;
+  top: -60px;
+  right: -80px;
+}
+
+.wallet-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #8f8f8f;
+  text-transform: uppercase;
+}
+
+.wallet-balance-card h2 {
+  margin: 12px 0 28px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #c40018;
+  position: relative;
+  z-index: 1;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.withdraw-btn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: all 0.25s ease;
+}
+
+.withdraw-btn {
+  background: #c40018;
+  color: #fff;
+}
+
+.withdraw-btn:hover {
+  background: #a70014;
+  transform: translateY(-2px);
+}
+
+
+.withdraw-btn svg {
+  flex-shrink: 0;
+}

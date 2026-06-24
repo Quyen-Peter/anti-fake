@@ -4,17 +4,32 @@ import ProductSpecification from "../../components/product/productSpecification"
 import "../../css/pages/productDetail.css";
 import Review from "../../components/product/review";
 import ShopCard from "../../components/shop/shopCard";
-import { MessageCircle, Store } from "lucide-react";
+import { MessageCircle, Star, Store } from "lucide-react";
 import { fetchOfferDetail } from "../../services/product.api";
 import { useParams } from "react-router-dom";
 import { fetchShopByOffer } from "../../services/shop.api";
 import LoadingOverlay from "../../components/loadingOverlay";
+import ProductGallery from "../../components/product/productGallery";
+import { fetchOfferReviews } from "../../services/review.api";
+
+type ReviewItem = {
+  id: string;
+  authorName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  media: string[];
+};
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("description");
   const [product, setProduct] = useState<any>();
   const [shop, setShop] = useState<any>();
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReview, setTotalReview] = useState(0);
+  const [loadingReviews, setLoadingReviews] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -43,7 +58,25 @@ export default function ProductDetail() {
       }
     };
 
+    const loadReviews = async () => {
+      try {
+        setLoadingReviews(true);
+
+        const data = await fetchOfferReviews(id);
+
+        setReviews(data.items || []);
+        setAverageRating(data.averageRating || 0);
+        setTotalReview(data.total || 0);
+      } catch (error) {
+        console.error(error);
+        setReviews([]);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+
     loadShop();
+    loadReviews();
     loadProduct();
   }, [id]);
 
@@ -52,14 +85,17 @@ export default function ProductDetail() {
   }, []);
 
   if (!product) {
-    return <div><LoadingOverlay /></div>;
+    return (
+      <div>
+        <LoadingOverlay />
+      </div>
+    );
   }
 
   return (
     <div className="product-detail-page">
-
       <div className="pd-top">
-        {/* <ProductGallery images={product.thumbnailUrl} /> */}
+        <ProductGallery images={product.imageUrls} />
 
         <ProductInfo product={product} />
       </div>
@@ -96,7 +132,8 @@ export default function ProductDetail() {
               className={`pd-tab ${activeTab === "review" ? "active" : ""}`}
               onClick={() => setActiveTab("review")}
             >
-              Đánh giá
+              Đánh giá ({totalReview}){averageRating.toFixed(1)}
+              <Star size={14} style={{ margin: "0 4px" }} />
             </button>
           </div>
           <div className="pd-tabs-content">
@@ -108,7 +145,9 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {activeTab === "review" && <Review productId={product.id} />}
+            {activeTab === "review" && (
+              <Review reviews={reviews} loading={loadingReviews} />
+            )}
           </div>
         </div>
         <ProductSpecification product={product} />

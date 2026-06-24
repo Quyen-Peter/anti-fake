@@ -1,0 +1,193 @@
+.wallet-table-card {
+  background: #fff;
+  border: 1px solid #f0e4e4;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* HEADER */
+
+.wallet-table-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #f4e8e8;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wallet-table-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* FILTER */
+
+.wallet-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.wallet-filters button {
+  height: 38px;
+  padding: 0 14px;
+
+  border: 1px solid #eadede;
+  border-radius: 8px;
+
+  background: #fff;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wallet-filters button:hover {
+  border-color: #c40018;
+  color: #c40018;
+}
+
+/* TABLE */
+
+.wallet-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wallet-table thead {
+  background: #faf6f6;
+}
+
+.wallet-table th {
+  padding: 14px 18px;
+  text-align: left;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.wallet-table td {
+  padding: 16px 18px;
+  border-top: 1px solid #f4eeee;
+
+  font-size: 14px;
+  color: #333;
+}
+
+.wallet-table tbody tr:hover {
+  background: #fcf8f8;
+}
+
+/* LOẠI GIAO DỊCH */
+
+.wallet-table td:nth-child(3) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* TIỀN */
+
+.wallet-table td:nth-child(4) {
+  font-weight: 600;
+}
+
+.wallet-table td:nth-child(4):has(+ td .success) {
+  color: #0ea75a;
+}
+
+.wallet-table td:nth-child(4):has(+ td .processing),
+.wallet-table td:nth-child(4):has(+ td .failed) {
+  color: #d32f2f;
+}
+
+/* STATUS */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.success {
+  background: #e8fff1;
+  color: #18a957;
+}
+
+.status.processing {
+  background: #fff5df;
+  color: #f59e0b;
+}
+
+.status.failed {
+  background: #ffe9e9;
+  color: #e53935;
+}
+
+/* PAGINATION */
+
+.wallet-pagination {
+  padding: 18px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  border-top: 1px solid #f4eeee;
+}
+
+.wallet-pagination button {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #eadede;
+  border-radius: 8px;
+
+  background: #fff;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.wallet-pagination button:hover {
+  border-color: #c40018;
+  color: #c40018;
+}
+
+.wallet-pagination .active {
+  background: #c40018;
+  color: #fff;
+  border-color: #c40018;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .wallet-table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .wallet-filters {
+    flex-wrap: wrap;
+  }
+
+  .wallet-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

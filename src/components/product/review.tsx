@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../../css/components/product/review.css";
 import { Star } from "lucide-react";
 
-type Props = {
-  productId: string;
-};
-
 type ReviewItem = {
   id: string;
-  userName: string;
+  authorName: string;
   rating: number;
   comment: string;
   createdAt: string;
+  media: string[];
 };
 
-export default function Review({ productId }: Props) {
-  const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = {
+  reviews: ReviewItem[];
+  loading: boolean;
+};
+
+export default function Review({ reviews, loading }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -26,73 +26,6 @@ export default function Review({ productId }: Props) {
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
-
-  const mockReviews: ReviewItem[] = [
-    {
-      id: "1",
-      userName: "Nguyễn Văn Hùng",
-      rating: 5,
-      comment:
-        "Sản phẩm rất tốt, đóng gói cẩn thận, giao hàng nhanh hơn dự kiến. Sẽ tiếp tục ủng hộ shop.",
-      createdAt: "12/06/2026",
-    },
-    {
-      id: "2",
-      userName: "Trần Thị Mai",
-      rating: 4,
-      comment: "Chất lượng ổn, dùng khá thích. Giá hợp lý so với thị trường.",
-      createdAt: "11/06/2026",
-    },
-    {
-      id: "3",
-      userName: "Lê Quốc Bảo",
-      rating: 5,
-      comment: "Đúng mô tả, hàng chính hãng. Shop hỗ trợ nhiệt tình.",
-      createdAt: "10/06/2026",
-    },
-    {
-      id: "4",
-      userName: "Phạm Minh Anh",
-      rating: 5,
-      comment: "Mình mua lần thứ 2 rồi. Chất lượng vẫn rất tốt.",
-      createdAt: "08/06/2026",
-    },
-    {
-      id: "5",
-      userName: "Đỗ Thanh Tùng",
-      rating: 3,
-      comment: "Sản phẩm ổn nhưng giao hàng hơi chậm.",
-      createdAt: "05/06/2026",
-    },
-    {
-      id: "6",
-      userName: "Đỗ Thanh Tùng",
-      rating: 3,
-      comment: "Sản phẩm ổn nhưng giao hàng hơi chậm.",
-      createdAt: "05/06/2026",
-    },
-    {
-      id: "7",
-      userName: "Phạm Minh Anh",
-      rating: 5,
-      comment: "Mình mua lần thứ 2 rồi. Chất lượng vẫn rất tốt.",
-      createdAt: "08/06/2026",
-    },
-  ];
-
-  useEffect(() => {
-    fetchReviews();
-  }, [productId]);
-
-  const fetchReviews = async () => {
-    try {
-      setReviews(mockReviews);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return <div className="pd-review-loading">Đang tải đánh giá...</div>;
@@ -109,7 +42,7 @@ export default function Review({ productId }: Props) {
       {paginatedReviews.map((item) => (
         <div key={item.id} className="pd-review-item">
           <div className="pd-review-top">
-            <strong>{item.userName}</strong>
+            <strong>{item.authorName}</strong>
 
             <div className="pd-review-rating">
               {[...Array(5)].map((_, index) => (
@@ -124,10 +57,22 @@ export default function Review({ productId }: Props) {
           </div>
 
           <p>{item.comment}</p>
-
-          <span>{item.createdAt}</span>
+          {item.media?.length > 0 && (
+            <div className="pd-review-media">
+              {item.media.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`review-${index}`}
+                  className="pd-review-image"
+                />
+              ))}
+            </div>
+          )}
+          <span>{new Date(item.createdAt).toLocaleDateString("vi-VN")}</span>
         </div>
       ))}
+
       {totalPages > 1 && (
         <div className="pd-pagination">
           <button

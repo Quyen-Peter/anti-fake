@@ -1,8 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const fetchCategories = async () => {
+export const fetchOfferReviews = async (
+  offerId: string
+) => {
   const response = await fetch(
-    `${BASE_URL}/api/categories`,
+    `${BASE_URL}/api/offers/${offerId}/reviews`,
     {
       method: "GET",
       headers: {
@@ -11,12 +13,9 @@ export const fetchCategories = async () => {
     }
   );
 
-  
-
   if (!response.ok) {
-    throw new Error("Lấy danh mục thất bại");
+    throw new Error("Lấy đánh giá thất bại");
   }
-  const data = await response.json();
+ const data = response.json();
   return data;
-
 };

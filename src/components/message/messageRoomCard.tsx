@@ -1,13 +1,13 @@
-import { BadgeCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
-
-import type { MessageRoom } from "../../type/message";
+import type { ChatRoom } from "../../type/message";
 
 type Props = {
-  room: MessageRoom;
+  room: ChatRoom;
 };
 
 export default function MessageRoomCard({ room }: Props) {
+  const latestMessage = room.lastMessage?.[0];
+
   return (
     <NavLink
       to={`/messages/${room.id}`}
@@ -18,38 +18,53 @@ export default function MessageRoomCard({ room }: Props) {
       }
     >
       <div className="message-room-avatar">
-        <img src={room.avatar} alt="" />
+        {/* TODO: Backend chưa trả avatar */}
+        <img
+          src="https://i.pravatar.cc/150?img=12"
+          alt={room.chatUserName}
+        />
 
-        {room.isOnline && (
+        {/* TODO: Backend chưa trả trạng thái online */}
+        {/* {room.isOnline && (
           <span className="online-dot" />
-        )}
+        )} */}
       </div>
 
       <div className="message-room-content">
         <div className="message-room-top">
           <div className="message-room-name">
-            <span>{room.shopName}</span>
+            <span>{room.chatUserName}</span>
 
-            {room.isVerified && (
+            {/* TODO: Backend chưa trả verified */}
+            {/* {room.isVerified && (
               <BadgeCheck size={14} />
-            )}
+            )} */}
           </div>
 
           <span className="message-room-time">
-            {room.lastTime}
+            {latestMessage
+              ? new Date(
+                  latestMessage.sentAt
+                ).toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : ""}
           </span>
         </div>
 
         <div className="message-room-bottom">
           <span className="message-room-last-message">
-            {room.lastMessage}
+            {latestMessage?.body ||
+              "Chưa có tin nhắn"}
           </span>
 
-          {room.unreadCount > 0 && (
+          {/* TODO: Backend chưa trả unreadCount */}
+          {/* {room.unreadCount > 0 && (
             <span className="message-room-unread">
               {room.unreadCount}
             </span>
-          )}
+          )} */}
         </div>
       </div>
     </NavLink>

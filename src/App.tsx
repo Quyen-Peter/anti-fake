@@ -30,6 +30,7 @@ import SellerLayout from "./layouts/sellerLayout";
 import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
 import OrderManagement from "./seller/orderManagement";
+import SellerWallet from "./seller/wallet";
 
 function App() {
   return (
@@ -96,7 +97,8 @@ function App() {
             <Route path="/seller" element={<SellerLayout />}>
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<ProductManagement />} />
-               <Route path="orders" element={<OrderManagement />} />
+              <Route path="orders" element={<OrderManagement />} />
+              <Route path="wallet" element={<SellerWallet />} />
             </Route>
           </Routes>
         </div>

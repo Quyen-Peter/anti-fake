@@ -13,7 +13,7 @@ interface SearchParams {
 export const fetchOffers = async (page: number, pageSize: number) => {
   try {
     const response = await fetch(
-      `${BASE_URL}/api/products/offers?page=${page}&pageSize=${pageSize}`,
+      `${BASE_URL}/api/offers?page=${page}&pageSize=${pageSize}`,
       {
         method: "GET",
         headers: {
@@ -36,7 +36,7 @@ export const fetchOffers = async (page: number, pageSize: number) => {
 
 export const fetchOfferDetail = async (id: string) => {
   const response = await fetch(
-    `${BASE_URL}/api/products/offers/${id}`,
+    `${BASE_URL}/api/offers/${id}`,
     {
       method: "GET",
       headers: {
@@ -74,7 +74,7 @@ export const searchOffers = async ({
   params.append("pageSize", String(pageSize));
 
   const response = await fetch(
-    `${BASE_URL}/api/products/offers?${params.toString()}`,
+    `${BASE_URL}/api/offers?${params.toString()}`,
     {
       method: "GET",
       headers: {

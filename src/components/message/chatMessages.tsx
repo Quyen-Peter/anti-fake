@@ -8,7 +8,7 @@ type Props = {
 export const mockMessages: ChatMessage[] = [
   {
     id: "msg-1",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     content: "Xin chào bạn 👋",
     createdAt: "09:00",
@@ -17,7 +17,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-2",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     content: "Shop có thể hỗ trợ gì cho bạn hôm nay?",
     createdAt: "09:01",
@@ -26,7 +26,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-3",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "USER",
     content: "Cho mình hỏi ví da bò sáp màu nâu còn hàng không?",
     createdAt: "09:03",
@@ -35,7 +35,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-4",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     content: "Dạ còn hàng bạn nhé.",
     createdAt: "09:04",
@@ -44,7 +44,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-5",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600",
     createdAt: "09:05",
@@ -53,7 +53,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-6",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "USER",
     content: "Mẫu này đẹp quá 😍",
     createdAt: "09:06",
@@ -62,7 +62,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-7",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     content: "Hiện đang giảm giá còn 450.000đ.",
     createdAt: "09:07",
@@ -71,7 +71,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-8",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "USER",
     content: "Mình lấy 1 cái nhé.",
     createdAt: "09:08",
@@ -80,7 +80,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-9",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "SHOP",
     content: "Dạ shop đã ghi nhận đơn hàng của bạn.",
     createdAt: "09:09",
@@ -89,7 +89,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-10",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "USER",
     content: "Cảm ơn shop ❤️",
     createdAt: "09:10",
@@ -98,7 +98,7 @@ export const mockMessages: ChatMessage[] = [
 
   {
     id: "msg-11",
-    roomId: "room-1",
+    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
     sender: "USER",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600",
     createdAt: "09:11",
@@ -122,7 +122,7 @@ export default function ChatMessages({ roomId }: Props) {
       {messages.map((msg) => (
         <div
           key={msg.id}
-          className={`chat-message ${
+          className={`chat-message-community ${
             msg.sender === "USER" ? "chat-message-user" : "chat-message-shop"
           }`}
         >

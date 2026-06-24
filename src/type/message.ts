@@ -1,13 +1,17 @@
-export interface MessageRoom {
+interface LastMessage {
   id: string;
-  shopId: string;
-  shopName: string;
-  avatar: string;
-  isVerified: boolean;
-  isOnline: boolean;
-  lastMessage: string;
-  lastTime: string;
-  unreadCount: number;
+  clientMessageId: string | null;
+  messageType: string;
+  body: string;
+  sentAt: string;
+}
+
+export interface ChatRoom {
+  id: string;
+  chatUserID: string;
+  chatUserName: string;
+  lastMessage: LastMessage[];
+  createdAt: string;
 }
 
 export interface ChatMessage {

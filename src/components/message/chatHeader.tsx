@@ -1,9 +1,9 @@
-import { ArrowLeft, BadgeCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { MessageRoom } from "../../type/message";
+import type { ChatRoom } from "../../type/message";
 
 type Props = {
-  room: MessageRoom;
+  room: ChatRoom;
 };
 
 export default function ChatHeader({ room }: Props) {
@@ -19,21 +19,25 @@ export default function ChatHeader({ room }: Props) {
       </button>
 
       <div className="chat-shop-info">
-        <img src={room.avatar} alt="" />
+        {/* TODO: Backend chưa trả avatar */}
+        <img
+          src="https://i.pravatar.cc/100?img=12"
+          alt={room.chatUserName}
+        />
 
         <div>
           <div className="chat-shop-name">
-            <span>{room.shopName}</span>
+            <span>{room.chatUserName}</span>
 
-            {room.isVerified && (
+            {/* TODO: Backend chưa trả isVerified */}
+            {/* {room.isVerified && (
               <BadgeCheck size={15} />
-            )}
+            )} */}
           </div>
 
           <span className="chat-shop-status">
-            {room.isOnline
-              ? "Đang hoạt động"
-              : "Không hoạt động"}
+            {/* TODO: Backend chưa trả isOnline */}
+            Đang trò chuyện
           </span>
         </div>
       </div>

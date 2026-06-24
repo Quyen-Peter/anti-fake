@@ -79,3 +79,24 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.pd-review-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.pd-review-image {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pd-review-image:hover {
+  transform: scale(1.05);
+}

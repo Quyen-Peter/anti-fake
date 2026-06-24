@@ -1,10 +1,10 @@
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { MessageRoom } from "../../type/message";
 import MessageRoomCard from "./messageRoomCard";
+import type { ChatRoom } from "../../type/message";
 
 type Props = {
-  rooms: MessageRoom[];
+  rooms: ChatRoom[];
 };
 
 export default function MessageSidebar({ rooms }: Props) {
@@ -14,17 +14,17 @@ export default function MessageSidebar({ rooms }: Props) {
   const filteredRooms = useMemo(() => {
     let result = rooms;
 
-    if (filter === "UNREAD") {
-      result = result.filter((x) => x.unreadCount > 0);
-    }
+    // if (filter === "UNREAD") {
+    //   result = result.filter((x) => x.unreadCount > 0);
+    // }
 
-    if (filter === "SHOP") {
-      result = result.filter((x) => x.shopId);
-    }
+    // if (filter === "SHOP") {
+    //   result = result.filter((x) => x.shopId);
+    // }
 
     if (keyword.trim()) {
       result = result.filter((x) =>
-        x.shopName.toLowerCase().includes(keyword.toLowerCase()),
+        x.chatUserName.toLowerCase().includes(keyword.toLowerCase()),
       );
     }
 

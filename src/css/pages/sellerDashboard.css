@@ -98,12 +98,10 @@
   padding: 10px;
 }
 
-.seller-orders-card h3{
+.seller-orders-card h3 {
   margin-left: 10px;
+  margin-bottom: 10px;
 }
-
-
-
 
 /* Mobile */
 @media (max-width: 576px) {
@@ -128,7 +126,7 @@
     padding-right: 2px;
   }
   .seller-card-header {
-    padding-left: 20px;
+    padding-left: 10px;
     padding-bottom: 5px;
   }
   .seller-action-recent-order {
@@ -137,7 +135,7 @@
   .seller-orders-card {
     padding: 10px;
   }
- 
+
   .seller-stat-icon {
     width: 35px;
     height: 35px;
@@ -150,7 +148,7 @@
     font-size: 14px;
   }
   .seller-card-header h3 {
-    font-size: 14px;
+    font-size: 18px;
   }
   .seller-top-item {
     gap: 9px;

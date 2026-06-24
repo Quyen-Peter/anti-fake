@@ -19,7 +19,7 @@
 }
 
 .seller-mobile-order-id {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: #b00020;
 }
@@ -52,8 +52,8 @@
 }
 
 .seller-mobile-order-card h3 {
-  margin: 12px 0;
-  font-size: 18px;
+  margin: 10px 0;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -66,15 +66,15 @@
 }
 
 .seller-mobile-order-footer {
-  margin-top: 16px;
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .seller-mobile-order-price {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
   color: #222;
 }
 

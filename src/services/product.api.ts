@@ -3,7 +3,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SearchParams {
   q?: string;
-  categoryId?: number;
+  categoryId?: string;
   minPrice?: number;
   maxPrice?: number;
   page?: number;
@@ -64,7 +64,7 @@ export const searchOffers = async ({
   const params = new URLSearchParams();
 
   if (q) params.append("q", q);
-  if (categoryId) params.append("categoryId", String(categoryId));
+  if (categoryId) params.append("categoryId", categoryId);
   if (minPrice !== undefined)
     params.append("minPrice", String(minPrice));
   if (maxPrice !== undefined)

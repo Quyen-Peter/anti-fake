@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import HomePage from "./pages/home";
 import CommunityPage from "./pages/community";
 import ProfilePage from "./pages/profile";
@@ -32,11 +33,23 @@ import ProductManagement from "./seller/productManagement";
 import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
 
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    // Scroll ve dau trang moi khi nguoi dung vao route hoac query moi.
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, search]);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <div>
         <Toaster richColors position="top-center" />
+        <ScrollToTop />
         <div className="app-container">
           <Routes>
             {/* USER */}

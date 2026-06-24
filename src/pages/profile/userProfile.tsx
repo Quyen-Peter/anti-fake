@@ -38,16 +38,6 @@ export default function UserProfile() {
             <span>{user.phone}</span>
           </div>
 
-          <div className="profile-item">
-            <span className="profile-label">Giới tính</span>
-            <span>{user.gender}</span>
-          </div>
-
-          <div className="profile-item">
-            <span className="profile-label">Ngày sinh</span>
-            <span>{user.birthday}</span>
-          </div>
-
           <button className="profile-edit-btn">Chỉnh sửa hồ sơ</button>
         </div>
 

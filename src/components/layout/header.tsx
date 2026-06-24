@@ -21,7 +21,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (!keyword.trim()) return;
+    // if (!keyword.trim()) return;
 
     navigate(`/search?q=${encodeURIComponent(keyword)}`);
   };

@@ -24,7 +24,7 @@ export default function SearchPage() {
 
         const data = await searchOffers({
           q: keyword || undefined,
-          categoryId: categoryId ? Number(categoryId) : undefined,
+          categoryId: categoryId || undefined,
           minPrice: minPrice ? Number(minPrice) : undefined,
           maxPrice: maxPrice ? Number(maxPrice) : undefined,
           page: 1,

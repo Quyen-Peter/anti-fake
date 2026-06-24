@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import "../../css/pages/message.css";
@@ -10,30 +10,39 @@ import ChatInput from "../../components/message/chatInput";
 import { getToken } from "../../ultil/auth";
 import { fetchChatThreads } from "../../services/chat.api";
 import type { ChatRoom } from "../../type/message";
-
-
+import {
+  useChatRealtime,
+  type ChatRealtimeEvent,
+} from "../../hooks/useChatRealtime";
 
 export default function MessagePage() {
   const { roomId } = useParams();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const [realtimeEvent, setRealtimeEvent] = useState<ChatRealtimeEvent | null>(null);
+
+  const loadThreads = useCallback(async () => {
+    try {
+      const token = getToken();
+
+      if (!token) return;
+
+      const data = await fetchChatThreads(token);
+
+      setRooms(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadThreads = async () => {
-      try {
-        const token = getToken();
-
-        if (!token) return;
-
-        const data = await fetchChatThreads(token);
-
-        setRooms(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     loadThreads();
-  }, []);
+  }, [loadThreads]);
+
+  const realtime = useChatRealtime({
+    threadId: roomId || "",
+    onMessage: setRealtimeEvent,
+    onReconnect: loadThreads,
+  });
 
   const room = rooms.find((r) => r.id === roomId);
 
@@ -47,8 +56,18 @@ export default function MessagePage() {
         ) : (
           <>
             <ChatHeader room={room} />
-            <ChatMessages roomId={room.id} />
-            <ChatInput />
+            <ChatMessages
+              roomId={room.id}
+              realtimeEvent={realtimeEvent}
+              typingUserIds={realtime.typingUserIds}
+            />
+            <ChatInput
+              roomId={room.id}
+              connected={realtime.connected}
+              error={realtime.lastError}
+              onSendMessage={realtime.sendMessage}
+              onTyping={realtime.sendTyping}
+            />
           </>
         )}
       </div>

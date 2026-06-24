@@ -6,11 +6,13 @@ import Review from "../../components/product/review";
 import ShopCard from "../../components/shop/shopCard";
 import { MessageCircle, Star, Store } from "lucide-react";
 import { fetchOfferDetail } from "../../services/product.api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchShopByOffer } from "../../services/shop.api";
 import LoadingOverlay from "../../components/loadingOverlay";
 import ProductGallery from "../../components/product/productGallery";
 import { fetchOfferReviews } from "../../services/review.api";
+import { getShopChatThread } from "../../services/chat.api";
+import { getToken } from "../../ultil/auth";
 
 type ReviewItem = {
   id: string;
@@ -23,6 +25,7 @@ type ReviewItem = {
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("description");
   const [product, setProduct] = useState<any>();
   const [shop, setShop] = useState<any>();
@@ -83,6 +86,33 @@ export default function ProductDetail() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  const getOrCreateChatThread = async (shopId: string) => {
+    try {
+      const token = getToken();
+
+      if (!token) {
+        throw new Error("Bạn chưa đăng nhập");
+      }
+
+      const response = await getShopChatThread(shopId, token);
+
+      if (!response?.success || !response?.threadId) {
+        throw new Error("Không thể tạo cuộc trò chuyện");
+      }
+
+      navigate(`/messages/${response.threadId}`);
+
+      return;
+    } catch (error: any) {
+      console.error("Lỗi tạo chat thread:", error);
+
+      throw new Error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Đã xảy ra lỗi khi tạo cuộc trò chuyện",
+      );
+    }
+  };
 
   if (!product) {
     return (
@@ -106,7 +136,10 @@ export default function ProductDetail() {
         </div>
 
         <div className="pd-shop-right">
-          <button className="pd-chat-btn">
+          <button
+            className="pd-chat-btn"
+            onClick={() => getOrCreateChatThread(shop.id)}
+          >
             <MessageCircle size={18} />
             <span>Nhắn tin</span>
           </button>

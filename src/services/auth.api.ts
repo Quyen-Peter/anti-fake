@@ -1,3 +1,5 @@
+import { connectSocket } from "./socket";
+
 export interface RegisterRequest {
   email: string;
   phone: string;
@@ -48,6 +50,7 @@ export const login = async (
     throw new Error(data.message || "Đăng nhập thất bại");
   }
 
+  connectSocket(data.accessToken);
   return data;
 };
 
@@ -81,5 +84,6 @@ export const register = async (
 export const logout = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("user");
+  connectSocket().disconnect();
   window.location.href = "/";
 };

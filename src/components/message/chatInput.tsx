@@ -1,29 +1,51 @@
 import { Image, SendHorizonal, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { sendMessage } from "../../services/chat.api";
 
-export default function ChatInput() {
+type Props = {
+  roomId: string;
+  connected?: boolean;
+  error?: string | null;
+  onSendMessage?: (
+    body: string,
+    clientMessageId: string
+  ) => Promise<{ thread: unknown; clientMessageId: string } | null>;
+  onTyping?: (isTyping: boolean) => void;
+};
+
+export default function ChatInput({
+  roomId,
+  connected = false,
+  error,
+  onSendMessage,
+  onTyping,
+}: Props) {
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState<string>();
 
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleSend = () => {
-    if (!message.trim() && !preview) return;
+  const handleSend = async () => {
+    if (!message.trim()) return;
 
-    console.log({
-      message,
-      image: preview,
-    });
+    try {
+      const body = message.trim();
+      const clientMessageId = crypto.randomUUID();
+      const realtimeResult = await onSendMessage?.(body, clientMessageId);
 
-    setMessage("");
-    setPreview(undefined);
+      if (!realtimeResult) {
+        await sendMessage(roomId, body, clientMessageId);
+      }
+
+      setMessage("");
+      onTyping?.(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
- 
   return (
     <>
-      {/* Preview ảnh */}
-
       {preview && (
         <div className="image-preview">
           <img src={preview} alt="" />
@@ -36,8 +58,6 @@ export default function ChatInput() {
           </button>
         </div>
       )}
-
-      {/* Input file ẩn */}
 
       <input
         ref={fileRef}
@@ -61,13 +81,15 @@ export default function ChatInput() {
           <Image size={20} />
         </button>
 
-
-
         <input
           type="text"
           value={message}
-          placeholder="Nhập tin nhắn..."
-          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Nhap tin nhan..."
+          onChange={(e) => {
+            setMessage(e.target.value);
+            onTyping?.(Boolean(e.target.value.trim()));
+          }}
+          onBlur={() => onTyping?.(false)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSend();
@@ -79,6 +101,7 @@ export default function ChatInput() {
           <SendHorizonal size={18} />
         </button>
       </div>
+      {error && !connected && <p className="chat-input-error">{error}</p>}
     </>
   );
 }

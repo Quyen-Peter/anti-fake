@@ -1,121 +1,113 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { ChatRealtimeEvent } from "../../hooks/useChatRealtime";
 import type { ChatMessage } from "../../type/message";
+import { getChatMessages } from "../../services/chat.api";
+import { getUser } from "../../ultil/auth";
+
+type RawMessage = {
+  id?: string;
+  senderUserId?: string;
+  body?: string;
+  sentAt?: string;
+  createdAt?: string;
+};
 
 type Props = {
   roomId: string;
+  realtimeEvent?: ChatRealtimeEvent | null;
+  typingUserIds?: string[];
 };
 
-export const mockMessages: ChatMessage[] = [
-  {
-    id: "msg-1",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    content: "Xin chào bạn 👋",
-    createdAt: "09:00",
+const formatTime = (value?: string) =>
+  new Date(value || Date.now()).toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+const mapMessage = (
+  msg: RawMessage,
+  roomId: string,
+  currentUserId?: string
+): ChatMessage | null => {
+  if (!msg.id) return null;
+
+  return {
+    id: msg.id,
+    roomId,
+    sender: msg.senderUserId === currentUserId ? "USER" : "SHOP",
+    content: msg.body,
+    createdAt: formatTime(msg.sentAt || msg.createdAt),
     seen: true,
-  },
+  };
+};
 
-  {
-    id: "msg-2",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    content: "Shop có thể hỗ trợ gì cho bạn hôm nay?",
-    createdAt: "09:01",
-    seen: true,
-  },
-
-  {
-    id: "msg-3",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "USER",
-    content: "Cho mình hỏi ví da bò sáp màu nâu còn hàng không?",
-    createdAt: "09:03",
-    seen: true,
-  },
-
-  {
-    id: "msg-4",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    content: "Dạ còn hàng bạn nhé.",
-    createdAt: "09:04",
-    seen: true,
-  },
-
-  {
-    id: "msg-5",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600",
-    createdAt: "09:05",
-    seen: true,
-  },
-
-  {
-    id: "msg-6",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "USER",
-    content: "Mẫu này đẹp quá 😍",
-    createdAt: "09:06",
-    seen: true,
-  },
-
-  {
-    id: "msg-7",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    content: "Hiện đang giảm giá còn 450.000đ.",
-    createdAt: "09:07",
-    seen: true,
-  },
-
-  {
-    id: "msg-8",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "USER",
-    content: "Mình lấy 1 cái nhé.",
-    createdAt: "09:08",
-    seen: true,
-  },
-
-  {
-    id: "msg-9",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "SHOP",
-    content: "Dạ shop đã ghi nhận đơn hàng của bạn.",
-    createdAt: "09:09",
-    seen: true,
-  },
-
-  {
-    id: "msg-10",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "USER",
-    content: "Cảm ơn shop ❤️",
-    createdAt: "09:10",
-    seen: true,
-  },
-
-  {
-    id: "msg-11",
-    roomId: "17813e50-e0ca-4f8c-bc66-3e6781b0fb58",
-    sender: "USER",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600",
-    createdAt: "09:11",
-    seen: false,
-  },
-];
-
-export default function ChatMessages({ roomId }: Props) {
+export default function ChatMessages({
+  roomId,
+  realtimeEvent,
+  typingUserIds = [],
+}: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    const loadMessages = async () => {
+      try {
+        setLoading(true);
+
+        const user = getUser();
+        const data = await getChatMessages(roomId);
+
+        const mappedMessages: ChatMessage[] = data.messages
+          .map((msg: RawMessage) => mapMessage(msg, data.id, user?.id))
+          .filter(Boolean);
+
+        setMessages(mappedMessages);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!realtimeEvent?.message) return;
+
+    const eventRoomId = realtimeEvent.threadId || realtimeEvent.roomId;
+    if (eventRoomId !== roomId) return;
+
+    const user = getUser();
+    const newMessage = mapMessage(
+      realtimeEvent.message as RawMessage,
+      roomId,
+      user?.id
+    );
+
+    if (!newMessage) return;
+
+    setMessages((current) => {
+      if (current.some((message) => message.id === newMessage.id)) {
+        return current;
+      }
+
+      return [...current, newMessage];
+    });
+  }, [realtimeEvent, roomId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [roomId]);
+  }, [messages.length, typingUserIds.length]);
 
-  const messages = mockMessages.filter((msg) => msg.roomId === roomId);
+  if (loading) {
+    return <div className="chat-messages" />;
+  }
 
   return (
     <div className="chat-messages">
@@ -141,6 +133,14 @@ export default function ChatMessages({ roomId }: Props) {
           </div>
         </div>
       ))}
+
+      {typingUserIds.length > 0 && (
+        <div className="chat-message-community chat-message-shop">
+          <div className="chat-bubble">
+            <p className="chat-text">Dang go...</p>
+          </div>
+        </div>
+      )}
 
       <div ref={bottomRef} />
     </div>

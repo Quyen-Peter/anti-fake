@@ -26,9 +26,9 @@ export default function SearchSidebar() {
     loadData();
   }, []);
 
-  const handleCategoryClick = (categoryId: number) => {
+  const handleCategoryClick = (categoryId: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("categoryId", categoryId.toString());
+    params.set("categoryId", categoryId);
     navigate(`/search?${params.toString()}`);
   };
 
@@ -82,7 +82,7 @@ export default function SearchSidebar() {
               className={`s-category-item ${
                 selectedCategoryId === String(item.id) ? "active" : ""
               }`}
-              onClick={() => handleCategoryClick(item.id)}
+              onClick={() => handleCategoryClick(String(item.id))}
             >
               <span>{item.name}</span>
             </div>

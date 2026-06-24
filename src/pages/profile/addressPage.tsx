@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Building2,
-  CheckCircle,
   Plus,
 } from "lucide-react";
 

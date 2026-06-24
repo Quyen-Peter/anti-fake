@@ -31,16 +31,12 @@
 .seller-product-add-btn {
   border: none;
   border-radius: 10px;
-
   background: #b00020;
   color: #fff;
-
   padding: 12px 18px;
-
   display: flex;
   align-items: center;
   gap: 8px;
-
   font-size: 14px;
   font-weight: 600;
 
@@ -191,6 +187,7 @@
   .seller-product-search input {
     height: 38px;
     font-size: 14px;
+    width: 150px;
   }
   .seller-product-filter select {
     height: 38px;
@@ -214,6 +211,7 @@
   .seller-product-add-btn {
     padding: 10px 14px;
     font-size: 12px;
+    gap: 0px;
   }
 }
 

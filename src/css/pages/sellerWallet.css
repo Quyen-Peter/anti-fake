@@ -8,3 +8,29 @@
 .seller-wallet-top {
   margin-bottom: 20px;
 }
+
+/* Mobile */
+@media (max-width: 576px) {
+  .seller-wallet-page {
+    padding: 10px;
+    background: #faf7f7;
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

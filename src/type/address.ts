@@ -8,3 +8,10 @@ export interface Address {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateAddressRequest {
+  recipientName: string;
+  phone: string;
+  addressLine: string;
+  isDefault: boolean;
+}

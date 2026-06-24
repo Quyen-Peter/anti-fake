@@ -1,0 +1,271 @@
+.profile-address-page {
+  width: 100%;
+  background: white;
+  border: 1px solid #f1dede;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.profile-address-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.profile-address-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #222;
+}
+
+.profile-address-subtitle {
+  margin-top: 6px;
+  color: #777;
+  font-size: 14px;
+}
+
+.profile-address-add-btn {
+  height: 46px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #8b0000;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+.profile-address-add-btn:hover {
+  background: #730000;
+}
+
+.profile-address-divider {
+  height: 1px;
+  background: #f1dede;
+  margin: 20px 0;
+}
+
+.profile-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-address-card {
+  position: relative;
+
+  padding: 20px;
+
+  border: 1px solid #eddede;
+  border-radius: 12px;
+
+  background: #fff;
+
+  transition: all 0.2s ease;
+}
+
+.profile-address-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.profile-address-card-default {
+  border: 1px solid #d70018;
+  background: #fff7f7;
+}
+
+.profile-address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.profile-address-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-address-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+}
+
+.profile-address-phone {
+  padding-left: 10px;
+  border-left: 1px solid #ddd;
+
+  color: #666;
+}
+
+.profile-address-default-badge {
+  background: #8b0000;
+  color: white;
+
+  padding: 4px 8px;
+
+  border-radius: 4px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.profile-address-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.profile-address-actions button {
+  border: none;
+  background: transparent;
+
+  color: #8b0000;
+
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.profile-address-line {
+  margin-top: 12px;
+
+  color: #444;
+  line-height: 1.7;
+}
+
+.profile-address-default-btn {
+  margin-top: 15px;
+
+  height: 34px;
+  padding: 0 14px;
+
+  border: 1px solid #eadcdc;
+  border-radius: 8px;
+
+  background: white;
+  color: #666;
+
+  cursor: pointer;
+}
+
+.profile-address-default-btn:hover {
+  border-color: #8b0000;
+  color: #8b0000;
+}
+
+.profile-address-footer {
+  margin-top: 30px;
+
+  min-height: 140px;
+
+  border: 2px dashed #f0dddd;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  color: #c4b8b8;
+}
+
+.profile-address-footer p {
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+.profile-address-loading,
+.profile-address-empty {
+  padding: 40px;
+  text-align: center;
+  color: #888;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .profile-address-page {
+    padding-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 20px;
+    border-radius: 20px;
+  }
+  .profile-address-title {
+    font-size: 26px;
+  }
+  .profile-address-subtitle {
+    font-size: 13px;
+  }
+  .profile-address-add-btn {
+    height: 35px;
+    padding: 0 15px;
+    gap: 2px;
+    font-size: 12px;
+  }
+
+  .profile-address-card {
+    padding: 10px;
+  }
+
+  .profile-address-header {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .profile-address-user {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .profile-address-name {
+    font-size: 16px;
+  }
+
+  .profile-address-phone {
+    padding-left: 0;
+    font-size: 14px;
+  }
+
+  .profile-address-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .profile-address-default-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+  .profile-address-line {
+    font-size: 14px;
+
+  }
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+
+}
+
+/* Tablet lớn */
+@media (min-width: 769px) and (max-width: 820px) {
+}
+
+/* Tablet pro */
+@media (min-width: 821px) and (max-width: 1024px) {
+}
+
+/* Laptop */
+@media (min-width: 1025px) and (max-width: 1440px) {
+}

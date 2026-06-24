@@ -32,6 +32,7 @@ import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
 import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
+import ProfileAddress from "./pages/profile/addressPage";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -66,6 +67,7 @@ function App() {
                 }
               >
                 <Route index element={<UserProfile />} />
+                <Route path="address" element={<ProfileAddress />} />
                 <Route path="orders" element={<OrdersPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route

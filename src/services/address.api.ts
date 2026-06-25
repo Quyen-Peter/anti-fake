@@ -129,3 +129,26 @@ export const updateAddress = async (
 
   return data;
 };
+
+export const getDefaultAddress = async () => {
+  const token = getToken();
+
+  const response = await fetch(
+    `${BASE_URL}/api/user/addresses/default`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể lấy địa chỉ mặc định");
+  }
+
+  return data;
+};

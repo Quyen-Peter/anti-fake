@@ -124,7 +124,7 @@ export default function HomePage() {
           <h2>Cửa hàng uy tín</h2>
           <div className="shop-list">
             {shop.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} />
+              <ShopCard key={shop.shopId} shop={shop} />
             ))}
           </div>
         </div>

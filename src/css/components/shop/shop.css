@@ -19,39 +19,44 @@
 
 .shop-header-card-view {
   max-width: 1300px;
-  margin: -90px auto 0;
+  margin: -60px auto 0;
+  padding: 22px 24px;
+
   background: #fff;
+  border-radius: 18px;
 
-  border-radius: 20px;
-  padding: 28px;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
 
   position: relative;
   z-index: 2;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-.shop-left-view {
-  display: flex;
-  gap: 24px;
+.shop-header-left-view {
   width: 100%;
-}
 
-/* ================= AVATAR ================= */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
 .shop-avatar-view {
-  width: 130px;
-  height: 130px;
+  width: 110px;
+  height: 110px;
+
   border-radius: 18px;
   object-fit: cover;
+
+  border: 4px solid #fff;
+
   flex-shrink: 0;
 
-  border: 3px solid #fff;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
 }
 
-/* ================= INFO ================= */
-
-.shop-info-view {
+.shop-header-info-view {
   flex: 1;
   min-width: 0;
 }
@@ -65,70 +70,83 @@
 .shop-name-row-view h2 {
   margin: 0;
 
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 700;
-  line-height: 1.2;
 
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .shop-verified-view {
-  color: #1677ff;
+  color: #0d6efd;
   flex-shrink: 0;
 }
 
-.shop-info-buttom-view {
+.shop-content-view-buttom {
+  margin-top: 10px;
+
   display: flex;
   justify-content: space-between;
-  align-items: center;
-
-  gap: 50px;
-  margin-top: 14px;
+  align-items: flex-end;
+  gap: 20px;
 }
 
-/* ================= RATING ================= */
-
-.shop-rating-view {
+.shop-meta-view {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  color: #666;
-  font-size: 15px;
-
-  margin-top: 10px;
-}
-
-.shop-rating-view span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.shop-view-count-view {
-  color: #444;
-}
-
-/* ================= ACTION ================= */
-
-.shop-actions-view {
-  display: flex;
   gap: 12px;
-  margin-top: 20px;
+
+  flex-wrap: wrap;
+
+  font-size: 15px;
+  color: #666;
 }
 
-.follow-btn-view {
-  min-width: 130px;
+.shop-meta-view span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.shop-meta-view b {
+  color: #222;
+}
+
+.shop-divider-view {
+  width: 1px;
+  height: 16px;
+  background: #ddd;
+}
+
+.shop-join-view {
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 15px;
+  color: #666;
+}
+
+.shop-join-view b {
+  color: #d0011b;
+}
+
+.shop-header-actions-view {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.chat-btn-view {
+  width: 120px;
   height: 46px;
 
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
 
-  background: #d0011b;
-  color: #fff;
+  background: #fff;
 
   display: flex;
   align-items: center;
@@ -143,63 +161,8 @@
   transition: 0.2s;
 }
 
-.follow-btn-view:hover {
-  opacity: 0.9;
-}
-
-.chat-btn-view {
-  min-width: 120px;
-  height: 46px;
-
-  border: 1px solid #ddd;
-  border-radius: 10px;
-
-  background: #fff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  cursor: pointer;
-
-  transition: 0.2s;
-}
-
 .chat-btn-view:hover {
-  background: #f5f5f5;
-}
-
-/* ================= STATS ================= */
-
-.shop-stats-view {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(160px, 1fr));
-
-  gap: 18px 50px;
-
-  padding-left: 40px;
-
-  border-left: 1px solid #eee;
-
-  flex-shrink: 0;
-}
-
-.shop-stat-view {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.shop-stat-view span {
-  color: #888;
-  font-size: 14px;
-}
-
-.shop-stat-view b {
-  color: #d0011b;
-  font-size: 18px;
-  font-weight: 700;
+  background: #f7f7f7;
 }
 
 /* ================= TABS ================= */
@@ -239,36 +202,12 @@
 
 /* Mobile */
 @media (max-width: 576px) {
-  .shop-header-card-view {
-    margin: -60px auto 0;
-  }
   .shop-page {
     margin-top: 60px;
   }
   .shop-banner {
     height: 200px;
     overflow: hidden;
-  }
-  .shop-left-view {
-    gap: 15px;
-  }
-  .shop-avatar-view {
-    width: 60px;
-    height: 60px;
-    border-radius: 13px;
-  }
-  .shop-name-row-view h2 {
-    font-size: 18px;
-  }
-  .shop-header-card-view {
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 5px;
-    border-radius: 10px;
-  }
-  .shop-rating-view {
-    font-size: 12px;
-    margin-top: 2px;
   }
 
   .shop-tabs {
@@ -281,23 +220,54 @@
     font-size: 13px;
     padding: 8px 0;
   }
-  .shop-stats-view {
-    display: none;
+  .shop-header-card-view {
+    margin: -70px 12px 0;
+    padding: 10px;
+    border-radius: 14px;
   }
-  .shop-info-buttom-view {
-    gap: 20px;
-    margin-top: 10px;
+
+  .shop-header-left-view {
+    align-items: flex-start;
+    gap: 14px;
   }
-  .follow-btn-view {
-    height: 25px;
-    font-size: 10px;
+
+  .shop-avatar-view {
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
   }
+
+  .shop-name-row-view h2 {
+    font-size: 22px;
+  }
+
+  .shop-content-view-buttom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .shop-meta-view {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .shop-join-view {
+    font-size: 13px;
+  }
+
   .chat-btn-view {
-    height: 25px;
-    font-size: 10px;
+    width: 40%;
+    height: 35px;
+    font-size: 13px;
   }
-  .shop-actions-view {
-    margin-top: 10px;
+
+  .shop-header-actions-view {
+    width: 100%;
+  }
+
+  .shop-divider-view {
+    display: none;
   }
 }
 
@@ -306,52 +276,53 @@
   .shop-page {
     margin-top: 50px;
   }
-  .shop-left-view {
-    gap: 15px;
-  }
-  .shop-avatar-view {
-    width: 90px;
-    height: 90px;
-  }
-  .shop-name-row-view h2 {
-    font-size: 28px;
-  }
   .shop-header-card-view {
-    margin-left: 20px;
-    margin-right: 20px;
-    padding: 15px;
-  }
-  .shop-rating-view {
-    font-size: 13.5px;
+    margin: -45px 12px 0;
+    padding: 16px;
+    border-radius: 14px;
   }
 
+  .shop-header-left-view {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .shop-avatar-view {
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
+  }
+
+  .shop-name-row-view h2 {
+    font-size: 22px;
+  }
+
+  .shop-meta-view {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .shop-join-view {
+    font-size: 13px;
+  }
+
+  .chat-btn-view {
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .shop-divider-view {
+    display: none;
+  }
   .shop-tabs {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin: 10px auto 0;
     padding-left: 40px;
   }
-  .shop-stats-view {
-    gap: 18px 0px;
-    padding-left: 20px;
-  }
-  .shop-info-buttom-view {
-    gap: 20px;
-    margin-top: 10px;
-  }
-  .follow-btn-view {
-    height: 30px;
-    font-size: 13px;
-  }
-  .chat-btn-view {
-    height: 30px;
-    font-size: 13px;
-  }
-  .shop-stat-view span {
-    font-size: 13.5px;
-  }
-
-  .shop-stat-view b {
-    font-size: 15px;
+  .shop-tab {
+    font-size: 16px;
+    padding: 8px 0;
   }
 }
 
@@ -360,49 +331,36 @@
   .shop-page {
     margin-top: 50px;
   }
-  .shop-avatar-view {
-    width: 100px;
-    height: 100px;
-  }
-  .shop-name-row-view h2 {
-    font-size: 30px;
-  }
   .shop-header-card-view {
     margin-left: 20px;
     margin-right: 20px;
-    padding: 15px;
-  }
-  .shop-rating-view {
-    font-size: 14px;
   }
 
+  .shop-avatar-view {
+    width: 95px;
+    height: 95px;
+  }
+
+  .shop-name-row-view h2 {
+    font-size: 28px;
+  }
+
+  .chat-btn-view {
+    width: 110px;
+  }
   .shop-tabs {
     margin-left: 20px;
     margin-right: 20px;
     padding-left: 40px;
   }
-  .shop-stats-view {
-    gap: 18px 0px;
-    padding-left: 20px;
-  }
+
   .shop-info-buttom-view {
     gap: 20px;
     margin-top: 10px;
   }
-  .follow-btn-view {
-    height: 37px;
-    font-size: 14px;
-  }
   .chat-btn-view {
     height: 37px;
     font-size: 14px;
-  }
-  .shop-stat-view span {
-    font-size: 14px;
-  }
-
-  .shop-stat-view b {
-    font-size: 16px;
   }
 }
 
@@ -421,17 +379,6 @@
     margin-left: 20px;
     margin-right: 20px;
     padding-left: 40px;
-  }
-  .shop-stats-view {
-    gap: 18px 0px;
-    padding-left: 20px;
-  }
-  .shop-info-buttom-view {
-    gap: 20px;
-  }
-  .follow-btn-view {
-    height: 40px;
-    font-size: 14px;
   }
   .chat-btn-view {
     height: 40px;

@@ -43,3 +43,25 @@ export const fetchShopByOffer = async (offerId: string) => {
   const data =  await response.json()
     return data;
 };
+
+export const getShopDetail = async (
+  shopId: string
+) => {
+  const response = await fetch(
+    `${BASE_URL}/api/shops/${shopId}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Lấy thông tin cửa hàng thất bại");
+  }
+
+  return data;
+};

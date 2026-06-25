@@ -8,13 +8,16 @@ import { useEffect } from "react";
 
 export default function LiveRoomPage() {
   const mockShop = {
-    id: "shop-1",
-    name: "TechWorld Official",
-    avatarUrl: "https://i.pravatar.cc/150?img=1",
+    shopId: "shop-1",
+    shopName: "TechWorld Official",
+    shopAvatar: "https://i.pravatar.cc/150?img=1",
+    shopBanner: "https://i.pravatar.cc/150?img=1",
     rating: 4.9,
-    totalReviews: 125000,
+    totalReview: 125000,
+    totalOffer: 356,
     totalSale: 356,
-    isVerified: true,
+    verify: true,
+    createdAt: "20/3",
   };
 
   useEffect(() => {

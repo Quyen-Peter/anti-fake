@@ -98,7 +98,7 @@ function App() {
               <Route path="/search" element={<SearchPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/shop/:id" element={<ShopPage />}>
+              <Route path="/shop/:shopId" element={<ShopPage />}>
                 <Route index element={<ShopReviews />} />
                 <Route path="products" element={<ShopProducts />} />
                 <Route path="categories" element={<ShopCategories />} />

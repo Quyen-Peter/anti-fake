@@ -1,75 +1,64 @@
-import { BadgeCheck, Star, MessageSquare, Plus, Eye } from "lucide-react";
+import {
+  BadgeCheck,
+  Star,
+  MessageSquare,
+  Package,
+  History,
+} from "lucide-react";
 
-export default function ShopHeader() {
+import type { shopCard } from "../../type/shop";
+import { formatJoinTime, formatSale } from "../../ultil/format";
+
+type Props = {
+  shop: shopCard;
+};
+
+export default function ShopHeader({ shop }: Props) {
   return (
     <div className="shop-header-card-view">
-      <div className="shop-left-view">
+      <div className="shop-header-left-view">
         <img
-          src="https://i.pravatar.cc/200"
+          src={shop.shopAvatar || "https://i.pravatar.cc/150?img=3"}
           alt=""
           className="shop-avatar-view"
         />
 
-        <div className="shop-info-view">
+        <div className="shop-header-info-view">
           <div className="shop-name-row-view">
-            <h2>Luxury Leather Goods</h2>
+            <h2>{shop.shopName}</h2>
 
-            <BadgeCheck size={16} className="shop-verified-view" />
+            <BadgeCheck size={18} className="shop-verified-view" />
           </div>
-          <div className="shop-info-buttom-view">
+          <div className="shop-content-view-buttom">
             <div>
-              <div className="shop-rating-view">
+              <div className="shop-meta-view">
                 <span>
-                  <Star size={16} />
-                  4.9
+                  <Star size={15} fill="#f59e0b" color="#f59e0b" />
+                  <b>{shop.rating}</b>
                 </span>
 
-                <span>2.4k đánh giá</span>
+                <span>{formatSale(shop.totalReview)} đánh giá</span>
 
-                <span>•</span>
+                <div className="shop-divider-view" />
 
-                <span>15k người theo dõi</span>
-
-                <span>•</span>
-
-                <span className="shop-view-count-view">
-                  <Eye size={16} />
-                  120k lượt xem
+                <span>
+                  <Package size={15} />
+                  <b>{formatSale(shop.totalSale)}</b> Sản phẩm
                 </span>
               </div>
 
-              <div className="shop-actions-view">
-                <button className="follow-btn-view">
-                  <Plus size={16} />
-                  Theo dõi
-                </button>
-
-                <button className="chat-btn-view">
-                  <MessageSquare size={16} />
-                  Chat
-                </button>
+              <div className="shop-join-view">
+                <History size={15} />
+                <span>
+                  Tham gia <b>{formatJoinTime(shop.createdAt)}</b>
+                </span>
               </div>
             </div>
-            <div className="shop-stats-view">
-              <div className="shop-stat-view">
-                <span>Sản phẩm</span>
-                <b>158</b>
-              </div>
-
-              <div className="shop-stat-view">
-                <span>Tỉ lệ phản hồi</span>
-                <b>98%</b>
-              </div>
-
-              <div className="shop-stat-view">
-                <span>Tham gia</span>
-                <b>2 năm</b>
-              </div>
-
-              <div className="shop-stat-view">
-                <span>Thời gian phản hồi</span>
-                <b>Trong vài giờ</b>
-              </div>
+            <div className="shop-header-actions-view">
+              <button className="chat-btn-view">
+                <MessageSquare size={18} />
+                Chat
+              </button>
             </div>
           </div>
         </div>

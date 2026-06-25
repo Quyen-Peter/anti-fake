@@ -1,9 +1,12 @@
 export type shopCard = {
-  id: string;
-  name: string;
-  avatarUrl: string;
-  isVerified: boolean;
+  shopId: string;
+  shopName: string;
+  shopBanner: string;
+  shopAvatar: string;
+  totalOffer: number;
+  verify: boolean;
   rating: number;
-  totalReviews: number;
+  totalReview: number;
   totalSale: number;
+  createdAt: string;
 };

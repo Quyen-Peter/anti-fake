@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { User, Phone, MapPin } from "lucide-react";
-
-import "../../css/components/address/createAddress.css";
-import { createAddress } from "../../services/address.api";
+import { MapPin, Phone, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import type { Address } from "../../type/address";
+import { updateAddress } from "../../services/address.api";
+import "../../css/components/address/createAddress.css";
 
 type Props = {
+  address: Address;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export default function CreateAddress({ onClose, onSuccess }: Props) {
+export default function UpdateAddress({ address, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -19,6 +20,15 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
     addressLine: "",
     isDefault: false,
   });
+
+  useEffect(() => {
+    setForm({
+      recipientName: address.recipientName,
+      phone: address.phone,
+      addressLine: address.addressLine,
+      isDefault: address.isDefault,
+    });
+  }, [address]);
 
   const [errors, setErrors] = useState({
     recipientName: "",
@@ -68,9 +78,9 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
     try {
       setLoading(true);
 
-      const data = await createAddress(form);
+      const data = await  updateAddress(address.id, form);
       if (data != null) {
-        toast.success("Thêm địa chỉ thành công");
+      toast.success("Cập nhật địa chỉ thành công!");
       }
       onSuccess();
       onClose();
@@ -78,7 +88,7 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
       console.error(error);
 
       toast.error(
-        error instanceof Error ? error.message : "Tạo địa chỉ thất bại",
+        error instanceof Error ? error.message : "Cập nhật địa chỉ thất bại!",
       );
     } finally {
       setLoading(false);

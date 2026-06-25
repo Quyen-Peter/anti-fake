@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import { Building2, Plus } from "lucide-react";
 
 import "../../css/pages/profile/address.css";
-import { getUserAddresses } from "../../services/address.api";
+import {
+  deleteAddress,
+  getUserAddresses,
+  setDefaultAddress,
+} from "../../services/address.api";
 import CreateAddress from "../../components/address/createAddress";
+import { toast } from "sonner";
+import ConfirmModal from "../../components/common/confirmModal";
+import UpdateAddress from "../../components/address/updateAddress";
 
 interface Address {
   id: string;
@@ -20,6 +27,8 @@ export default function ProfileAddress() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   useEffect(() => {
     loadAddresses();
@@ -38,16 +47,29 @@ export default function ProfileAddress() {
     }
   };
 
-  const handleEdit = (id: string) => {
-    console.log("edit", id);
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteAddress(id);
+      loadAddresses();
+      setShowDelete(false);
+      toast.success("Xóa địa chỉ thành công!");
+    } catch (error) {
+      console.error(error);
+      setShowDelete(false);
+      toast.error("Xóa địa chỉ thất bại!");
+    }
   };
 
-  const handleDelete = (id: string) => {
-    console.log("delete", id);
-  };
+  const handleSetDefault = async (id: string) => {
+    try {
+      await setDefaultAddress(id);
+      loadAddresses();
 
-  const handleSetDefault = (id: string) => {
-    console.log("set default", id);
+      toast.success("Cập nhật địa chỉ mặc định thành công!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Cập nhật thất bại!");
+    }
   };
 
   return (
@@ -101,10 +123,23 @@ export default function ProfileAddress() {
                 </div>
 
                 <div className="profile-address-actions">
-                  <button onClick={() => handleEdit(address.id)}>Sửa</button>
+                  <button onClick={() => setEditingAddress(address)}>
+                    Sửa
+                  </button>
 
-                  <button onClick={() => handleDelete(address.id)}>Xóa</button>
+                  <button onClick={() => setShowDelete(true)}>Xóa</button>
                 </div>
+                <ConfirmModal
+                  open={showDelete}
+                  title="Xóa địa chỉ"
+                  message="Bạn có chắc muốn xóa địa chỉ này không?"
+                  confirmText="Xóa"
+                  cancelText="Hủy"
+                  danger={true}
+                  loading={loading}
+                  onConfirm={() => handleDelete(address.id)}
+                  onCancel={() => setShowDelete(false)}
+                />
               </div>
 
               <div className="profile-address-line">{address.addressLine}</div>
@@ -130,7 +165,23 @@ export default function ProfileAddress() {
           trình mua sắm.
         </p>
       </div>
-      {showModal && <CreateAddress onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <CreateAddress
+          onClose={() => setShowModal(false)}
+          onSuccess={loadAddresses}
+        />
+      )}
+
+      {editingAddress && (
+        <UpdateAddress
+          address={editingAddress}
+          onClose={() => setEditingAddress(null)}
+          onSuccess={async () => {
+            await loadAddresses();
+            setEditingAddress(null);
+          }}
+        />
+      )}
     </div>
   );
 }

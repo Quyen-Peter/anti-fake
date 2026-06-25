@@ -15,3 +15,10 @@ export interface CreateAddressRequest {
   addressLine: string;
   isDefault: boolean;
 }
+
+export interface UpdateAddressRequest {
+  recipientName: string;
+  phone: string;
+  addressLine: string;
+  isDefault: boolean;
+}

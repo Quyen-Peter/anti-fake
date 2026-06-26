@@ -1,12 +1,16 @@
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import type { SocialPost } from "../../type/community";
 import { formatCommunityTime } from "../../ultil/format";
+import { useState } from "react";
+import CommentBottomSheet from "./commentBottomSheet";
 
 type Props = {
   post: SocialPost;
 };
 
 export default function CommunityPost({ post }: Props) {
+  const [openComment, setOpenComment] = useState(false);
+
   return (
     <div className="community-post">
       <div className="post-header">
@@ -35,7 +39,7 @@ export default function CommunityPost({ post }: Props) {
           {post.stats.reactions}
         </button>
 
-        <button>
+        <button onClick={() => setOpenComment(true)}>
           <MessageCircle size={18} />
           {post.stats.comments}
         </button>
@@ -45,6 +49,11 @@ export default function CommunityPost({ post }: Props) {
           {post.stats.shares}
         </button>
       </div>
+      <CommentBottomSheet
+        open={openComment}
+        onClose={() => setOpenComment(false)}
+        postId={post.id}
+      />
     </div>
   );
 }

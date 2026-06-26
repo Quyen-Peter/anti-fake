@@ -19,3 +19,25 @@ export interface SocialPost {
     liked: boolean;
   };
 }
+
+export interface Comment {
+  id: string;
+  author: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+  body: string;
+  createdAt: string;
+  likeCount: number;
+  viewerLiked: boolean;
+  replyCount: number;
+}
+
+export interface CommentResponse {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  items: Comment[];
+}

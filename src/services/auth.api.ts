@@ -109,8 +109,6 @@ export const refreshToken = async () => {
     throw new Error(data.message || "Làm mới token thất bại");
   }
 
-  console.log("Refresh thành công");
-
   saveToken(data.accessToken);
   saveUser(data.user);
 

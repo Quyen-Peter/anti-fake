@@ -52,14 +52,6 @@
   cursor: pointer;
 }
 
-.verified-address {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #1976d2;
-  font-size: 13px;
-}
 
 .checkout-shop-header {
   display: flex;

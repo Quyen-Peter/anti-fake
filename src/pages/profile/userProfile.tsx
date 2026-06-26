@@ -4,7 +4,6 @@ import { getUser } from "../../ultil/auth";
 
 export default function UserProfile() {
   const user = getUser();
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

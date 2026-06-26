@@ -11,6 +11,7 @@ import Footer from "../../components/layout/footer";
 import { useEffect, useState } from "react";
 import { fetchOffers } from "../../services/product.api";
 import { fetchShops } from "../../services/shop.api";
+import { refreshToken } from "../../services/auth.api";
 
 export default function HomePage() {
   const mockLiveShops = [
@@ -154,6 +155,14 @@ export default function HomePage() {
           </button>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={async () => {
+          await refreshToken();
+        }}
+      >
+        Test
+      </button>
       <Footer />
     </div>
   );

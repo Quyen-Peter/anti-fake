@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { login } from "../../services/auth.api";
 import { toast } from "sonner";
 import { useLocation, useNavigate } from "react-router-dom";
+import { saveToken, saveUser } from "../../ultil/auth";
 
 type Props = {
   onSwitch: () => void;
@@ -44,12 +45,10 @@ export default function LoginPage({ onSwitch }: Props) {
         password,
       });
 
-      localStorage.setItem("accessToken", data.accessToken);
+      saveToken( data.accessToken);
 
-      localStorage.setItem("user", JSON.stringify(data.user));
-
+      saveUser( data.user);
       toast.success("Đăng nhập thành công");
-
       navigate(from);
     } catch (error) {
       console.error("Login Error:", error);

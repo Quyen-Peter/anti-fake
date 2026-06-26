@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { getToken } from "../ultil/auth";
 type Props = {
   children: React.ReactNode;
 };
@@ -6,7 +7,7 @@ type Props = {
 export default function ProtectedRoute({ children }: Props) {
   const location = useLocation();
 
-  const token = localStorage.getItem("accessToken");
+  const token = getToken();
 
   if (!token) {
     return (

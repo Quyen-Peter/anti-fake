@@ -11,7 +11,6 @@ import {
   fetchCart,
   updateCartItemQuantity,
 } from "../../services/cart.api";
-import { getToken } from "../../ultil/auth";
 import { toast } from "sonner";
 
 export default function CartPage() {
@@ -20,11 +19,7 @@ export default function CartPage() {
   useEffect(() => {
     const loadCart = async () => {
       try {
-        const token = getToken();
-
-        if (!token) return;
-
-        const data = await fetchCart(token);
+        const data = await fetchCart();
 
         setCartShops(
           (data.shops || []).map((shop: any) => ({
@@ -45,13 +40,9 @@ export default function CartPage() {
 
   const handleQuantityChange = async (itemId: string, quantity: number) => {
     try {
-      const token = getToken();
-
-      if (!token) return;
-
       if (quantity < 1) return;
 
-      await updateCartItemQuantity(itemId, quantity, token);
+      await updateCartItemQuantity(itemId, quantity);
 
       setCartShops((prev) =>
         prev.map((shop) => ({
@@ -73,13 +64,8 @@ export default function CartPage() {
 
   const handleDeleteItem = async (itemId: string) => {
     try {
-      const token = getToken();
 
-      if (!token) {
-        return;
-      }
-
-      await deleteCartItem(itemId, token);
+      await deleteCartItem(itemId);
 
       setCartShops((prev) =>
         prev

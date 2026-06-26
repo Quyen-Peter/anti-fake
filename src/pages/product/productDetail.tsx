@@ -12,7 +12,6 @@ import LoadingOverlay from "../../components/loadingOverlay";
 import ProductGallery from "../../components/product/productGallery";
 import { fetchOfferReviews } from "../../services/review.api";
 import { getShopChatThread } from "../../services/chat.api";
-import { getToken } from "../../ultil/auth";
 
 type ReviewItem = {
   id: string;
@@ -40,7 +39,6 @@ export default function ProductDetail() {
     const loadProduct = async () => {
       try {
         const data = await fetchOfferDetail(id);
-        console.log(data);
         setProduct(data);
       } catch (error) {
         console.error(error);
@@ -51,9 +49,6 @@ export default function ProductDetail() {
     const loadShop = async () => {
       try {
         const shop = await fetchShopByOffer(id);
-
-        console.log("shop:", shop);
-
         setShop(shop);
       } catch (error) {
         console.error(error);
@@ -86,15 +81,11 @@ export default function ProductDetail() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   const getOrCreateChatThread = async (shopId: string) => {
     try {
-      const token = getToken();
 
-      if (!token) {
-        throw new Error("Bạn chưa đăng nhập");
-      }
-
-      const response = await getShopChatThread(shopId, token);
+      const response = await getShopChatThread(shopId);
 
       if (!response?.success || !response?.threadId) {
         throw new Error("Không thể tạo cuộc trò chuyện");
@@ -144,7 +135,7 @@ export default function ProductDetail() {
             <span>Nhắn tin</span>
           </button>
 
-          <button className="pd-view-shop-btn">
+          <button className="pd-view-shop-btn" onClick={() => navigate(`/shop/${shop.id}`)}>
             <Store size={18} />
             <span>Xem Shop</span>
           </button>

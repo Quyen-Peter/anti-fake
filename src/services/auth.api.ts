@@ -1,3 +1,4 @@
+import { removeToken, removeUser, saveToken, saveUser } from "../ultil/auth";
 import { connectSocket } from "./socket";
 
 export interface RegisterRequest {
@@ -42,6 +43,7 @@ export const login = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    credentials: "include",
   });
 
   const data = await response.json();
@@ -82,8 +84,35 @@ export const register = async (
 
 
 export const logout = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("user");
+  removeToken();
+  removeUser();
   connectSocket().disconnect();
   window.location.href = "/";
+};
+
+
+export const refreshToken = async () => {
+  const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+    credentials: "include",
+  });
+
+
+  const data = await response.json();
+
+
+  if (!response.ok) {
+    logout();
+    throw new Error(data.message || "Làm mới token thất bại");
+  }
+
+  console.log("Refresh thành công");
+
+  saveToken(data.accessToken);
+  saveUser(data.user);
+
+  return data.accessToken;
 };

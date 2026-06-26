@@ -1,15 +1,14 @@
-import { getToken } from "../ultil/auth";
+import { authFetch } from "../ultil/auth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const fetchChatThreads = async (token: string) => {
-  const response = await fetch(
+export const fetchChatThreads = async () => {
+  const response = await authFetch(
     `${BASE_URL}/api/chat/threads`,
     {
       method: "GET",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -27,15 +26,13 @@ export const getChatMessages = async (
   threadId: string,
   limit = 20
 ) => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/chat/threads/${threadId}?limit=${limit}`,
     {
       method: "GET",
       headers: {
         accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -50,15 +47,13 @@ export const getChatMessages = async (
 
 export const getShopChatThread = async (
   shopId: string,
-  token: string
 ) => {
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/shops/${shopId}/chat-thread`,
     {
       method: "POST",
       headers: {
         accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -77,16 +72,14 @@ export const sendMessage = async (
   body: string,
   clientMessageId = crypto.randomUUID()
 ) => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/chat/threads/${threadId}/messages`,
     {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         body,

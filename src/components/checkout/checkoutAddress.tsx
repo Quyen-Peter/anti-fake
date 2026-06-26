@@ -1,33 +1,49 @@
-import { MapPin, ShieldCheck } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getDefaultAddress } from "../../services/address.api";
+import type { Address } from "../../type/address";
+import AddressSelectorModal from "../address/addressSelectorModal";
 
-export default function CheckoutAddress (){
-    return(
-        <div className="checkout-card">
-          <div className="section-title">
-            <MapPin size={18} />
-            Địa chỉ nhận hàng
-          </div>
+export default function CheckoutAddress() {
+  const [address, setAddress] = useState<Address>();
+  const [openAddressModal, setOpenAddressModal] = useState(false);
 
+  const fetchDefaultAddress = async () => {
+    try {
+      const address = await getDefaultAddress();
+      setAddress(address);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-          <div className="address-box">
-            <div className="address-header">
-              <strong>
-                Nguyễn Văn A | 0901234567
-              </strong>
+  useEffect(() => {
+    fetchDefaultAddress();
+  }, []);
 
-              <button>Thay đổi</button>
-            </div>
+  return (
+    <div className="checkout-card">
+      <div className="section-title">
+        <MapPin size={18} />
+        Địa chỉ nhận hàng
+      </div>
 
-            <p>
-              123 Đường Lê Lợi, Phường Bến Thành,
-              Quận 1, TP Hồ Chí Minh
-            </p>
+      <div className="address-box">
+        <div className="address-header">
+          <strong>
+            {address?.recipientName} | {address?.phone}
+          </strong>
 
-            <span className="verified-address">
-              <ShieldCheck size={14} />
-              Địa chỉ đã xác thực
-            </span>
-          </div>
+          <button onClick={() => setOpenAddressModal(true)}>Thay đổi</button>
         </div>
-    )
+
+        <p>{address?.addressLine}</p>
+      </div>
+      <AddressSelectorModal
+        open={openAddressModal}
+        onClose={() => setOpenAddressModal(false)}
+        onSuccess={fetchDefaultAddress}
+      />
+    </div>
+  );
 }

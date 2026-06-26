@@ -7,7 +7,6 @@ import MessageSidebar from "../../components/message/messageSidebar";
 import ChatHeader from "../../components/message/chatHeader";
 import ChatMessages from "../../components/message/chatMessages";
 import ChatInput from "../../components/message/chatInput";
-import { getToken } from "../../ultil/auth";
 import { fetchChatThreads } from "../../services/chat.api";
 import type { ChatRoom } from "../../type/message";
 import {
@@ -22,11 +21,7 @@ export default function MessagePage() {
 
   const loadThreads = useCallback(async () => {
     try {
-      const token = getToken();
-
-      if (!token) return;
-
-      const data = await fetchChatThreads(token);
+      const data = await fetchChatThreads();
 
       setRooms(data);
     } catch (error) {

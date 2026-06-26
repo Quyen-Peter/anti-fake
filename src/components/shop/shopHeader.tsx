@@ -8,12 +8,39 @@ import {
 
 import type { shopCard } from "../../type/shop";
 import { formatJoinTime, formatSale } from "../../ultil/format";
+import { useNavigate } from "react-router-dom";
+
+import { getShopChatThread } from "../../services/chat.api";
 
 type Props = {
   shop: shopCard;
 };
 
 export default function ShopHeader({ shop }: Props) {
+  const navigate = useNavigate();
+
+  const getOrCreateChatThread = async (shopId: string) => {
+    try {
+      const response = await getShopChatThread(shopId);
+
+      if (!response?.success || !response?.threadId) {
+        throw new Error("Không thể tạo cuộc trò chuyện");
+      }
+
+      navigate(`/messages/${response.threadId}`);
+
+      return;
+    } catch (error: any) {
+      console.error("Lỗi tạo chat thread:", error);
+
+      throw new Error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Đã xảy ra lỗi khi tạo cuộc trò chuyện",
+      );
+    }
+  };
+
   return (
     <div className="shop-header-card-view">
       <div className="shop-header-left-view">
@@ -55,9 +82,12 @@ export default function ShopHeader({ shop }: Props) {
               </div>
             </div>
             <div className="shop-header-actions-view">
-              <button className="chat-btn-view">
+              <button
+                className="chat-btn-view"
+                onClick={() => getOrCreateChatThread(shop.shopId)}
+              >
                 <MessageSquare size={18} />
-                Chat
+                Nhắn tin
               </button>
             </div>
           </div>

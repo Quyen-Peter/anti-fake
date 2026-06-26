@@ -1,18 +1,16 @@
 import type { CreateAddressRequest, UpdateAddressRequest } from "../type/address";
-import { getToken } from "../ultil/auth";
+import { authFetch } from "../ultil/auth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getUserAddresses = async () => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/user/addresses`,
     {
       method: "GET",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -31,14 +29,13 @@ export const getUserAddresses = async () => {
 export const createAddress = async (
   payload: CreateAddressRequest
 ) => {
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/user/addresses`,
     {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
       },
       body: JSON.stringify(payload),
     }
@@ -55,15 +52,13 @@ export const createAddress = async (
 
 
 export const setDefaultAddress = async (addressId: string) => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/user/addresses/${addressId}/default`,
     {
       method: "POST",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -80,13 +75,12 @@ export const setDefaultAddress = async (addressId: string) => {
 
 export const deleteAddress = async (addressId: string) => {
   try {
-    const response = await fetch(
+    const response = await authFetch(
     `${BASE_URL}/api/user/addresses/${addressId}`,
     {
       method: "DELETE",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${getToken()}`,
       },
     }
   );
@@ -106,16 +100,14 @@ export const updateAddress = async (
   id: string,
   payload: UpdateAddressRequest
 ) => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/user/addresses/${id}`,
     {
       method: "PATCH", 
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     }
@@ -131,15 +123,13 @@ export const updateAddress = async (
 };
 
 export const getDefaultAddress = async () => {
-  const token = getToken();
 
-  const response = await fetch(
+  const response = await authFetch(
     `${BASE_URL}/api/user/addresses/default`,
     {
       method: "GET",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
       },
     }
   );

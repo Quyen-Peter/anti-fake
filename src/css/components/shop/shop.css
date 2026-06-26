@@ -156,7 +156,7 @@
   cursor: pointer;
 
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 
   transition: 0.2s;
 }
@@ -238,7 +238,7 @@
   }
 
   .shop-name-row-view h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .shop-content-view-buttom {
@@ -258,8 +258,8 @@
 
   .chat-btn-view {
     width: 40%;
-    height: 35px;
-    font-size: 13px;
+    height: 30px;
+    font-size: 12px;
   }
 
   .shop-header-actions-view {
@@ -340,9 +340,8 @@
     width: 95px;
     height: 95px;
   }
-
   .shop-name-row-view h2 {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .chat-btn-view {

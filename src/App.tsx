@@ -34,6 +34,7 @@ import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
 import ProfileAddress from "./pages/profile/addressPage";
 import SellerOrderDetail from "./components/orderManagement/orderDetail";
+import SellerRegistration from "./components/sellerRegistration/sellerRegistration";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -54,6 +55,8 @@ function App() {
         <ScrollToTop />
         <div className="app-container">
           <Routes>
+            
+
             {/* USER */}
             <Route element={<MainLayout />}>
               <Route path="/auth" element={<AuthPage />} />
@@ -107,6 +110,7 @@ function App() {
               <Route path="/live/:id" element={<LiveRoomPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-success" element={<OrderSuccessPage />} />
+              <Route path="/register" element={<SellerRegistration />} />
             </Route>
 
             {/* seller */}

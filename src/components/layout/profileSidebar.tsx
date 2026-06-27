@@ -41,9 +41,14 @@ const menus = [
   },
   {
     label: "Cài đặt tài khoản",
-    path: "/profile/settings",
+    path: "/register",
     icon: Settings,
   },
+  // {
+  //   label: "Cài đặt tài khoản",
+  //   path: "/profile/settings",
+  //   icon: Settings,
+  // },
   {
     label: "Đăng xuất",
     path: "/logout",

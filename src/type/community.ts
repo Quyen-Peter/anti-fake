@@ -22,16 +22,25 @@ export interface SocialPost {
 
 export interface Comment {
   id: string;
+
   author: {
     id: string;
     name: string;
     avatar: string;
   };
+
   body: string;
   createdAt: string;
+
   likeCount: number;
   viewerLiked: boolean;
   replyCount: number;
+  parentCommentId?: string;
+  depth?: number;
+  replyToUser?: {
+    userId: string;
+    userName: string;
+  };
 }
 
 export interface CommentResponse {

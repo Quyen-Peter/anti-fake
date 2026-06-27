@@ -3,11 +3,13 @@ import ProductTable from "../../components/productManagement/productTable";
 import "../../css/pages/productManagement.css";
 import { useMemo, useState } from "react";
 import ProductCard from "../../components/productManagement/productCard";
+import CreateProduct from "../../components/productManagement/createProduct";
 
 export default function ProductManagement() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [openCreateProduct, setOpenCreateProduct] = useState(false);
 
   const products = [
     {
@@ -194,7 +196,10 @@ export default function ProductManagement() {
           <p>Theo dõi, chỉnh sửa và quản lý sản phẩm của cửa hàng.</p>
         </div>
 
-        <button className="seller-product-add-btn">
+        <button
+          className="seller-product-add-btn"
+          onClick={() => setOpenCreateProduct(true)}
+        >
           <Plus size={18} />
           Thêm sản phẩm mới
         </button>
@@ -303,6 +308,37 @@ export default function ProductManagement() {
           </div>
         )}
       </div>
+      {openCreateProduct && (
+        <div
+          className="create-product-overlay"
+          role="presentation"
+          onClick={() => setOpenCreateProduct(false)}
+        >
+          <div
+            className="create-product-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-product-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="create-product-header">
+              <h2 id="create-product-title">Tạo sản phẩm mới</h2>
+
+              <button
+                type="button"
+                aria-label="Dong form tao san pham"
+                onClick={() => setOpenCreateProduct(false)}
+              >
+                x
+              </button>
+            </div>
+
+            <div className="create-product-body">
+              <CreateProduct onCancel={() => setOpenCreateProduct(false)} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

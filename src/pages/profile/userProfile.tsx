@@ -1,53 +1,244 @@
-import { useEffect } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import "../../css/pages/profile/userProfile.css";
-import { getUser } from "../../ultil/auth";
+import { getUser, saveUser } from "../../ultil/auth";
+
+type ProfileForm = {
+  displayName: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  avatar: string;
+};
+
+const defaultAvatar =
+  "https://api.dicebear.com/9.x/initials/svg?seed=AntiFake&backgroundColor=f4e5e5";
 
 export default function UserProfile() {
   const user = getUser();
+  const initialProfile: ProfileForm = {
+    displayName: user?.displayName || user?.fullName || "Người dùng",
+    fullName: user?.fullName || user?.displayName || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    avatar: user?.avatar || defaultAvatar,
+  };
+
+  const [profile, setProfile] = useState<ProfileForm>(initialProfile);
+  const [form, setForm] = useState<ProfileForm>(initialProfile);
+  const [openEditProfile, setOpenEditProfile] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const openProfileModal = () => {
+    setForm(profile);
+    setAvatarError("");
+    setOpenEditProfile(true);
+  };
+
+  const closeProfileModal = () => {
+    setOpenEditProfile(false);
+    setAvatarError("");
+  };
+
+  const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      setAvatarError("Dung lượng file tối đa 1MB");
+      event.target.value = "";
+      return;
+    }
+
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      setAvatarError("Chỉ hỗ trợ ảnh JPEG hoặc PNG");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((currentForm) => ({
+        ...currentForm,
+        avatar: String(reader.result),
+      }));
+      setAvatarError("");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveProfile = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const nextUser = {
+      ...user,
+      displayName: form.displayName,
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      avatar: form.avatar,
+    };
+
+    setProfile(form);
+    saveUser(nextUser);
+    closeProfileModal();
+  };
+
   return (
-    <div className="profile-card">
-      <div className="profile-header">
-        <h2>Hồ sơ cá nhân</h2>
-        <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
-      </div>
-
-      <div className="profile-body">
-        <div className="profile-info">
-          <div className="profile-item">
-            <span className="profile-label">Tên tài khoản</span>
-            <span>{user.displayName}</span>
-          </div>
-
-          <div className="profile-item">
-            <span className="profile-label">Họ và tên</span>
-            <span>{user.displayName}</span>
-          </div>
-
-          <div className="profile-item">
-            <span className="profile-label">Email</span>
-            <span>{user.email}</span>
-          </div>
-
-          <div className="profile-item">
-            <span className="profile-label">Số điện thoại</span>
-            <span>{user.phone}</span>
-          </div>
-
-          <button className="profile-edit-btn">Chỉnh sửa hồ sơ</button>
+    <>
+      <div className="profile-card">
+        <div className="profile-header">
+          <h2>Hồ sơ cá nhân</h2>
+          <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
         </div>
 
-        <div className="profile-avatar-section">
-          <img
-            src={user.avatar}
-            alt={user.fullName}
-            className="profile-avatar"
-          />
+        <div className="profile-body">
+          <div className="profile-info">
+            <div className="profile-item">
+              <span className="profile-label">Tên tài khoản</span>
+              <span>{profile.displayName}</span>
+            </div>
+
+            <div className="profile-item">
+              <span className="profile-label">Họ và tên</span>
+              <span>{profile.fullName || profile.displayName}</span>
+            </div>
+
+            <div className="profile-item">
+              <span className="profile-label">Email</span>
+              <span>{profile.email}</span>
+            </div>
+
+            <div className="profile-item">
+              <span className="profile-label">Số điện thoại</span>
+              <span>{profile.phone}</span>
+            </div>
+
+            <button
+              type="button"
+              className="profile-edit-btn"
+              onClick={openProfileModal}
+            >
+              Chỉnh sửa hồ sơ
+            </button>
+          </div>
+
+          <div className="profile-avatar-section">
+            <img
+              src={profile.avatar}
+              alt={profile.fullName || profile.displayName}
+              className="profile-avatar"
+            />
+          </div>
         </div>
       </div>
-    </div>
+
+      {openEditProfile && (
+        <div
+          className="profile-edit-overlay"
+          role="presentation"
+          onClick={closeProfileModal}
+        >
+          <form
+            className="profile-edit-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profile-edit-title"
+            onClick={(event) => event.stopPropagation()}
+            onSubmit={handleSaveProfile}
+          >
+            <div className="profile-edit-header">
+              <div>
+                <h2 id="profile-edit-title">Hồ sơ cá nhân</h2>
+                <p>Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+              </div>
+
+              <button
+                type="button"
+                className="profile-edit-close"
+                aria-label="Đóng chỉnh sửa hồ sơ"
+                onClick={closeProfileModal}
+              >
+                x
+              </button>
+            </div>
+
+            <div className="profile-edit-content">
+              <div className="profile-edit-fields">
+                <div className="profile-edit-row readonly">
+                  <label>Tên tài khoản</label>
+                  <strong>{profile.displayName}</strong>
+                </div>
+
+                <div className="profile-edit-row">
+                  <label htmlFor="profile-full-name">Họ và tên</label>
+                  <input
+                    id="profile-full-name"
+                    value={form.fullName}
+                    onChange={(event) =>
+                      setForm({ ...form, fullName: event.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="profile-edit-row">
+                  <label htmlFor="profile-email">Email</label>
+                  <input
+                    id="profile-email"
+                    type="email"
+                    value={form.email}
+                    readOnly
+                  />
+                  <button type="button">Thay đổi</button>
+                </div>
+
+                <div className="profile-edit-row">
+                  <label htmlFor="profile-phone">Số điện thoại</label>
+                  <input
+                    id="profile-phone"
+                    value={form.phone}
+                    onChange={(event) =>
+                      setForm({ ...form, phone: event.target.value })
+                    }
+                  />
+                  <button type="button">Thay đổi</button>
+                </div>
+
+                <button type="submit" className="profile-save-btn">
+                  Lưu
+                </button>
+              </div>
+
+              <div className="profile-edit-avatar-panel">
+                <img
+                  src={form.avatar}
+                  alt={form.fullName || form.displayName}
+                  className="profile-edit-avatar"
+                />
+
+                <label className="profile-avatar-upload">
+                  Chọn ảnh
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    onChange={handleAvatarChange}
+                  />
+                </label>
+
+                <p>Dung lượng file tối đa 1MB</p>
+                <p>Định dạng: JPEG, PNG</p>
+
+                {avatarError && (
+                  <span className="profile-avatar-error">{avatarError}</span>
+                )}
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }

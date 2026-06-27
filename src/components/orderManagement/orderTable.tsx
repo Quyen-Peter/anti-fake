@@ -1,4 +1,5 @@
 import { Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../../css/components/orderManagement/orderTable.css";
 
 interface Order {
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export default function OrderTable({ orders }: Props) {
+  const navigate = useNavigate();
+
   const getStatus = (status: string) => {
     switch (status) {
       case "processing":
@@ -71,6 +74,7 @@ export default function OrderTable({ orders }: Props) {
       <tbody>
         {orders.map((order) => {
           const status = getStatus(order.status);
+          const orderId = encodeURIComponent(order.id.replace("#", ""));
 
           return (
             <tr key={order.id}>
@@ -97,7 +101,11 @@ export default function OrderTable({ orders }: Props) {
 
               <td>
                 <div className="seller-order-table-actions">
-                  <button>
+                  <button
+                    type="button"
+                    aria-label="Xem chi tiet don hang"
+                    onClick={() => navigate(`/seller/orders/${orderId}`)}
+                  >
                     <Eye size={16} />
                   </button>
                 </div>

@@ -1,0 +1,858 @@
+/* ===========================
+   CREATE PRODUCT PAGE
+=========================== */
+
+.create-product-page {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.create-product-card {
+  max-width: 1200px;
+  margin: auto;
+
+  background: white;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow: 0 10px 35px rgba(0,0,0,.08);
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.create-header {
+  padding: 28px 36px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-bottom: 1px solid #eee;
+}
+
+.create-header h2 {
+  margin: 0;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: #222;
+}
+
+.create-header p {
+  margin-top: 8px;
+
+  color: #777;
+  font-size: 15px;
+}
+
+.create-header-action {
+  display: flex;
+  gap: 14px;
+}
+
+/* ===========================
+   SECTION
+=========================== */
+
+.create-section {
+  padding: 32px 36px;
+
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.create-section:last-child {
+  border-bottom: none;
+}
+
+.create-section h3 {
+  margin-bottom: 28px;
+
+  color: #222;
+
+  font-size: 22px;
+}
+
+/* ===========================
+   GRID
+=========================== */
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 24px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 24px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 20px;
+}
+
+/* ===========================
+   FORM
+=========================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  margin-bottom: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #444;
+}
+
+.form-group small {
+  margin-top: 8px;
+
+  color: #888;
+  font-size: 13px;
+}
+
+.form-group input,
+.form-group select,
+textarea {
+  width: 100%;
+
+  padding: 13px 16px;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  font-size: 15px;
+
+  transition: .25s;
+
+  background: white;
+}
+
+.form-group input:hover,
+.form-group select:hover,
+textarea:hover {
+  border-color: #ff6b6b;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+textarea:focus {
+  outline: none;
+
+  border-color: #e53935;
+
+  box-shadow: 0 0 0 3px rgba(229,57,53,.12);
+}
+
+/* ===========================
+   TEXTAREA
+=========================== */
+
+textarea {
+  resize: vertical;
+
+  min-height: 220px;
+
+  font-family: inherit;
+
+  line-height: 1.6;
+}
+
+/* ===========================
+   BUTTON
+=========================== */
+
+.btn-primary {
+  border: none;
+
+  background: #e53935;
+
+  color: white;
+
+  padding: 13px 24px;
+
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.btn-primary:hover {
+  background: #d32f2f;
+}
+
+.btn-outline {
+  border: 1px solid #ddd;
+
+  background: white;
+
+  color: #444;
+
+  padding: 13px 24px;
+
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.btn-outline:hover {
+  border-color: #e53935;
+
+  color: #e53935;
+}
+
+/* ===========================
+   DESCRIPTION TOOLBAR
+=========================== */
+
+.description-upload {
+  margin-top: 18px;
+}
+
+.description-upload button,
+.description-upload-btn {
+  border: 1px dashed #e53935;
+
+  background: #fff5f5;
+
+  color: #e53935;
+
+  padding: 12px 20px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+
+  font-weight: 600;
+
+  transition: .25s;
+}
+
+.description-upload button:hover,
+.description-upload-btn:hover {
+  background: #ffeaea;
+}
+
+/* ==========================================
+   PRODUCT IMAGE UPLOAD
+========================================== */
+
+.upload-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.upload-box {
+  width: 150px;
+  height: 150px;
+
+  border: 2px dashed #d7d7d7;
+  border-radius: 14px;
+
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.upload-box:hover {
+  border-color: #e53935;
+  background: #fff5f5;
+}
+
+.upload-box svg {
+  width: 38px;
+  height: 38px;
+
+  color: #888;
+}
+
+.upload-box span {
+  margin-top: 12px;
+
+  font-size: 14px;
+  color: #777;
+}
+
+.upload-input {
+  display: none;
+}
+
+/* ================= Preview ================= */
+
+.upload-preview {
+  position: relative;
+
+  width: 150px;
+  height: 150px;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  border: 1px solid #ececec;
+
+  transition: .25s;
+}
+
+.upload-preview:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 8px 18px rgba(0,0,0,.1);
+}
+
+.upload-preview img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* ================= Delete ================= */
+
+.upload-remove {
+  position: absolute;
+
+  top: 8px;
+  right: 8px;
+
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: rgba(0,0,0,.65);
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.upload-remove:hover {
+  background: #e53935;
+}
+
+/* ================= Cover ================= */
+
+.upload-cover {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background: rgba(229,57,53,.95);
+
+  color: white;
+
+  text-align: center;
+
+  padding: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ================= Upload Tip ================= */
+
+.upload-tip {
+  margin-top: 16px;
+
+  color: #888;
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ==========================================
+   DESCRIPTION IMAGE
+========================================== */
+
+.description-images {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+.description-image {
+  width: 120px;
+  height: 120px;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  position: relative;
+
+  border: 1px solid #eee;
+}
+
+.description-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* ==========================================
+   SHIPPING
+========================================== */
+
+.shipping-list {
+  display: grid;
+
+  grid-template-columns: repeat(3,1fr);
+
+  gap: 16px;
+
+  margin-top: 10px;
+}
+
+.shipping-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px;
+
+  border: 1px solid #ececec;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.shipping-item:hover {
+  border-color: #e53935;
+
+  background: #fff6f6;
+}
+
+.shipping-item input {
+  width: 18px;
+  height: 18px;
+
+  accent-color: #e53935;
+}
+
+.shipping-item span {
+  font-weight: 500;
+}
+
+/* ==========================================
+   SIZE CARD
+========================================== */
+
+.grid-4 .form-group {
+  padding: 18px;
+
+  border: 1px solid #eee;
+
+  border-radius: 12px;
+
+  background: #fcfcfc;
+}
+
+.grid-4 .form-group label {
+  margin-bottom: 12px;
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.create-footer {
+  padding: 28px 36px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #fafafa;
+
+  border-top: 1px solid #ececec;
+
+  position: sticky;
+  bottom: 0;
+
+  z-index: 5;
+}
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+.create-section {
+  animation: fadeIn .35s ease;
+}
+
+@keyframes fadeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(12px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+  }
+
+}
+
+/* ==========================================
+   CARD HOVER
+========================================== */
+
+.create-section {
+  transition: .25s;
+}
+
+.create-section:hover {
+  background: #fffdfd;
+}
+
+/* ==========================================
+   REQUIRED
+========================================== */
+
+.required::after {
+  content: " *";
+  color: #e53935;
+}
+
+/* ==========================================
+   INPUT GROUP
+========================================== */
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  padding-left: 52px;
+}
+
+.input-group span {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #888;
+  font-weight: 600;
+}
+
+/* ==========================================
+   PRICE INPUT
+========================================== */
+
+.price-box {
+  position: relative;
+}
+
+.price-box::before {
+  content: "₫";
+
+  position: absolute;
+
+  left: 16px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #666;
+
+  font-size: 18px;
+
+  font-weight: bold;
+}
+
+.price-box input {
+  padding-left: 42px;
+}
+
+/* ==========================================
+   CHARACTER COUNT
+========================================== */
+
+.char-count {
+  margin-top: 8px;
+
+  text-align: right;
+
+  font-size: 13px;
+
+  color: #888;
+}
+
+.char-count.warning {
+  color: #ff9800;
+}
+
+.char-count.error {
+  color: #e53935;
+}
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.error-text {
+  margin-top: 6px;
+
+  color: #e53935;
+
+  font-size: 13px;
+}
+
+.input-error {
+  border-color: #e53935 !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 4px rgba(229,57,53,.12);
+}
+
+/* ==========================================
+   INFO BOX
+========================================== */
+
+.info-box {
+  margin-top: 18px;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  background: #fff7e8;
+
+  border: 1px solid #ffd591;
+}
+
+.info-box h4 {
+  margin-bottom: 8px;
+
+  color: #d46b08;
+}
+
+.info-box p {
+  margin: 0;
+
+  color: #8c5b00;
+
+  line-height: 1.6;
+}
+
+/* ==========================================
+   DIVIDER
+========================================== */
+
+.section-divider {
+  height: 1px;
+
+  margin: 28px 0;
+
+  background: #efefef;
+}
+
+/* ==========================================
+   LOADING BUTTON
+========================================== */
+
+.btn-loading {
+  pointer-events: none;
+
+  opacity: .7;
+}
+
+.btn-loading::after {
+  content: "";
+
+  width: 16px;
+  height: 16px;
+
+  margin-left: 10px;
+
+  border-radius: 50%;
+
+  border: 2px solid white;
+  border-top-color: transparent;
+
+  display: inline-block;
+
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #ddd;
+
+  border-radius: 20px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+
+  .grid-4 {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+}
+
+@media (max-width: 900px) {
+
+  .grid-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .shipping-list {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .create-product-page {
+    padding: 16px;
+  }
+
+  .create-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .create-header-action {
+    width: 100%;
+  }
+
+  .create-header-action button {
+    flex: 1;
+  }
+
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .shipping-list {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-box,
+  .upload-preview {
+    width: 110px;
+    height: 110px;
+  }
+
+  .create-footer {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .create-footer>div {
+    width: 100%;
+    display: flex;
+  }
+
+  .create-footer button {
+    flex: 1;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .create-header h2 {
+    font-size: 24px;
+  }
+
+  .create-section {
+    padding: 20px;
+  }
+
+  .upload-grid {
+    justify-content: center;
+  }
+
+}

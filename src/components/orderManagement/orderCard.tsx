@@ -1,4 +1,5 @@
 import { Eye, Clock3 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "../../css/components/orderManagement/orderCard.css";
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export default function OrderCard({ order }: Props) {
+  const navigate = useNavigate();
+
   const getStatus = () => {
     switch (order.status) {
       case "processing":
@@ -48,6 +51,7 @@ export default function OrderCard({ order }: Props) {
   };
 
   const status = getStatus();
+  const orderId = encodeURIComponent(order.id.replace("#", ""));
 
   return (
     <div className="seller-mobile-order-card">
@@ -69,7 +73,11 @@ export default function OrderCard({ order }: Props) {
         <div className="seller-mobile-order-price">{order.total}</div>
 
         <div className="seller-mobile-order-actions">
-          <button>
+          <button
+            type="button"
+            aria-label="Xem chi tiet don hang"
+            onClick={() => navigate(`/seller/orders/${orderId}`)}
+          >
             <Eye size={18} />
           </button>
         </div>

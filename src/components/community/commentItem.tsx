@@ -45,7 +45,27 @@ export default function CommentItem({ comment, onReply }: Props) {
         <div className="comment-bubble">
           <strong>{comment?.author.name}</strong>
 
-          <p>{comment?.body}</p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              flexWrap: "wrap",
+            }}
+          >
+            {comment.replyToUser && (
+              <span
+                style={{
+                  color: "#1677ff",
+                  fontWeight: 600,
+                }}
+              >
+                @{comment.replyToUser.userName}
+              </span>
+            )}
+
+            <span>{comment.body}</span>
+          </div>
         </div>
 
         <div className="comment-actions">

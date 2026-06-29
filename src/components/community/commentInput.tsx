@@ -15,7 +15,7 @@ type Props = {
   onSubmit: (
     content: string,
     replyTo?: ReplyTarget | null,
-  ) => Promise<void> | void;
+  ) => Promise<void | false> | void | false;
 };
 
 export default function CommentInput({
@@ -39,7 +39,9 @@ export default function CommentInput({
 
     if (!value || loading) return;
 
-    await onSubmit(value, replyTo);
+    const submitted = await onSubmit(value, replyTo);
+
+    if (submitted === false) return;
 
     setContent("");
     onCancelReply?.();

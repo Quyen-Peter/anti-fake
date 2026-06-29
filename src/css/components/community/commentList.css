@@ -67,6 +67,19 @@
     gap:12px;
 }
 
+.reply-list .comment-item {
+    gap: 8px;
+}
+
+.reply-list .comment-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.reply-list .comment-bubble {
+    padding: 8px 12px;
+}
+
 .comment-view-replies{
     margin-top:6px;
     border:none;

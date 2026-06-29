@@ -105,7 +105,10 @@ export const refreshToken = async () => {
 
 
   if (!response.ok) {
-    logout();
+    removeToken();
+    removeUser();
+    connectSocket().disconnect();
+    window.location.href = "/auth";
     throw new Error(data.message || "Làm mới token thất bại");
   }
 

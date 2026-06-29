@@ -1,21 +1,39 @@
 import { Heart } from "lucide-react";
-import type { Comment } from "../../type/community";
-import { formatCommunityTime } from "../../ultil/format";
 import { useState } from "react";
 import { getReplies } from "../../services/community.api";
+import type { Comment } from "../../type/community";
+import { formatCommunityTime } from "../../ultil/format";
 
 type Props = {
   comment: Comment;
+  isReply?: boolean;
+  pendingRepliesByParent?: Record<string, Comment[]>;
   onReply?: (comment: Comment) => void;
 };
 
-export default function CommentItem({ comment, onReply }: Props) {
+export default function CommentItem({
+  comment,
+  isReply = false,
+  pendingRepliesByParent = {},
+  onReply,
+}: Props) {
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const pendingReplies = isReply ? [] : pendingRepliesByParent[comment.id] ?? [];
+  const visibleReplies = [
+    ...pendingReplies,
+    ...replies.filter(
+      (reply) =>
+        !pendingReplies.some((pendingReply) => pendingReply.id === reply.id)
+    ),
+  ];
+  const repliesVisible = showReplies || pendingReplies.length > 0;
+  const replyCount = Math.max(comment.replyCount, visibleReplies.length);
+
   const handleToggleReplies = async () => {
-    if (showReplies) {
+    if (repliesVisible) {
       setShowReplies(false);
       return;
     }
@@ -23,11 +41,12 @@ export default function CommentItem({ comment, onReply }: Props) {
     if (replies.length === 0) {
       setLoading(true);
 
-      const data = await getReplies(comment.id);
-
-      setReplies(data.items);
-
-      setLoading(false);
+      try {
+        const data = await getReplies(comment.id);
+        setReplies(data.items);
+      } finally {
+        setLoading(false);
+      }
     }
 
     setShowReplies(true);
@@ -36,14 +55,14 @@ export default function CommentItem({ comment, onReply }: Props) {
   return (
     <div className="comment-item">
       <img
-        src={comment?.author.avatar}
-        alt={comment?.author.id}
+        src={comment.author.avatar}
+        alt={comment.author.id}
         className="comment-avatar"
       />
 
       <div className="comment-content">
         <div className="comment-bubble">
-          <strong>{comment?.author.name}</strong>
+          <strong>{comment.author.name}</strong>
 
           <div
             style={{
@@ -69,32 +88,39 @@ export default function CommentItem({ comment, onReply }: Props) {
         </div>
 
         <div className="comment-actions">
-          <span>{formatCommunityTime(comment?.createdAt)}</span>
+          <span>{formatCommunityTime(comment.createdAt)}</span>
 
-          <button>Thích </button>
+          <button>Thích</button>
 
           <button onClick={() => onReply?.(comment)}>Trả lời</button>
 
           <button>
             <Heart size={14} />
-            {comment?.likeCount}
+            {comment.likeCount}
           </button>
         </div>
-        {comment.replyCount > 0 && (
+
+        {!isReply && replyCount > 0 && (
           <button
             className="comment-view-replies"
             onClick={handleToggleReplies}
           >
-            {showReplies ? "Ẩn phản hồi" : `Xem ${comment.replyCount} phản hồi`}
+            {repliesVisible ? "Ẩn phản hồi" : `Xem ${replyCount} phản hồi`}
           </button>
         )}
 
-        {showReplies && (
+        {!isReply && repliesVisible && (
           <div className="reply-list">
             {loading && <p>Đang tải...</p>}
 
-            {replies.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} onReply={onReply} />
+            {visibleReplies.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                isReply
+                pendingRepliesByParent={pendingRepliesByParent}
+                onReply={onReply}
+              />
             ))}
           </div>
         )}

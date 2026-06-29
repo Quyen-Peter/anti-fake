@@ -83,3 +83,112 @@ export const getReplies = async (
 
   return data;
 };
+
+
+export const likePost = async (
+  postId: string,
+  reactionType: "LIKE"
+) => {
+
+  const response = await authFetch(
+    `${BASE_URL}/api/social/posts/${postId}/reactions`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reactionType,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Thả cảm xúc thất bại");
+  }
+
+  return data;
+};
+
+
+export const unLikePost = async (
+  postId: string,
+  reactionType: "LIKE"
+) => {
+
+  const response = await authFetch(
+    `${BASE_URL}/api/social/posts/${postId}/reactions`,
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reactionType,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Thả cảm xúc thất bại");
+  }
+
+  return data;
+};
+
+export const createComment = async (
+  postId: string,
+  body: string
+) => {
+  const response = await authFetch(
+    `${BASE_URL}/api/social/posts/${postId}/comments`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        body,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Đăng bình luận thất bại");
+  }
+
+  return data;
+};
+
+export const createReply = async (commentId: string, body: string) => {
+  const response = await authFetch(
+    `${BASE_URL}/api/social/comments/${commentId}/replies`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        body,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Đăng phản hồi thất bại");
+  }
+
+  return data;
+};

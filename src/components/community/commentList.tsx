@@ -6,10 +6,17 @@ import type { Comment, CommentResponse } from "../../type/community";
 
 type Props = {
   postId: string;
+  pendingComments?: Comment[];
+  pendingRepliesByParent?: Record<string, Comment[]>;
   onReply?: (comment: Comment) => void;
 };
 
-export default function CommentList({ postId, onReply }: Props) {
+export default function CommentList({
+  postId,
+  pendingComments = [],
+  pendingRepliesByParent = {},
+  onReply,
+}: Props) {
   const [comments, setComments] = useState<CommentResponse>();
   const [loading, setLoading] = useState(true);
 
@@ -30,14 +37,29 @@ export default function CommentList({ postId, onReply }: Props) {
     return <div>Đang tải bình luận...</div>;
   }
 
-  if (comments?.items.length === 0) {
+  if (comments?.items.length === 0 && pendingComments.length === 0) {
     return <div className="comment-empty">Chưa có bình luận nào.</div>;
   }
 
+  const commentItems = [
+    ...pendingComments,
+    ...(comments?.items.filter(
+      (comment) =>
+        !pendingComments.some(
+          (pendingComment) => pendingComment.id === comment.id
+        )
+    ) ?? []),
+  ];
+
   return (
     <div className="comment-list">
-      {comments?.items.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} onReply={onReply} />
+      {commentItems.map((comment) => (
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          pendingRepliesByParent={pendingRepliesByParent}
+          onReply={onReply}
+        />
       ))}
     </div>
   );

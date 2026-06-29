@@ -285,6 +285,16 @@
   color: #9b0019;
 }
 
+.seller-register-empty-category {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed #ead1d1;
+  border-radius: 8px;
+  background: #fffafa;
+  color: #8b7777;
+  font-size: 13px;
+}
+
 .seller-register-category-fieldset > small {
   color: #8b7777;
   font-size: 12px;
@@ -420,6 +430,15 @@
   margin-bottom: 28px;
   background: #ffe7ea;
   color: #b00020;
+}
+
+.seller-register-card-error .seller-register-success-icon {
+  background: #fff0f1;
+  color: #b00020;
+}
+
+.seller-register-card-error .seller-register-success-desc {
+  color: #7f1d1d;
 }
 
 .seller-register-next-box {

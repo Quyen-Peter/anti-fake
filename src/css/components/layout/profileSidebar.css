@@ -34,13 +34,19 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 12px 14px;
+  border: none;
   border-radius: 10px;
+  background: transparent;
   text-decoration: none;
   color: #5f4f4f;
   font-size: 15px;
   font-weight: 500;
+  font-family: inherit;
+  text-align: left;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .profile-sidebar-link svg {
@@ -52,6 +58,34 @@
 .profile-sidebar-link:hover {
   background: #fff2f2;
   color: #b30000;
+}
+
+.profile-sidebar-link:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.profile-shop-link {
+  justify-content: flex-start;
+}
+
+.profile-shop-link span {
+  flex: 1;
+}
+
+.profile-sidebar-spinner {
+  margin-left: auto;
+  animation: profile-sidebar-spin 0.8s linear infinite;
+}
+
+@keyframes profile-sidebar-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .profile-sidebar-link.active {
@@ -69,12 +103,7 @@
 }
 
 .profile-logout-link {
-  width: auto;
   flex: 0 0 auto;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
   color: #ef4444;
 }
 

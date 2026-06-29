@@ -1,17 +1,20 @@
 import {
-  User,
+  LogOut,
   MapPin,
-  ShoppingBag,
+  Menu,
   QrCode,
   Settings,
-  LogOut,
-  Menu,
+  ShoppingBag,
   Store,
+  User,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
-import "../../css/components/layout/profileSidebar.css";
 import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import LoadingOverlay from "../loadingOverlay";
 import { logout } from "../../services/auth.api";
+import { getMyShop } from "../../services/shop.api";
+import "../../css/components/layout/profileSidebar.css";
 
 const menus = [
   {
@@ -44,11 +47,6 @@ const menus = [
     path: "/register",
     icon: Settings,
   },
-  // {
-  //   label: "Cài đặt tài khoản",
-  //   path: "/profile/settings",
-  //   icon: Settings,
-  // },
   {
     label: "Đăng xuất",
     path: "/logout",
@@ -57,16 +55,92 @@ const menus = [
 ];
 
 export default function ProfileSidebar() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [checkingShop, setCheckingShop] = useState(false);
+
+  const normalizeMyShop = (data: any) => {
+    const payload = data?.data ?? data?.items ?? data;
+
+    if (Array.isArray(payload)) {
+      return payload[0] ?? null;
+    }
+
+    if (payload && typeof payload === "object") {
+      return payload;
+    }
+
+    return null;
+  };
+
+  const getShopStatus = (shop: any) =>
+    String(shop?.status ?? shop?.kycStatus ?? shop?.shopStatus ?? "")
+      .trim()
+      .toLowerCase();
+
+  const isRejectedShop = (status: string) =>
+    status.includes("reject") ||
+    status.includes("rejected") ||
+    status.includes("declined") ||
+    status.includes("failed");
+
+  const handleMyShopClick = async () => {
+    if (checkingShop) return;
+
+    setCheckingShop(true);
+
+    try {
+      const data = await getMyShop();
+      const shop = normalizeMyShop(data);
+      const shopId = shop?.shopId || shop?.id;
+
+      setOpen(false);
+
+      if (!shop) {
+        navigate("/register");
+        return;
+      }
+
+      const status = getShopStatus(shop);
+
+      // if (status === "pending_kyc") {
+      //   navigate("/register", {
+      //     state: { initialStep: 3, registrationStatus: "pending_kyc" },
+      //   });
+      //   return;
+      // }
+
+      if (isRejectedShop(status)) {
+        navigate("/register", {
+          state: { initialStep: 3, registrationStatus: "rejected" },
+        });
+        return;
+      }
+
+      if (!shopId) {
+        navigate("/register");
+        return;
+      }
+
+      navigate("/seller/dashboard");
+    } catch (err: any) {
+      toast.error(err.message || "Không thể kiểm tra cửa hàng");
+    } finally {
+      setCheckingShop(false);
+    }
+  };
 
   return (
     <>
+      {checkingShop && <LoadingOverlay />}
+
       {open && (
         <div
           className="profile-sidebar-overlay"
           onClick={() => setOpen(false)}
         />
       )}
+
       <aside className="profile-sidebar">
         <div>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -87,6 +161,7 @@ export default function ProfileSidebar() {
           >
             {menus.map((item) => {
               const Icon = item.icon;
+
               if (item.path === "/logout") {
                 return (
                   <button
@@ -99,6 +174,21 @@ export default function ProfileSidebar() {
                   </button>
                 );
               }
+
+              if (item.path === "/seller/dashboard") {
+                return (
+                  <button
+                    key={item.path}
+                    className="profile-sidebar-link profile-shop-link"
+                    onClick={handleMyShopClick}
+                    disabled={checkingShop}
+                  >
+                    <Icon size={18} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              }
+
               return (
                 <NavLink
                   key={item.path}

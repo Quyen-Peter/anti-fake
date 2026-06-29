@@ -1,4 +1,14 @@
+import { authFetch } from "../ultil/auth";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export type CreateShopPayload = {
+  shopName: string;
+  registrationType: string;
+  taxCode: string;
+  businessType: string;
+  categoryIds: string[];
+};
 
 export const fetchShops = async (
   page: number,
@@ -61,6 +71,46 @@ export const getShopDetail = async (
 
   if (!response.ok) {
     throw new Error(data.message || "Lấy thông tin cửa hàng thất bại");
+  }
+
+  return data;
+};
+
+export const getMyShop = async () => {
+  const response = await authFetch(`${BASE_URL}/api/shops/mine`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (response.status === 204 || response.status === 404) {
+    return null;
+  }
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể lấy thông tin cửa hàng");
+  }
+
+  return data;
+};
+
+export const createShop = async (payload: CreateShopPayload) => {
+  const response = await authFetch(`${BASE_URL}/api/shops`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Đăng ký cửa hàng thất bại");
   }
 
   return data;

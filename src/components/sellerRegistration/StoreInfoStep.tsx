@@ -1,37 +1,32 @@
 import { ArrowRight } from "lucide-react";
 import type { FormEvent } from "react";
-import type { RegistrationForm } from "./sellerRegistration";
+import type { RegistrationForm, ShopCategory } from "./sellerRegistration";
 
 type StoreInfoStepProps = {
   form: RegistrationForm;
   setForm: (form: RegistrationForm) => void;
+  categories: ShopCategory[];
+  loadingCategories: boolean;
+  submitting: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
-
-const productCategories = [
-  "Linh kiện Điện tử",
-  "Cơ khí chính xác",
-  "Thời trang",
-  "Mỹ phẩm",
-  "Thực phẩm",
-  "Thiết bị gia dụng",
-  "Nội thất",
-  "Vật liệu xây dựng",
-];
 
 export default function StoreInfoStep({
   form,
   setForm,
+  categories,
+  loadingCategories,
+  submitting,
   onSubmit,
 }: StoreInfoStepProps) {
-  const toggleCategory = (category: string) => {
-    const isSelected = form.categories.includes(category);
+  const toggleCategory = (categoryId: string) => {
+    const isSelected = form.categoryIds.includes(categoryId);
 
     setForm({
       ...form,
-      categories: isSelected
-        ? form.categories.filter((item) => item !== category)
-        : [...form.categories, category],
+      categoryIds: isSelected
+        ? form.categoryIds.filter((item) => item !== categoryId)
+        : [...form.categoryIds, categoryId],
     });
   };
 
@@ -50,6 +45,7 @@ export default function StoreInfoStep({
           <span>Tên Cửa hàng</span>
           <input
             value={form.storeName}
+            disabled={submitting}
             onChange={(event) =>
               setForm({ ...form, storeName: event.target.value })
             }
@@ -61,6 +57,7 @@ export default function StoreInfoStep({
             <span>Loại hình đăng ký</span>
             <select
               value={form.registrationType}
+              disabled={submitting}
               onChange={(event) =>
                 setForm({ ...form, registrationType: event.target.value })
               }
@@ -75,6 +72,7 @@ export default function StoreInfoStep({
             <span>Mã số thuế</span>
             <input
               value={form.taxCode}
+              disabled={submitting}
               onChange={(event) =>
                 setForm({ ...form, taxCode: event.target.value })
               }
@@ -94,6 +92,7 @@ export default function StoreInfoStep({
                 type="radio"
                 name="businessType"
                 checked={form.businessType === "MANUFACTURER"}
+                disabled={submitting}
                 onChange={() =>
                   setForm({ ...form, businessType: "MANUFACTURER" })
                 }
@@ -113,6 +112,7 @@ export default function StoreInfoStep({
                 type="radio"
                 name="businessType"
                 checked={form.businessType === "DISTRIBUTOR"}
+                disabled={submitting}
                 onChange={() =>
                   setForm({ ...form, businessType: "DISTRIBUTOR" })
                 }
@@ -127,37 +127,48 @@ export default function StoreInfoStep({
 
         <fieldset className="seller-register-fieldset seller-register-category-fieldset">
           <legend>Danh mục Sản phẩm</legend>
-          <div className="seller-register-category-list">
-            {productCategories.map((category) => {
-              const checked = form.categories.includes(category);
+          {categories.length > 0 ? (
+            <div className="seller-register-category-list">
+              {categories.map((category) => {
+                const categoryId = String(category.id);
+                const checked = form.categoryIds.includes(categoryId);
 
-              return (
-                <label
-                  key={category}
-                  className={`seller-register-category-option ${
-                    checked ? "active" : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleCategory(category)}
-                  />
-                  <span>{category}</span>
-                </label>
-              );
-            })}
-          </div>
-          <small>{form.categories.length} danh mục đã chọn</small>
+                return (
+                  <label
+                    key={categoryId}
+                    className={`seller-register-category-option ${
+                      checked ? "active" : ""
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={submitting}
+                      onChange={() => toggleCategory(categoryId)}
+                    />
+                    <span>{category.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="seller-register-empty-category">
+              {loadingCategories
+                ? "Đang tải danh mục..."
+                : "Chưa có danh mục nào."}
+            </p>
+          )}
+          <small>{form.categoryIds.length} danh mục đã chọn</small>
         </fieldset>
       </div>
 
       <footer className="seller-register-actions">
-        <button type="button" className="seller-register-link-btn">
-          Lưu nháp
-        </button>
-        <button type="submit" className="seller-register-primary-btn">
-          Tiếp theo <ArrowRight size={18} />
+        <button
+          type="submit"
+          className="seller-register-primary-btn"
+          disabled={submitting || loadingCategories}
+        >
+          Đăng ký <ArrowRight size={18} />
         </button>
       </footer>
     </form>

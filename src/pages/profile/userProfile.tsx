@@ -1,5 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { toast } from "sonner";
 import "../../css/pages/profile/userProfile.css";
+import { updateUserProfile, uploadUserAvatar } from "../../services/user.api";
 import { getUser, saveUser } from "../../ultil/auth";
 
 type ProfileForm = {
@@ -12,6 +14,20 @@ type ProfileForm = {
 
 const defaultAvatar =
   "https://api.dicebear.com/9.x/initials/svg?seed=AntiFake&backgroundColor=f4e5e5";
+
+const getResponseData = (data: any) => data?.user || data?.data || data || {};
+
+const getAvatarUrl = (data: any) => {
+  const payload = getResponseData(data);
+  return (
+    payload.avatar ||
+    payload.avatarUrl ||
+    payload.url ||
+    data?.avatar ||
+    data?.avatarUrl ||
+    data?.url
+  );
+};
 
 export default function UserProfile() {
   const user = getUser();
@@ -27,6 +43,8 @@ export default function UserProfile() {
   const [form, setForm] = useState<ProfileForm>(initialProfile);
   const [openEditProfile, setOpenEditProfile] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,12 +53,16 @@ export default function UserProfile() {
   const openProfileModal = () => {
     setForm(profile);
     setAvatarError("");
+    setAvatarFile(null);
     setOpenEditProfile(true);
   };
 
   const closeProfileModal = () => {
+    if (saving) return;
+
     setOpenEditProfile(false);
     setAvatarError("");
+    setAvatarFile(null);
   };
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,15 +71,19 @@ export default function UserProfile() {
 
     if (file.size > 1024 * 1024) {
       setAvatarError("Dung lượng file tối đa 1MB");
+      setAvatarFile(null);
       event.target.value = "";
       return;
     }
 
     if (!["image/jpeg", "image/png"].includes(file.type)) {
       setAvatarError("Chỉ hỗ trợ ảnh JPEG hoặc PNG");
+      setAvatarFile(null);
       event.target.value = "";
       return;
     }
+
+    setAvatarFile(file);
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -70,21 +96,57 @@ export default function UserProfile() {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveProfile = (event: FormEvent<HTMLFormElement>) => {
+  const handleSaveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (saving) return;
 
-    const nextUser = {
-      ...user,
-      displayName: form.displayName,
-      fullName: form.fullName,
-      email: form.email,
-      phone: form.phone,
-      avatar: form.avatar,
-    };
+    const nextDisplayName = form.fullName.trim() || form.displayName.trim();
 
-    setProfile(form);
-    saveUser(nextUser);
-    closeProfileModal();
+    setSaving(true);
+
+    try {
+      const profileResponse = await updateUserProfile({
+        displayName: nextDisplayName,
+        phone: form.phone.trim(),
+      });
+      const profileData = getResponseData(profileResponse);
+
+      let nextAvatar = profileData.avatar || form.avatar;
+
+      if (avatarFile) {
+        const avatarResponse = await uploadUserAvatar(avatarFile);
+        nextAvatar = getAvatarUrl(avatarResponse) || nextAvatar;
+      }
+
+      const nextProfile: ProfileForm = {
+        displayName: profileData.displayName || nextDisplayName,
+        fullName: profileData.fullName || profileData.displayName || nextDisplayName,
+        email: profileData.email || form.email,
+        phone: profileData.phone || form.phone.trim(),
+        avatar: nextAvatar,
+      };
+
+      const nextUser = {
+        ...user,
+        ...profileData,
+        displayName: nextProfile.displayName,
+        fullName: nextProfile.fullName,
+        email: nextProfile.email,
+        phone: nextProfile.phone,
+        avatar: nextProfile.avatar,
+      };
+
+      setProfile(nextProfile);
+      setForm(nextProfile);
+      saveUser(nextUser);
+      setAvatarFile(null);
+      closeProfileModal();
+      toast.success("Cập nhật hồ sơ thành công");
+    } catch (err: any) {
+      toast.error(err.message || "Cập nhật hồ sơ thất bại");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -161,6 +223,7 @@ export default function UserProfile() {
                 className="profile-edit-close"
                 aria-label="Đóng chỉnh sửa hồ sơ"
                 onClick={closeProfileModal}
+                disabled={saving}
               >
                 x
               </button>
@@ -178,6 +241,7 @@ export default function UserProfile() {
                   <input
                     id="profile-full-name"
                     value={form.fullName}
+                    disabled={saving}
                     onChange={(event) =>
                       setForm({ ...form, fullName: event.target.value })
                     }
@@ -192,7 +256,9 @@ export default function UserProfile() {
                     value={form.email}
                     readOnly
                   />
-                  <button type="button">Thay đổi</button>
+                  <button type="button" disabled={saving}>
+                    Thay đổi
+                  </button>
                 </div>
 
                 <div className="profile-edit-row">
@@ -200,15 +266,22 @@ export default function UserProfile() {
                   <input
                     id="profile-phone"
                     value={form.phone}
+                    disabled={saving}
                     onChange={(event) =>
                       setForm({ ...form, phone: event.target.value })
                     }
                   />
-                  <button type="button">Thay đổi</button>
+                  <button type="button" disabled={saving}>
+                    Thay đổi
+                  </button>
                 </div>
 
-                <button type="submit" className="profile-save-btn">
-                  Lưu
+                <button
+                  type="submit"
+                  className="profile-save-btn"
+                  disabled={saving}
+                >
+                  {saving ? "Đang lưu..." : "Lưu"}
                 </button>
               </div>
 
@@ -224,6 +297,7 @@ export default function UserProfile() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png"
+                    disabled={saving}
                     onChange={handleAvatarChange}
                   />
                 </label>

@@ -1,10 +1,13 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 export default function ShopTabs() {
+  const { shopId } = useParams<{ shopId: string }>();
+  const basePath = `/shop/${shopId}`;
+
   return (
     <div className="shop-tabs">
       <NavLink
-        to="/shop/1"
+        to={basePath}
         end
         className={({ isActive }) =>
           isActive ? "shop-tab active" : "shop-tab"
@@ -14,7 +17,7 @@ export default function ShopTabs() {
       </NavLink>
 
       <NavLink
-        to="/shop/1/products"
+        to={`${basePath}/products`}
         className={({ isActive }) =>
           isActive ? "shop-tab active" : "shop-tab"
         }
@@ -23,7 +26,7 @@ export default function ShopTabs() {
       </NavLink>
 
       <NavLink
-        to="/shop/1/categories"
+        to={`${basePath}/categories`}
         className={({ isActive }) =>
           isActive ? "shop-tab active" : "shop-tab"
         }

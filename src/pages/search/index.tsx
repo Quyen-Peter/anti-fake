@@ -6,16 +6,37 @@ import { useEffect, useState } from "react";
 import { searchOffers } from "../../services/product.api";
 import LoadingOverlay from "../../components/loadingOverlay";
 import ProductCard from "../../components/product/productCard";
+import { fetchCategories } from "../../services/category.api";
+import type { SearchCategory } from "../../components/layout/searchSidebar";
+
+const normalizeList = (data: any) => {
+  const payload = data?.data ?? data?.items ?? data;
+  return Array.isArray(payload) ? payload : [];
+};
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<SearchCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const keyword = searchParams.get("q") || "";
   const categoryId = searchParams.get("categoryId");
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const [sortType, setSortType] = useState("all");
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategories(normalizeList(data));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -31,7 +52,7 @@ export default function SearchPage() {
           pageSize: 20,
         });
 
-        setProducts(data.items || []);
+        setProducts(normalizeList(data));
       } catch (error) {
         console.error(error);
       } finally {
@@ -68,11 +89,15 @@ export default function SearchPage() {
   return (
     <div className="search-page">
       <div className="s-sidebar-page">
-        <SearchSidebar />
+        <SearchSidebar categories={categories} />
       </div>
 
       <div className="search-content">
-        <SearchHeader sortType={sortType} setSortType={setSortType} />
+        <SearchHeader
+          sortType={sortType}
+          setSortType={setSortType}
+          categories={categories}
+        />
         <div className="s-product-grid">
           {loading && <LoadingOverlay />}
 

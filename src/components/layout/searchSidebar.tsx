@@ -1,10 +1,21 @@
 import "../../css/components/layout/searchSidebar.css";
 import { useEffect, useState } from "react";
-import { fetchCategories } from "../../services/category.api";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-export default function SearchSidebar() {
-  const [categories, setCategories] = useState<any[]>([]);
+export type SearchCategory = {
+  id: string | number;
+  name: string;
+};
+
+type SearchSidebarProps = {
+  categories: SearchCategory[];
+  basePath?: string;
+};
+
+export default function SearchSidebar({
+  categories,
+  basePath = "/search",
+}: SearchSidebarProps) {
   const [fromPrice, setFromPrice] = useState("");
   const [toPrice, setToPrice] = useState("");
 
@@ -14,22 +25,24 @@ export default function SearchSidebar() {
   const selectedCategoryId = searchParams.get("categoryId");
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    setFromPrice(searchParams.get("minPrice") || "");
+    setToPrice(searchParams.get("maxPrice") || "");
+  }, [searchParams]);
 
-    loadData();
-  }, []);
+  const navigateWithParams = (params: URLSearchParams) => {
+    navigate(`${basePath}?${params.toString()}`);
+  };
 
   const handleCategoryClick = (categoryId: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("categoryId", categoryId);
-    navigate(`/search?${params.toString()}`);
+
+    if (selectedCategoryId === categoryId) {
+      params.delete("categoryId");
+    } else {
+      params.set("categoryId", categoryId);
+    }
+
+    navigateWithParams(params);
   };
 
   const handlePriceRange = (minPrice?: number, maxPrice?: number) => {
@@ -47,7 +60,7 @@ export default function SearchSidebar() {
       params.delete("maxPrice");
     }
 
-    navigate(`/search?${params.toString()}`);
+    navigateWithParams(params);
   };
 
   const handleApplyPrice = () => {
@@ -65,32 +78,37 @@ export default function SearchSidebar() {
       params.delete("maxPrice");
     }
 
-    navigate(`/search?${params.toString()}`);
+    navigateWithParams(params);
   };
 
   return (
     <aside className="search-sidebar">
-      {/* Danh mục */}
-
       <div className="filter-section">
         <h4>DANH MỤC</h4>
 
         <div className="s-category-list">
-          {categories.map((item) => (
-            <div
-              key={item.id}
-              className={`s-category-item ${
-                selectedCategoryId === String(item.id) ? "active" : ""
-              }`}
-              onClick={() => handleCategoryClick(String(item.id))}
-            >
-              <span>{item.name}</span>
-            </div>
-          ))}
+          {categories.map((item) => {
+            const categoryId = String(item.id);
+
+            return (
+              <button
+                type="button"
+                key={categoryId}
+                className={`s-category-item ${
+                  selectedCategoryId === categoryId ? "active" : ""
+                }`}
+                onClick={() => handleCategoryClick(categoryId)}
+              >
+                <span>{item.name}</span>
+              </button>
+            );
+          })}
+
+          {categories.length === 0 && (
+            <p className="s-category-empty">Chưa có danh mục.</p>
+          )}
         </div>
       </div>
-
-      {/* Khoảng giá */}
 
       <div className="filter-section">
         <h4>KHOẢNG GIÁ</h4>
@@ -161,14 +179,14 @@ export default function SearchSidebar() {
             placeholder="Từ"
             className="price-range-from"
             value={fromPrice}
-            onChange={(e) => setFromPrice(e.target.value)}
+            onChange={(event) => setFromPrice(event.target.value)}
           />
           <input
             type="number"
             placeholder="Đến"
             className="price-range-to"
             value={toPrice}
-            onChange={(e) => setToPrice(e.target.value)}
+            onChange={(event) => setToPrice(event.target.value)}
           />
         </div>
 

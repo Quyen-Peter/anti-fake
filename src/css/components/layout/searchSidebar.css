@@ -8,6 +8,13 @@
   padding-left: 20px;
   padding-right: 20px;
   height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;            
+  scrollbar-color: rgba(0,0,0,.18) transparent;
+
 }
 
 /* Section */
@@ -39,6 +46,8 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 6px;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 .s-category-list::-webkit-scrollbar {
@@ -55,12 +64,18 @@
 }
 
 .s-category-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
   display: flex;
   align-items: center;
+  text-align: left;
   color: #666;
   cursor: pointer;
   margin-bottom: 9px;
   margin-left: 10px;
+  font: inherit;
 }
 
 .s-category-item:hover {
@@ -75,6 +90,12 @@
 .s-category-item span {
   font-size: 14px;
   font-weight: 500;
+}
+
+.s-category-empty {
+  margin: 0 0 0 10px;
+  color: #888;
+  font-size: 13px;
 }
 
 /* Checkbox */

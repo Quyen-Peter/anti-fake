@@ -10,6 +10,11 @@ export type CreateShopPayload = {
   categoryIds: string[];
 };
 
+export type ShopCategory = {
+  id: string | number;
+  name: string;
+};
+
 export const fetchShops = async (
   page: number,
   pageSize: number,
@@ -114,4 +119,29 @@ export const createShop = async (payload: CreateShopPayload) => {
   }
 
   return data;
+};
+
+export const fetchShopCategories = async (shopId: string) => {
+  const response = await fetch(`${BASE_URL}/api/shops/${shopId}/categories`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể lấy danh mục của cửa hàng");
+  }
+
+  const payload = data?.data ?? data?.items ?? data;
+  if (!Array.isArray(payload)) return [];
+
+  return payload
+    .map((item: any) => ({
+      id: item.id ?? item.categoryId,
+      name: item.name ?? item.categoryName,
+    }))
+    .filter((item: ShopCategory) => item.id && item.name);
 };

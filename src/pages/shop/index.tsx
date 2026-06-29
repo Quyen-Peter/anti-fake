@@ -30,7 +30,7 @@ export default function ShopPage() {
     <div className="shop-page">
       <div className="shop-banner">
         <img
-          src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49"
+          src={shop?.shopBanner}
           alt=""
         />
       </div>

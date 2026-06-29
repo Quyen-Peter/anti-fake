@@ -1,17 +1,24 @@
 import { SlidersHorizontal } from "lucide-react";
 import "../../css/components/layout/searchHeader.css";
-import SearchSidebar from "./searchSidebar";
+import SearchSidebar, { type SearchCategory } from "./searchSidebar";
 import { useState } from "react";
 
 interface Props {
   sortType: string;
   setSortType: (value: string) => void;
+  categories: SearchCategory[];
+  basePath?: string;
 }
 
-export default function SearchHeader({ sortType, setSortType }: Props) {
+export default function SearchHeader({
+  sortType,
+  setSortType,
+  categories,
+  basePath = "/search",
+}: Props) {
   const [showFilter, setShowFilter] = useState(false);
   const [priceSort, setPriceSort] = useState<"none" | "asc" | "desc">("none");
-  
+
   const handlePriceSort = () => {
     if (priceSort === "none") {
       setPriceSort("asc");
@@ -24,7 +31,6 @@ export default function SearchHeader({ sortType, setSortType }: Props) {
       setSortType("all");
     }
   };
-
 
   return (
     <div className="search-header">
@@ -84,15 +90,10 @@ export default function SearchHeader({ sortType, setSortType }: Props) {
             onClick={() => setShowFilter(false)}
           />
 
-          <aside className="mobile-filter">
-            <SearchSidebar />
-
-            <button
-              className="close-filter"
-              onClick={() => setShowFilter(false)}
-            >
-              Đóng
-            </button>
+          <aside
+            className={`mobile-filter ${basePath !== "/search" ? "shop-mobile-filter" : ""}`}
+          >
+            <SearchSidebar categories={categories} basePath={basePath} />
           </aside>
         </>
       )}

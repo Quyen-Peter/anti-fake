@@ -232,6 +232,10 @@ textarea {
 
 .description-upload {
   margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .description-upload button,
@@ -440,6 +444,46 @@ textarea {
   object-fit: cover;
 }
 
+.create-product-help {
+  color: #888;
+  font-size: 13px;
+}
+
+.create-product-choice-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.create-product-choice {
+  min-height: 54px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 0 16px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.create-product-choice:hover {
+  border-color: #e53935;
+  background: #fff6f6;
+}
+
+.create-product-choice input {
+  width: 18px;
+  height: 18px;
+  accent-color: #e53935;
+}
+
+.create-product-choice span {
+  font-weight: 600;
+  color: #444;
+}
+
 /* ==========================================
    SHIPPING
 ========================================== */
@@ -525,6 +569,17 @@ textarea {
   bottom: 0;
 
   z-index: 5;
+}
+
+.create-footer p {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+}
+
+.create-footer > div {
+  display: flex;
+  gap: 12px;
 }
 
 /* ==========================================

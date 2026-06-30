@@ -18,6 +18,7 @@ export default function OrderCard({ order }: Props) {
 
   const getStatus = () => {
     switch (order.status) {
+      case "pending":
       case "processing":
         return {
           text: "Đang xử lý",

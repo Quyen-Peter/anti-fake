@@ -20,6 +20,7 @@ export default function OrderTable({ orders }: Props) {
 
   const getStatus = (status: string) => {
     switch (status) {
+      case "pending":
       case "processing":
         return {
           text: "Chờ xử lý",

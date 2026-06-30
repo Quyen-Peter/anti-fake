@@ -22,7 +22,7 @@ export default function OrderFilters({
     },
     {
       label: "Chờ xử lý",
-      value: "processing",
+      value: "pending",
     },
     {
       label: "Đang giao",

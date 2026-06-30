@@ -158,6 +158,69 @@
   color: #888;
   font-size: 15px;
 }
+
+.seller-product-loading {
+  padding: 28px 18px;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.seller-product-loading-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.seller-product-loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #f0d6dc;
+  border-top-color: #b00020;
+  border-radius: 50%;
+  animation: seller-product-spin 0.75s linear infinite;
+}
+
+.seller-product-loading-list {
+  display: grid;
+  gap: 12px;
+}
+
+.seller-product-loading-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 1fr 0.6fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.seller-product-loading-row span {
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #eeeeee 25%, #f8f8f8 45%, #eeeeee 65%);
+  background-size: 240% 100%;
+  animation: seller-product-shimmer 1.2s ease-in-out infinite;
+}
+
+.seller-product-loading-row span:first-child {
+  height: 18px;
+}
+
+@keyframes seller-product-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes seller-product-shimmer {
+  to {
+    background-position: -240% 0;
+  }
+}
+
 .seller-product-management-mobile {
   display: none;
 }
@@ -288,6 +351,17 @@
 
   .seller-product-header p {
     font-size: 13px;
+  }
+  .seller-product-loading {
+    padding: 22px 12px;
+  }
+  .seller-product-loading-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fff;
   }
 
   /* Add button */

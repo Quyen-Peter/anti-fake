@@ -7,7 +7,7 @@ import {
 import "../../css/components/productManagement/productCard.css";
 
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   sku: string;
   category: string;

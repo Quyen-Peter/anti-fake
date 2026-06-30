@@ -3,7 +3,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import "../../css/components/productManagement/productTable.css";
 
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   sku: string;
   category: string;

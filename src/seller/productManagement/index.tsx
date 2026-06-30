@@ -1,192 +1,194 @@
 import { Plus, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import ProductTable from "../../components/productManagement/productTable";
 import "../../css/pages/productManagement.css";
-import { useMemo, useState } from "react";
 import ProductCard from "../../components/productManagement/productCard";
 import CreateProduct from "../../components/productManagement/createProduct";
+import {
+  fetchShopCategories,
+  fetchShopOffers,
+  getMyShop,
+  type ShopCategory,
+  type ShopOffer,
+} from "../../services/shop.api";
+
+type Product = {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  categoryId: string;
+  price: string;
+  stock: number;
+  status: string;
+  image: string;
+};
+
+const PAGE_SIZE = 20;
+
+const normalizeMyShop = (data: any) => {
+  const payload = data?.data ?? data?.items ?? data;
+  if (Array.isArray(payload)) return payload[0] ?? null;
+  return payload && typeof payload === "object" ? payload : null;
+};
+
+const formatCurrency = (value?: number, currency = "VND") =>
+  typeof value === "number"
+    ? new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency,
+      }).format(value)
+    : "";
+
+const normalizeStatus = (offer: ShopOffer) => {
+  const status = offer.offerStatus?.toLowerCase() || "active";
+  const stock = offer.availableQuantity ?? 0;
+
+  if (status === "pending") return "review";
+  if (status === "rejected") return "failed";
+  if (status === "inactive") return "disabled";
+  if (status === "active" && stock > 0 && stock <= 5) return "low";
+
+  return status;
+};
+
+const mapOfferToProduct = (
+  offer: ShopOffer,
+  categories: ShopCategory[],
+): Product => {
+  const categoryId = offer.categoryId || "";
+  const category = categories.find(
+    (item) => String(item.id) === String(categoryId),
+  );
+
+  return {
+    id: offer.id,
+    name: offer.title,
+    sku: offer.id,
+    category: category?.name || "Chua phan loai",
+    categoryId,
+    price: formatCurrency(offer.price, offer.currency || "VND"),
+    stock: offer.availableQuantity ?? 0,
+    status: normalizeStatus(offer),
+    image: offer.thumbnailUrl || "/vite.svg",
+  };
+};
+
+function ProductLoading() {
+  return (
+    <div
+      className="seller-product-loading"
+      role="status"
+      aria-live="polite"
+      aria-label="Dang tai san pham"
+    >
+      <div className="seller-product-loading-head">
+        <span className="seller-product-loading-spinner" />
+        <span>Dang tai san pham...</span>
+      </div>
+
+      <div className="seller-product-loading-list" aria-hidden="true">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div className="seller-product-loading-row" key={index}>
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ProductManagement() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [openCreateProduct, setOpenCreateProduct] = useState(false);
+  const [shopId, setShopId] = useState("");
+  const [categories, setCategories] = useState<ShopCategory[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const products = [
-    {
-      id: 1,
-      name: "Rolex Submariner Date",
-      sku: "AF-W-00921",
-      category: "Đồng hồ",
-      price: "325.000.000đ",
-      stock: 15,
-      status: "active",
-      image:
-        "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=200",
-    },
-    {
-      id: 2,
-      name: "Rolex Daytona Panda",
-      sku: "AF-W-00922",
-      category: "Đồng hồ",
-      price: "580.000.000đ",
-      stock: 2,
-      status: "low",
-      image:
-        "https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=200",
-    },
-    {
-      id: 3,
-      name: "Hermès Birkin 25 Gold",
-      sku: "AF-B-00125",
-      category: "Túi xách",
-      price: "720.000.000đ",
-      stock: 1,
-      status: "low",
-      image:
-        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200",
-    },
-    {
-      id: 4,
-      name: "Louis Vuitton Neverfull MM",
-      sku: "AF-B-00891",
-      category: "Túi xách",
-      price: "58.000.000đ",
-      stock: 0,
-      status: "review",
-      image:
-        "https://images.unsplash.com/photo-1591561954557-26941169b49e?w=200",
-    },
-    {
-      id: 5,
-      name: "Gucci Marmont Small",
-      sku: "AF-B-00752",
-      category: "Túi xách",
-      price: "65.000.000đ",
-      stock: 0,
-      status: "review",
-      image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=200",
-    },
-    {
-      id: 6,
-      name: "Nike Air Jordan 1 Chicago",
-      sku: "AF-S-00212",
-      category: "Giày",
-      price: "24.500.000đ",
-      stock: 20,
-      status: "active",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200",
-    },
-    {
-      id: 7,
-      name: "Adidas Yeezy Boost 350",
-      sku: "AF-S-00418",
-      category: "Giày",
-      price: "18.000.000đ",
-      stock: 0,
-      status: "failed",
-      image:
-        "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=200",
-    },
-    {
-      id: 8,
-      name: "Apple Watch Ultra 2",
-      sku: "AF-E-00991",
-      category: "Điện tử",
-      price: "22.900.000đ",
-      stock: 35,
-      status: "active",
-      image:
-        "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=200",
-    },
-    {
-      id: 9,
-      name: "AirPods Pro 2 USB-C",
-      sku: "AF-E-00221",
-      category: "Điện tử",
-      price: "5.990.000đ",
-      stock: 3,
-      status: "low",
-      image:
-        "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f37?w=200",
-    },
-    {
-      id: 10,
-      name: "Samsung Galaxy S25 Ultra Samsung Galaxy S25 Ultra Samsung Galaxy S25 Ultra",
-      sku: "AF-E-01021",
-      category: "Điện thoại",
-      price: "31.990.000đ",
-      stock: 0,
-      status: "disabled",
-      image:
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200",
-    },
-    {
-      id: 11,
-      name: "Dior Saddle Bag",
-      sku: "AF-B-01088",
-      category: "Túi xách",
-      price: "95.000.000đ",
-      stock: 0,
-      status: "failed",
-      image:
-        "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200",
-    },
-    {
-      id: 12,
-      name: "Omega Seamaster Diver 300M",
-      sku: "AF-W-00881",
-      category: "Đồng hồ",
-      price: "168.000.000đ",
-      stock: 0,
-      status: "disabled",
-      image:
-        "https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=200",
-    },
-  ];
+  useEffect(() => {
+    const loadShop = async () => {
+      try {
+        const shopData = await getMyShop();
+        const shop = normalizeMyShop(shopData);
+        const nextShopId = shop?.shopId || shop?.id;
 
-  const categories = [...new Set(products.map((p) => p.category))];
+        if (!nextShopId) {
+          setError("Khong tim thay cua hang cua ban");
+          setLoading(false);
+          return;
+        }
+
+        setShopId(String(nextShopId));
+      } catch (err: any) {
+        setError(err.message || "Khong the tai thong tin cua hang");
+        setLoading(false);
+      }
+    };
+
+    loadShop();
+  }, []);
+
+  useEffect(() => {
+    if (!shopId) return;
+
+    const loadProducts = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [categoryData, offerData] = await Promise.all([
+          fetchShopCategories(shopId),
+          fetchShopOffers(shopId, 1, PAGE_SIZE),
+        ]);
+
+        setCategories(categoryData);
+        setProducts(
+          offerData.items.map((offer) =>
+            mapOfferToProduct(offer, categoryData),
+          ),
+        );
+      } catch (err: any) {
+        setCategories([]);
+        setProducts([]);
+        setError(err.message || "Khong the tai danh sach san pham");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [shopId]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      let statusMatch = true;
+      const statusMatch =
+        activeTab === "all" ? true : product.status === activeTab;
 
-      switch (activeTab) {
-        case "active":
-          statusMatch = product.status === "active";
-          break;
-
-        case "low":
-          statusMatch = product.status === "low";
-          break;
-
-        case "review":
-          statusMatch = product.status === "review";
-          break;
-
-        case "failed":
-          statusMatch = product.status === "failed";
-          break;
-
-        case "disabled":
-          statusMatch = product.status === "disabled";
-          break;
-
-        default:
-          statusMatch = true;
-      }
-
-      const keyword = searchText.toLowerCase();
+      const keyword = searchText.trim().toLowerCase();
 
       const searchMatch =
+        keyword === "" ||
         product.name.toLowerCase().includes(keyword) ||
         product.sku.toLowerCase().includes(keyword);
 
       const categoryMatch =
-        categoryFilter === "all" ? true : product.category === categoryFilter;
+        categoryFilter === "all"
+          ? true
+          : String(product.categoryId) === String(categoryFilter);
 
       return statusMatch && searchMatch && categoryMatch;
     });
   }, [products, activeTab, searchText, categoryFilter]);
+
+  const countByStatus = (status: string) =>
+    products.filter((product) => product.status === status).length;
 
   return (
     <div className="seller-product-page">
@@ -222,7 +224,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("active")}
           >
-            Trên kệ ({products.filter((p) => p.status === "active").length})
+            Trên kệ ({countByStatus("active")})
           </button>
 
           <button
@@ -231,7 +233,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("low")}
           >
-            Còn ít ({products.filter((p) => p.status === "low").length})
+            Còn ít ({countByStatus("low")})
           </button>
 
           <button
@@ -240,8 +242,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("review")}
           >
-            Đang xét duyệt (
-            {products.filter((p) => p.status === "review").length})
+            Đang xét duyệt ({countByStatus("review")})
           </button>
 
           <button
@@ -250,8 +251,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("failed")}
           >
-            Không thành công (
-            {products.filter((p) => p.status === "failed").length})
+            Không thành công ({countByStatus("failed")})
           </button>
 
           <button
@@ -260,8 +260,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("disabled")}
           >
-            Đã vô hiệu hóa (
-            {products.filter((p) => p.status === "disabled").length})
+            Đã vô hiệu hóa ({countByStatus("disabled")})
           </button>
         </div>
         <div className="seller-product-search-select">
@@ -282,8 +281,8 @@ export default function ProductManagement() {
             <option value="all">Tất cả danh mục</option>
 
             {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
+              <option key={category.id} value={String(category.id)}>
+                {category.name}
               </option>
             ))}
           </select>
@@ -291,7 +290,11 @@ export default function ProductManagement() {
       </div>
 
       <div className="seller-product-table-section">
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <ProductLoading />
+        ) : error ? (
+          <div className="seller-empty-product">{error}</div>
+        ) : filteredProducts.length > 0 ? (
           <div>
             <div className="seller-product-management-destop">
               <ProductTable products={filteredProducts} />

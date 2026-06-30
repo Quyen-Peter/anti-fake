@@ -15,6 +15,30 @@ export type ShopCategory = {
   name: string;
 };
 
+export type ShopOffer = {
+  id: string;
+  title: string;
+  price?: number;
+  currency?: string;
+  salesMode?: string;
+  minWholesaleQty?: number;
+  availableQuantity?: number;
+  soldQuantity?: number;
+  verificationLevel?: string;
+  offerStatus?: string;
+  categoryId?: string;
+  brandId?: string;
+  thumbnailUrl?: string;
+  createdAt?: string;
+};
+
+export type ShopOffersResponse = {
+  total: number;
+  page: number;
+  pageSize: number;
+  items: ShopOffer[];
+};
+
 export const fetchShops = async (
   page: number,
   pageSize: number,
@@ -144,4 +168,39 @@ export const fetchShopCategories = async (shopId: string) => {
       name: item.name ?? item.categoryName,
     }))
     .filter((item: ShopCategory) => item.id && item.name);
+};
+
+
+export const fetchShopOffers = async (
+  shopId: string,
+  page = 1,
+  pageSize = 20,
+): Promise<ShopOffersResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/offers?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay danh sach san pham");
+  }
+
+  return {
+    total: Number(data.total ?? 0),
+    page: Number(data.page ?? page),
+    pageSize: Number(data.pageSize ?? pageSize),
+    items: Array.isArray(data.items) ? data.items : [],
+  };
 };

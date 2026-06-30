@@ -3,36 +3,32 @@
 .shop-products-page {
   display: grid;
   grid-template-columns: 260px 1fr;
-
   width: 100%;
-
-  overflow: hidden;
 }
-
 /* ================= SIDEBAR ================= */
 
 .shop-products-sidebar {
   width: 260px;
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  height: fit-content;
 }
 
 .shop-products-sidebar .search-sidebar {
-  position: sticky;
-  top: var(--shop-main-header-height);
-
-  height: calc(100vh - var(--shop-main-header-height));
-
   overflow-y: auto;
-
   background: #fff;
-
   border-right: 1px solid #eee;
   border-top: 1px solid #eee;
-
-  z-index: 90;
 }
 
 /* ================= CONTENT ================= */
 
+.shop-products-content-search-header {
+  position: sticky;
+  top: 113px;
+  z-index: 150;
+}
 .shop-products-content {
   min-width: 0;
 
@@ -43,9 +39,6 @@
 /* ================= SORT HEADER ================= */
 
 .shop-products-page .search-header {
-  position: sticky;
-  top: var(--shop-main-header-height);
-
   display: flex;
   align-items: center;
 
@@ -56,8 +49,6 @@
   background: #fff;
 
   border-bottom: 1px solid #ececec;
-
-  z-index: 900;
 }
 
 /* ================= PRODUCT GRID ================= */
@@ -69,6 +60,9 @@
   gap: 14px;
   padding-left: 15px;
   padding-right: 15px;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 800px;
 }
 
 /* ================= EMPTY ================= */
@@ -89,9 +83,7 @@
 
 .shop-products-empty h3 {
   margin: 0;
-
   color: #d70018;
-
   font-size: 24px;
 }
 
@@ -101,24 +93,7 @@
   color: #777;
 }
 
-.shop-products-sidebar .search-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.shop-products-sidebar .search-sidebar::-webkit-scrollbar-thumb {
-  background: #d7d7d7;
-  border-radius: 999px;
-}
-
-.shop-products-sidebar .search-sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 @media (max-width: 576px) {
-  .shop-products-page {
-    --shop-main-header-height: 50px;
-  }
-
   .shop-products-sidebar {
     display: none;
   }
@@ -146,14 +121,15 @@
   .shop-mobile-filter .search-sidebar {
     padding: 16px;
   }
+  .shop-products-content-search-header {
+    position: sticky;
+    top: 97px;
+    z-index: 150;
+  }
 }
 
 /* Tablet */
 @media (min-width: 577px) and (max-width: 768px) {
-  .shop-products-page {
-    --shop-main-header-height: 50px;
-  }
-
   .shop-products-sidebar {
     display: none;
   }
@@ -169,14 +145,15 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+  .shop-products-content-search-header {
+    position: sticky;
+    top: 102px;
+    z-index: 150;
+  }
 }
 
 /* Tablet lớn */
 @media (min-width: 769px) and (max-width: 820px) {
-  .shop-products-page {
-    --shop-main-header-height: 50px;
-  }
-
   .shop-products-sidebar {
     display: none;
   }
@@ -196,10 +173,6 @@
 
 /* Tablet pro */
 @media (min-width: 821px) and (max-width: 1024px) {
-  .shop-products-page {
-    --shop-main-header-height: 50px;
-  }
-
   .shop-products-sidebar {
     display: none;
   }

@@ -97,13 +97,14 @@ export default function ShopProducts() {
       </div>
 
       <div className="shop-products-content">
-        <SearchHeader
-          sortType={sortType}
-          setSortType={setSortType}
-          categories={categories}
-          basePath={basePath}
-        />
-
+        <div className="shop-products-content-search-header">
+          <SearchHeader
+            sortType={sortType}
+            setSortType={setSortType}
+            categories={categories}
+            basePath={basePath}
+          />
+        </div>
         <div className="shop-products-grid">
           {loading && <LoadingOverlay />}
 

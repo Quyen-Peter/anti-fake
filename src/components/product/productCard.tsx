@@ -28,7 +28,7 @@ export default function ProductCard({ product }: Props) {
         </div>
 
         <div className="product-content">
-          <span className="product-category">{product.categoryName}</span>
+          {/* <span className="product-category">{product.categoryName}</span> */}
 
           <h3 className="product-title">{product.title}</h3>
 

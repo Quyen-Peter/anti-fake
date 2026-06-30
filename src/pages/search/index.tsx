@@ -93,11 +93,13 @@ export default function SearchPage() {
       </div>
 
       <div className="search-content">
-        <SearchHeader
-          sortType={sortType}
-          setSortType={setSortType}
-          categories={categories}
-        />
+        <div className="search-header-page">
+          <SearchHeader
+            sortType={sortType}
+            setSortType={setSortType}
+            categories={categories}
+          />
+        </div>
         <div className="s-product-grid">
           {loading && <LoadingOverlay />}
 

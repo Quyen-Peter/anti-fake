@@ -29,18 +29,18 @@ export default function ShopPage() {
   return (
     <div className="shop-page">
       <div className="shop-banner">
-        <img
-          src={shop?.shopBanner}
-          alt=""
-        />
+        <img src={shop?.shopBanner} alt="" />
       </div>
 
       {shop && <ShopHeader shop={shop} />}
+      <div className="shop-main">
+        <div className="shop-tabs-wrapper">
+          <ShopTabs />
+        </div>
 
-      <ShopTabs />
-
-      <div className="shop-content">
-        <Outlet />
+        <div className="shop-content">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

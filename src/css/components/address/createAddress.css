@@ -84,6 +84,7 @@
 }
 
 .address-input-wrapper input,
+.address-input-wrapper select,
 .address-textarea-wrapper textarea {
   width: 100%;
 
@@ -98,7 +99,18 @@
   box-sizing: border-box;
 }
 
+.address-input-wrapper select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.address-input-wrapper select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .address-textarea-wrapper textarea {
+  height: 88px;
   resize: none;
 }
 

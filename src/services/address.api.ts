@@ -1,4 +1,9 @@
-import type { CreateAddressRequest, UpdateAddressRequest } from "../type/address";
+import type {
+  AddressProvince,
+  AddressWard,
+  CreateAddressRequest,
+  UpdateAddressRequest,
+} from "../type/address";
 import { authFetch } from "../ultil/auth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -22,6 +27,49 @@ export const getUserAddresses = async () => {
   }
 
   return data;
+};
+
+export const getAddressProvinces = async (): Promise<AddressProvince[]> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/addresses/provinces`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Láº¥y danh sÃ¡ch tá»‰nh/thÃ nh tháº¥t báº¡i");
+  }
+
+  return Array.isArray(data) ? data : [];
+};
+
+export const getAddressWards = async (
+  provinceCode: string
+): Promise<AddressWard[]> => {
+  const params = new URLSearchParams({ provinceCode });
+  const response = await authFetch(
+    `${BASE_URL}/api/addresses/wards?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Láº¥y danh sÃ¡ch phÆ°á»ng/xÃ£ tháº¥t báº¡i");
+  }
+
+  return Array.isArray(data) ? data : [];
 };
 
 

@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Phone, MapPin } from "lucide-react";
 
 import "../../css/components/address/createAddress.css";
-import { createAddress } from "../../services/address.api";
+import {
+  createAddress,
+  getAddressProvinces,
+  getAddressWards,
+} from "../../services/address.api";
 import { toast } from "sonner";
+import type { AddressProvince, AddressWard } from "../../type/address";
 
 type Props = {
   onClose: () => void;
@@ -12,11 +17,19 @@ type Props = {
 
 export default function CreateAddress({ onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
+  const [loadingProvinces, setLoadingProvinces] = useState(false);
+  const [loadingWards, setLoadingWards] = useState(false);
+  const [provinces, setProvinces] = useState<AddressProvince[]>([]);
+  const [wards, setWards] = useState<AddressWard[]>([]);
 
   const [form, setForm] = useState({
     recipientName: "",
     phone: "",
     addressLine: "",
+    provinceCode: "",
+    provinceName: "",
+    wardCode: "",
+    wardName: "",
     isDefault: false,
   });
 
@@ -24,13 +37,63 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
     recipientName: "",
     phone: "",
     addressLine: "",
+    provinceCode: "",
+    wardCode: "",
   });
+
+  useEffect(() => {
+    const loadProvinces = async () => {
+      try {
+        setLoadingProvinces(true);
+        setProvinces(await getAddressProvinces());
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Không thể tải danh sách tỉnh/thành",
+        );
+      } finally {
+        setLoadingProvinces(false);
+      }
+    };
+
+    loadProvinces();
+  }, []);
+
+  useEffect(() => {
+    if (!form.provinceCode) {
+      setWards([]);
+      return;
+    }
+
+    const loadWards = async () => {
+      try {
+        setLoadingWards(true);
+        setWards(await getAddressWards(form.provinceCode));
+      } catch (error) {
+        console.error(error);
+        setWards([]);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Không thể tải danh sách phường/xã",
+        );
+      } finally {
+        setLoadingWards(false);
+      }
+    };
+
+    loadWards();
+  }, [form.provinceCode]);
 
   const validate = () => {
     const newErrors = {
       recipientName: "",
       phone: "",
       addressLine: "",
+      provinceCode: "",
+      wardCode: "",
     };
 
     let isValid = true;
@@ -55,6 +118,16 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
       isValid = false;
     }
 
+    if (!form.provinceCode) {
+      newErrors.provinceCode = "Vui lòng chọn tỉnh/thành";
+      isValid = false;
+    }
+
+    if (!form.wardCode) {
+      newErrors.wardCode = "Vui lòng chọn phường/xã";
+      isValid = false;
+    }
+
     setErrors(newErrors);
 
     return isValid;
@@ -68,7 +141,16 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
     try {
       setLoading(true);
 
-      const data = await createAddress(form);
+      const data = await createAddress({
+        recipientName: form.recipientName.trim(),
+        phone: form.phone.trim(),
+        addressLine: form.addressLine.trim(),
+        provinceCode: form.provinceCode,
+        provinceName: form.provinceName,
+        wardCode: form.wardCode,
+        wardName: form.wardName,
+        isDefault: form.isDefault,
+      });
       if (data != null) {
         toast.success("Thêm địa chỉ thành công");
       }
@@ -150,6 +232,83 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
 
               {errors.phone && (
                 <span className="address-error">{errors.phone}</span>
+              )}
+            </div>
+          </div>
+
+          <div className="address-form-grid">
+            <div className="address-input-group">
+              <label>Tỉnh/Thành phố</label>
+
+              <div className="address-input-wrapper">
+                <select
+                  value={form.provinceCode}
+                  disabled={loadingProvinces}
+                  onChange={(e) => {
+                    const selectedProvince = provinces.find(
+                      (province) => province.provinceCode === e.target.value,
+                    );
+
+                    setForm({
+                      ...form,
+                      provinceCode: selectedProvince?.provinceCode ?? "",
+                      provinceName: selectedProvince?.provinceName ?? "",
+                      wardCode: "",
+                      wardName: "",
+                    });
+                  }}
+                >
+                  <option value="">
+                    {loadingProvinces ? "Đang tải..." : "Chọn tỉnh/thành"}
+                  </option>
+                  {provinces.map((province) => (
+                    <option
+                      key={province.provinceCode}
+                      value={province.provinceCode}
+                    >
+                      {province.provinceName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {errors.provinceCode && (
+                <span className="address-error">{errors.provinceCode}</span>
+              )}
+            </div>
+
+            <div className="address-input-group">
+              <label>Phường/Xã</label>
+
+              <div className="address-input-wrapper">
+                <select
+                  value={form.wardCode}
+                  disabled={!form.provinceCode || loadingWards}
+                  onChange={(e) => {
+                    const selectedWard = wards.find(
+                      (ward) => ward.wardCode === e.target.value,
+                    );
+
+                    setForm({
+                      ...form,
+                      wardCode: selectedWard?.wardCode ?? "",
+                      wardName: selectedWard?.wardName ?? "",
+                    });
+                  }}
+                >
+                  <option value="">
+                    {loadingWards ? "Đang tải..." : "Chọn phường/xã"}
+                  </option>
+                  {wards.map((ward) => (
+                    <option key={ward.wardCode} value={ward.wardCode}>
+                      {ward.wardName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {errors.wardCode && (
+                <span className="address-error">{errors.wardCode}</span>
               )}
             </div>
           </div>

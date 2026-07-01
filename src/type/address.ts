@@ -28,6 +28,10 @@ export interface UpdateAddressRequest {
   recipientName: string;
   phone: string;
   addressLine: string;
+  provinceCode: string;
+  provinceName: string;
+  wardCode: string;
+  wardName: string;
   isDefault: boolean;
 }
 

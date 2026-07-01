@@ -4,7 +4,11 @@ import { getDefaultAddress } from "../../services/address.api";
 import type { Address } from "../../type/address";
 import AddressSelectorModal from "../address/addressSelectorModal";
 
-export default function CheckoutAddress() {
+type Props = {
+  onAddressChange?: (address?: Address) => void;
+};
+
+export default function CheckoutAddress({ onAddressChange }: Props) {
   const [address, setAddress] = useState<Address>();
   const [openAddressModal, setOpenAddressModal] = useState(false);
 
@@ -12,8 +16,10 @@ export default function CheckoutAddress() {
     try {
       const address = await getDefaultAddress();
       setAddress(address);
+      onAddressChange?.(address);
     } catch (error) {
       console.error(error);
+      onAddressChange?.(undefined);
     }
   };
 

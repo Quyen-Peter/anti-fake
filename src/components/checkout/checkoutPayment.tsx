@@ -33,7 +33,7 @@ export default function CheckoutPayment({ payment, setPayment }: Props) {
         Chuyển khoản ngân hàng
       </label>
 
-      <label className={`payment-item ${payment === "wallet" ? "active" : ""}`}>
+      {/* <label className={`payment-item ${payment === "wallet" ? "active" : ""}`}>
         <input
           type="radio"
           checked={payment === "wallet"}
@@ -41,7 +41,7 @@ export default function CheckoutPayment({ payment, setPayment }: Props) {
         />
         <Wallet size={18} />
         Ví điện tử (MoMo, ZaloPay)
-      </label>
+      </label> */}
     </div>
   );
 }

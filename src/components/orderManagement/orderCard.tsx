@@ -22,10 +22,10 @@ export default function OrderCard({ order }: Props) {
       case "processing":
         return {
           text: "Đang xử lý",
-          className: "processing",
+          className: "pending",
         };
 
-      case "shipping":
+      case "paid":
         return {
           text: "Đang giao",
           className: "shipping",

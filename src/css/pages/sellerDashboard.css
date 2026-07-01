@@ -103,6 +103,17 @@
   margin-bottom: 10px;
 }
 
+.seller-dashboard-orders-state {
+  padding: 22px 14px;
+  color: #777;
+  text-align: center;
+  font-size: 14px;
+}
+
+.seller-dashboard-orders-state.error {
+  color: #b00020;
+}
+
 /* Mobile */
 @media (max-width: 576px) {
   .seller-dashboard {

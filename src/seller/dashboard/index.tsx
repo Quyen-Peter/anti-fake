@@ -1,45 +1,136 @@
+import { useEffect, useState } from "react";
 import SellerRevenueChart from "../../components/dashboard/sellerRevenueChart";
 import SellerStats from "../../components/dashboard/sellerStats";
 import SellerTopProducts from "../../components/dashboard/sellerTopProducts";
 import OrderCard from "../../components/orderManagement/orderCard";
 import OrderTable from "../../components/orderManagement/orderTable";
 import "../../css/pages/sellerDashboard.css";
+import {
+  fetchSellerOrders,
+  type SellerOrder,
+} from "../../services/order.api";
+import { getMyShop } from "../../services/shop.api";
+
+type ViewOrder = {
+  id: string;
+  customer: string;
+  email: string;
+  date: string;
+  total: string;
+  status: string;
+};
+
+const normalizeMyShop = (data: any) => {
+  const payload = data?.data ?? data?.items ?? data;
+  if (Array.isArray(payload)) return payload[0] ?? null;
+  return payload && typeof payload === "object" ? payload : null;
+};
+
+const formatCurrency = (value?: number) =>
+  typeof value === "number"
+    ? new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      }).format(value)
+    : "";
+
+const formatDate = (value?: string) => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const mapOrder = (order: SellerOrder): ViewOrder => ({
+  id: order.orderId,
+  customer: order.customer?.name || "Khach hang",
+  email: order.customer?.email || "",
+  date: formatDate(order.createdAt || order.orderDate || order.createdDate),
+  total: formatCurrency(order.orderAmount),
+  status: order.orderStatus.toLowerCase(),
+});
 
 export default function SellerDashboard() {
-  const orders = [
-    {
-      id: "#AF-12845",
-      customer: "Nguyễn Hoàng Nam",
-      email: "nam.n@gmail.com",
-      date: "24/05/2024, 14:20",
-      total: "2,450,000đ",
-      status: "processing",
-    },
-    {
-      id: "#AF-12844",
-      customer: "Phạm Thu Thảo",
-      email: "thao.p@gmail.com",
-      date: "24/05/2024, 11:05",
-      total: "1,120,000đ",
-      status: "shipping",
-    },
-    {
-      id: "#AF-12843",
-      customer: "Lê Duy Anh",
-      email: "duyanh@gmail.com",
-      date: "23/05/2024, 18:45",
-      total: "5,800,000đ",
-      status: "completed",
-    },
-    {
-      id: "#AF-12842",
-      customer: "Mai Tuyết Nhi",
-      email: "nhi.mt@gmail.com",
-      date: "23/05/2024, 09:30",
-      total: "890,000đ",
-      status: "cancelled",
-    },
-  ];
+  const [orders, setOrders] = useState<ViewOrder[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [ordersError, setOrdersError] = useState("");
+
+  useEffect(() => {
+    const loadPendingOrders = async () => {
+      try {
+        setLoadingOrders(true);
+        setOrdersError("");
+
+        const shopData = await getMyShop();
+        const shop = normalizeMyShop(shopData);
+        const shopId = shop?.shopId || shop?.id;
+
+        if (!shopId) {
+          setOrders([]);
+          setOrdersError("Khong tim thay cua hang cua ban");
+          return;
+        }
+
+        const data = await fetchSellerOrders({
+          shopId: String(shopId),
+          orderStatus: "pending",
+          page: 1,
+          pageSize: 5,
+        });
+
+        setOrders(data.items.map(mapOrder));
+      } catch (error) {
+        console.error(error);
+        setOrders([]);
+        setOrdersError(
+          error instanceof Error
+            ? error.message
+            : "Khong the tai don hang moi",
+        );
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    loadPendingOrders();
+  }, []);
+
+  const orderContent = () => {
+    if (loadingOrders) {
+      return (
+        <div className="seller-dashboard-orders-state">
+          Dang tai don hang moi...
+        </div>
+      );
+    }
+
+    if (ordersError) {
+      return (
+        <div className="seller-dashboard-orders-state error">
+          {ordersError}
+        </div>
+      );
+    }
+
+    if (orders.length === 0) {
+      return (
+        <div className="seller-dashboard-orders-state">
+          Không có đơn hàng mới để xác nhận
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="seller-dashboard">
       <SellerStats />
@@ -48,18 +139,17 @@ export default function SellerDashboard() {
         <SellerRevenueChart />
         <SellerTopProducts />
       </div>
-      <div className="seller-orders-card">
 
+      <div className="seller-orders-card">
         <h3>Đơn đặt hàng mới</h3>
 
         <div className="seller-laptop-orders-table">
-          <OrderTable orders={orders} />
+          {orderContent() || <OrderTable orders={orders} />}
         </div>
 
         <div className="seller-mobile-orders-card">
-          {orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
+          {orderContent() ||
+            orders.map((order) => <OrderCard key={order.id} order={order} />)}
         </div>
       </div>
     </div>

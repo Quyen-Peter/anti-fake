@@ -12,3 +12,39 @@ export interface CheckoutShop {
   shopName: string;
   items: CheckoutItem[];
 }
+
+export interface ShippingOption {
+  optionCode: string;
+  providerCode: string;
+  providerName: string;
+  methodName: string;
+  shippingFee: number;
+  estimatedDelivery: string;
+}
+
+export interface ShippingOptionsRequest {
+  cartItemIds: string[];
+}
+
+export interface ShippingOptionsResponse {
+  options: ShippingOption[];
+}
+
+export interface CartCheckoutRequest {
+  cartItemIds: string[];
+  paymentMethod: string;
+  shippingOptionCode: string;
+  affiliateCode?: string;
+}
+
+export interface CartCheckoutResponse {
+  orderId?: string;
+  orderCode?: string;
+  amount?: number;
+  totalAmount?: number;
+  paymentAmount?: number;
+  qrCodeUrl?: string;
+  qrImageUrl?: string;
+  checkoutUrl?: string;
+  paymentUrl?: string;
+}

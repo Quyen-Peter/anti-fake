@@ -1,11 +1,21 @@
 import { Truck } from "lucide-react";
+import type { ShippingOption } from "../../type/checkout";
 
 interface Props {
-  shipping: string;
-  setShipping: (value: string) => void;
+  error: string;
+  loading: boolean;
+  options: ShippingOption[];
+  selectedOptionCode: string;
+  setSelectedOptionCode: (value: string) => void;
 }
 
-export default function CheckoutShipping({ shipping, setShipping }: Props) {
+export default function CheckoutShipping({
+  error,
+  loading,
+  options,
+  selectedOptionCode,
+  setSelectedOptionCode,
+}: Props) {
   return (
     <div className="checkout-card">
       <div className="section-title">
@@ -13,43 +23,42 @@ export default function CheckoutShipping({ shipping, setShipping }: Props) {
         Phương thức vận chuyển
       </div>
 
-      <div className="shipping-list">
-        <label
-          className={`shipping-item ${shipping === "fast" ? "active" : ""}`}
-        >
-          <input
-            type="radio"
-            checked={shipping === "fast"}
-            onChange={() => setShipping("fast")}
-          />
+      {loading ? (
+        <div className="shipping-state">Đang tải phương thức vận chuyển...</div>
+      ) : error ? (
+        <div className="shipping-state shipping-error">{error}</div>
+      ) : options.length === 0 ? (
+        <div className="shipping-state">
+          Chưa có phương thức vận chuyển phù hợp.
+        </div>
+      ) : (
+        <div className="shipping-list">
+          {options.map((option) => (
+            <label
+              key={option.optionCode}
+              className={`shipping-item ${
+                selectedOptionCode === option.optionCode ? "active" : ""
+              }`}
+            >
+              <input
+                type="radio"
+                checked={selectedOptionCode === option.optionCode}
+                onChange={() => setSelectedOptionCode(option.optionCode)}
+              />
 
-          <div>
-            <strong>Giao hàng nhanh</strong>
+              <div>
+                <strong>
+                   {option.methodName}
+                </strong>
 
-            <p>Nhận hàng trong 24-48h</p>
-          </div>
+                <p>Dự kiến giao: {option.estimatedDelivery}</p>
+              </div>
 
-          <span>35.000đ</span>
-        </label>
-
-        <label
-          className={`shipping-item ${shipping === "save" ? "active" : ""}`}
-        >
-          <input
-            type="radio"
-            checked={shipping === "save"}
-            onChange={() => setShipping("save")}
-          />
-
-          <div>
-            <strong>Tiết kiệm</strong>
-
-            <p>Nhận hàng trong 3-5 ngày</p>
-          </div>
-
-          <span>15.000đ</span>
-        </label>
-      </div>
+              <span>{option.shippingFee.toLocaleString()}đ</span>
+            </label>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

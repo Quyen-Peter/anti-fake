@@ -13,7 +13,7 @@ import CreateAddress from "./createAddress";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 
 export default function AddressSelectorModal({
@@ -57,7 +57,7 @@ export default function AddressSelectorModal({
 
       await setDefaultAddress(selectedId);
 
-      onSuccess();
+      await onSuccess();
 
       onClose();
     } finally {

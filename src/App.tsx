@@ -25,7 +25,6 @@ import ProtectedRoute from "./routes/protectedRoute";
 import AuthPage from "./pages/auth";
 import LiveRoomPage from "./pages/live";
 import CheckoutPage from "./pages/checkout";
-import OrderSuccessPage from "./components/checkout/orderSuccessPage";
 import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
 import SellerDashboard from "./seller/dashboard";
@@ -35,6 +34,9 @@ import SellerWallet from "./seller/wallet";
 import ProfileAddress from "./pages/profile/addressPage";
 import SellerOrderDetail from "./components/orderManagement/orderDetail";
 import SellerRegistration from "./components/sellerRegistration/sellerRegistration";
+import PaymentModel from "./components/payment/paymentModel";
+import PaymentFailedPage from "./components/payment/paymentFailed";
+import PaymentSuccess from "./components/payment/paymentSuccess";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -109,8 +111,10 @@ function App() {
               </Route>
               <Route path="/live/:id" element={<LiveRoomPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/order-success" element={<OrderSuccessPage />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/register" element={<SellerRegistration />} />
+              <Route path="/payment" element={<PaymentModel />} />
+              <Route path="/payment-failed" element={<PaymentFailedPage />} />
             </Route>
 
             {/* seller */}

@@ -60,10 +60,16 @@ export const fetchSellerOrders = async ({
     throw new Error(data.message || "Khong the tai danh sach don hang");
   }
 
+  const items = Array.isArray(data)
+    ? data
+    : Array.isArray(data.items)
+      ? data.items
+      : [];
+
   return {
-    total: Number(data.total ?? 0),
+    total: Number(data.total ?? items.length),
     page: Number(data.page ?? page),
     pageSize: Number(data.pageSize ?? pageSize),
-    items: Array.isArray(data.items) ? data.items : [],
+    items,
   };
 };

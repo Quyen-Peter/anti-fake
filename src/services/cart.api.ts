@@ -1,4 +1,10 @@
 import { authFetch } from "../ultil/auth";
+import type {
+  CartCheckoutRequest,
+  CartCheckoutResponse,
+  ShippingOptionsRequest,
+  ShippingOptionsResponse,
+} from "../type/checkout";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -44,6 +50,50 @@ export const fetchCart = async () => {
   }
 
   return response.json();
+};
+
+export const fetchShippingOptions = async (
+  payload: ShippingOptionsRequest,
+): Promise<ShippingOptionsResponse> => {
+  const response = await authFetch(`${BASE_URL}/api/cart/shipping-options`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể lấy phương thức vận chuyển");
+  }
+
+  return {
+    options: Array.isArray(data.options) ? data.options : [],
+  };
+};
+
+export const checkoutCart = async (
+  payload: CartCheckoutRequest,
+): Promise<CartCheckoutResponse> => {
+  const response = await authFetch(`${BASE_URL}/api/cart/checkout`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the tao thanh toan");
+  }
+
+  return data;
 };
 
 

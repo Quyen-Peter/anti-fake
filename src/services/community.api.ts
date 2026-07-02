@@ -3,6 +3,39 @@ import { authFetch, getToken } from "../ultil/auth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+export type CreateSocialPostPayload = {
+  postType: "QUESTION";
+  body: string;
+  media?: File[];
+};
+
+export const createSocialPost = async ({
+  postType,
+  body,
+  media = [],
+}: CreateSocialPostPayload) => {
+  const formData = new FormData();
+  formData.append("postType", postType);
+  formData.append("body", body);
+  media.forEach((file) => formData.append("media", file));
+
+  const response = await authFetch(`${BASE_URL}/api/social/posts`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Dang bai viet that bai");
+  }
+
+  return data;
+};
+
 export const getSocialPosts = async (
   page = 1,
   pageSize = 20

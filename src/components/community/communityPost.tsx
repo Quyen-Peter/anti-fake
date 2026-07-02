@@ -1,4 +1,11 @@
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  MessageCircle,
+  Share2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,6 +25,18 @@ export default function CommunityPost({ post }: Props) {
   const [liked, setLiked] = useState(post.viewer.liked);
   const [reactionCount, setReactionCount] = useState(post.stats.reactions);
   const [loadingLike, setLoadingLike] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+
+  const imageMedia =
+    post.media
+      ?.filter((item) => item.assetType === "IMAGE" && item.url)
+      .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)) ??
+    [];
+  const legacyImageMedia =
+    imageMedia.length === 0 && post.image
+      ? [{ id: post.image, url: post.image }]
+      : [];
+  const mediaToRender = imageMedia.length > 0 ? imageMedia : legacyImageMedia;
 
   const redirectToLogin = () => {
     toast.error("Vui lòng đăng nhập trước");
@@ -79,6 +98,22 @@ export default function CommunityPost({ post }: Props) {
     }
   };
 
+  const closeImageViewer = () => setActiveImageIndex(null);
+
+  const showPrevImage = () => {
+    setActiveImageIndex((current) =>
+      current === null
+        ? current
+        : (current - 1 + mediaToRender.length) % mediaToRender.length,
+    );
+  };
+
+  const showNextImage = () => {
+    setActiveImageIndex((current) =>
+      current === null ? current : (current + 1) % mediaToRender.length,
+    );
+  };
+
   return (
     <div className="community-post">
       <div className="post-header">
@@ -95,7 +130,24 @@ export default function CommunityPost({ post }: Props) {
 
       <p>{post.body}</p>
 
-      {post.image && <img src={post.image} alt="" className="post-image" />}
+      {mediaToRender.length > 0 && (
+        <div className={`post-media-grid media-count-${mediaToRender.length}`}>
+          {mediaToRender.slice(0, 4).map((item, index) => (
+            <button
+              key={item.id}
+              className="post-image-button"
+              type="button"
+              onClick={() => setActiveImageIndex(index)}
+            >
+              <img
+                src={item.url}
+                alt={`Ảnh bài viết ${index + 1}`}
+                className="post-image"
+              />
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="post-actions">
         <button onClick={handleLike} disabled={loadingLike}>
@@ -123,6 +175,57 @@ export default function CommunityPost({ post }: Props) {
         onClose={() => setOpenComment(false)}
         postId={post.id}
       />
+
+      {activeImageIndex !== null && (
+        <div
+          className="post-image-viewer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Xem ảnh bài viết"
+        >
+          <button
+            className="post-image-viewer-close"
+            type="button"
+            aria-label="Đóng"
+            onClick={closeImageViewer}
+          >
+            <X size={24} />
+          </button>
+
+          {mediaToRender.length > 1 && (
+            <button
+              className="post-image-viewer-nav prev"
+              type="button"
+              aria-label="Ảnh trước"
+              onClick={showPrevImage}
+            >
+              <ChevronLeft size={28} />
+            </button>
+          )}
+
+          <img
+            src={mediaToRender[activeImageIndex].url}
+            alt={`Ảnh bài viết ${activeImageIndex + 1}`}
+          />
+
+          {mediaToRender.length > 1 && (
+            <button
+              className="post-image-viewer-nav next"
+              type="button"
+              aria-label="Ảnh tiếp theo"
+              onClick={showNextImage}
+            >
+              <ChevronRight size={28} />
+            </button>
+          )}
+
+          {mediaToRender.length > 1 && (
+            <span className="post-image-viewer-count">
+              {activeImageIndex + 1}/{mediaToRender.length}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

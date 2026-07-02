@@ -1,3 +1,11 @@
+export interface SocialPostMedia {
+  id: string;
+  assetType: "IMAGE" | string;
+  url: string;
+  mimeType?: string;
+  sortOrder?: number;
+}
+
 export interface SocialPost {
   id: string;
   author: {
@@ -6,9 +14,10 @@ export interface SocialPost {
     avatar: string | null;
     shopName: string | null;
   };
-  postType: "SHARE" | "PRODUCT_SHARE";
+  postType: "SHARE" | "PRODUCT_SHARE" | "QUESTION";
   body: string;
-  image: string | null;
+  image?: string | null;
+  media?: SocialPostMedia[];
   createdAt: string;
   stats: {
     reactions: number;

@@ -8,18 +8,19 @@ import LoadingOverlay from "../../components/loadingOverlay";
 export default function DiscussionFeed() {
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await getSocialPosts(1, 20);
-        setPosts(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
+  const fetchPosts = async () => {
+    try {
+      const data = await getSocialPosts(1, 20);
+      setPosts(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchPosts();
   }, []);
 
@@ -27,7 +28,7 @@ export default function DiscussionFeed() {
 
   return (
     <>
-      <CreatePostBox />
+      <CreatePostBox onCreated={fetchPosts} />
 
       {posts.map((post) => (
         <CommunityPost key={post.id} post={post} />

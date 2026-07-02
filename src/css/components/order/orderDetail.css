@@ -45,6 +45,16 @@
   align-items: center;
 }
 
+.od-step-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.od-step-wrap:first-child {
+  flex: 0 0 auto;
+}
+
 .od-step {
   min-width: 50px;
   display: flex;

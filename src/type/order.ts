@@ -26,6 +26,7 @@ export type OrderStatus =
 
 export type PaymentMethod =
   | "COD"
+  | "PAYOS"
   | "VNPay"
   | "Momo"
   | "ZaloPay"
@@ -50,27 +51,31 @@ export interface OrderItem {
 }
 
 export interface OrderShop {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
+  shopId?: string;
+  shopName?: string;
+  fulfillmentStatus?: string;
   items: OrderItem[];
 }
 
 export interface OrderDetail {
   id: string;
   orderCode: string;
-  status: OrderStatus;
+  status: OrderStatus | string;
   createdAt: string;
 
   receiverName: string;
   receiverPhone: string;
   shippingAddress: string;
 
-  carrier: string;
-  trackingCode: string;
-  shippingMethod: string;
-  estimatedDelivery: string;
+  carrier?: string;
+  trackingCode?: string;
+  shippingMethod?: string;
+  estimatedDelivery?: string;
 
   paymentMethod: PaymentMethod;
+  paymentStatus?: string;
 
   subtotal: number;
   discount: number;

@@ -1,49 +1,101 @@
+import { useEffect, useState } from "react";
+import { CheckCircle2, Clock3, Package, Truck } from "lucide-react";
 import {
-  Package,
-  Clock3,
-  Truck,
-  CheckCircle2,
-} from "lucide-react";
+  fetchShopOrderStatusSummary,
+  type ShopOrderStatusSummary,
+} from "../../services/order.api";
 import "../../css/components/orderManagement/orderStats.css";
 
-export default function OrderStats() {
+type OrderStatsProps = {
+  shopId?: string;
+};
+
+const emptySummary: ShopOrderStatusSummary = {
+  totalOrders: 0,
+  pendingOrders: 0,
+  shippingOrders: 0,
+  completedOrders: 0,
+};
+
+const formatNumber = (value: number) =>
+  new Intl.NumberFormat("vi-VN").format(value);
+
+export default function OrderStats({ shopId }: OrderStatsProps) {
+  const [summary, setSummary] =
+    useState<ShopOrderStatusSummary>(emptySummary);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!shopId) return;
+
+    let ignore = false;
+
+    const loadSummary = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await fetchShopOrderStatusSummary(shopId);
+        if (!ignore) setSummary(data);
+      } catch (err: any) {
+        if (!ignore) {
+          setSummary(emptySummary);
+          setError(err.message || "Khong the tai thong ke don hang");
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    loadSummary();
+
+    return () => {
+      ignore = true;
+    };
+  }, [shopId]);
+
+  const stats = [
+    {
+      label: "Tổng đơn hàng",
+      value: summary.totalOrders,
+      icon: <Package size={20} />,
+      className: "",
+    },
+    {
+      label: "Đang xử lý",
+      value: summary.pendingOrders,
+      icon: <Clock3 size={20} />,
+      className: "processing",
+    },
+    {
+      label: "Đang giao",
+      value: summary.shippingOrders,
+      icon: <Truck size={20} />,
+      className: "shipping",
+    },
+    {
+      label: "Đã hoàn thành",
+      value: summary.completedOrders,
+      icon: <CheckCircle2 size={20} />,
+      className: "completed",
+    },
+  ];
+
   return (
-    <div className="seller-order-stats">
-      <div className="seller-order-stat-card">
-        <div className="icon">
-          <Package size={20} />
+    <div
+      className="seller-order-stats"
+      aria-busy={loading}
+      title={error || undefined}
+    >
+      {stats.map((item) => (
+        <div className="seller-order-stat-card" key={item.label}>
+          <div className={`icon ${item.className}`.trim()}>{item.icon}</div>
+
+          <span>{item.label}</span>
+          <h2>{loading ? "..." : formatNumber(item.value)}</h2>
         </div>
-
-        <span>Tổng đơn hàng</span>
-        <h2>1,284</h2>
-      </div>
-
-      <div className="seller-order-stat-card">
-        <div className="icon processing">
-          <Clock3 size={20} />
-        </div>
-
-        <span>Đang xử lý</span>
-        <h2>42</h2>
-      </div>
-
-      <div className="seller-order-stat-card">
-        <div className="icon shipping">
-          <Truck size={20} />
-        </div>
-
-        <span>Đang giao</span>
-        <h2>156</h2>
-      </div>
-
-      <div className="seller-order-stat-card">
-        <div className="icon completed">
-          <CheckCircle2 size={20} />
-        </div>
-
-        <span>Đã hoàn thành</span>
-        <h2>1,086</h2>
-      </div>
+      ))}
     </div>
   );
 }

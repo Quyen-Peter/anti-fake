@@ -1,5 +1,5 @@
 import { authFetch } from "../ultil/auth";
-import type { Order } from "../type/order";
+import type { Order, OrderDetail } from "../type/order";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -14,6 +14,8 @@ const normalizeItems = (data: any) => {
 };
 
 const firstOrderItem = (order: any) => {
+  if (order.firstProduct) return order.firstProduct;
+
   const rootItems = order.items ?? order.orderItems;
   if (Array.isArray(rootItems) && rootItems.length > 0) return rootItems[0];
 
@@ -35,6 +37,8 @@ const firstShop = (order: any) => {
 };
 
 const countOrderItems = (order: any) => {
+  if (order.firstProduct) return Number(order.otherProducts ?? 0) + 1;
+
   const rootItems = order.items ?? order.orderItems;
   if (Array.isArray(rootItems)) return rootItems.length;
 
@@ -51,6 +55,27 @@ const toUserOrder = (order: any): Order => {
   const item = firstOrderItem(order);
   const shop = firstShop(order);
   const itemCount = countOrderItems(order);
+  const firstProduct = order.firstProduct
+    ? {
+        name: String(order.firstProduct.name ?? "San pham"),
+        variant: String(order.firstProduct.variant ?? ""),
+        quantity: Number(order.firstProduct.quantity ?? 1),
+        price: Number(order.firstProduct.price ?? 0),
+        image: String(order.firstProduct.image ?? ""),
+      }
+    : {
+        name: String(
+          item.name ??
+            item.productName ??
+            item.offerTitleSnapshot ??
+            item.offerTitle ??
+            "San pham",
+        ),
+        variant: String(item.variantName ?? item.variant ?? ""),
+        quantity: Number(item.quantity ?? 1),
+        price: Number(item.price ?? item.unitPrice ?? item.totalPrice ?? 0),
+        image: String(item.image ?? item.thumbnailUrl ?? item.thumbnail ?? ""),
+      };
 
   return {
     id: String(order.id ?? order.orderId ?? ""),
@@ -61,20 +86,8 @@ const toUserOrder = (order: any): Order => {
       order.totalAmount ?? order.orderAmount ?? order.paymentAmount ?? 0,
     ),
     paymentMethod: String(order.paymentMethod ?? order.payment?.method ?? ""),
-    firstProduct: {
-      name: String(
-        item.name ??
-          item.productName ??
-          item.offerTitleSnapshot ??
-          item.offerTitle ??
-          "San pham",
-      ),
-      variant: String(item.variantName ?? item.variant ?? ""),
-      quantity: Number(item.quantity ?? 1),
-      price: Number(item.price ?? item.unitPrice ?? item.totalPrice ?? 0),
-      image: String(item.image ?? item.thumbnailUrl ?? item.thumbnail ?? ""),
-    },
-    otherProducts: Math.max(itemCount - 1, 0),
+    firstProduct,
+    otherProducts: Number(order.otherProducts ?? Math.max(itemCount - 1, 0)),
   };
 };
 
@@ -93,6 +106,34 @@ export const fetchMyOrders = async (): Promise<Order[]> => {
   }
 
   return normalizeItems(data).map(toUserOrder);
+};
+
+export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> => {
+  const response = await authFetch(`${BASE_URL}/api/orders/${orderId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the tai chi tiet don hang");
+  }
+
+  return {
+    ...data,
+    shops: Array.isArray(data.shops)
+      ? data.shops.map((shop: any) => ({
+          ...shop,
+          id: shop.id ?? shop.shopId,
+          name: shop.name ?? shop.shopName,
+          items: Array.isArray(shop.items) ? shop.items : [],
+        }))
+      : [],
+    histories: Array.isArray(data.histories) ? data.histories : [],
+  };
 };
 
 export type SellerOrderCustomer = {
@@ -118,12 +159,39 @@ export type SellerOrdersResponse = {
   items: SellerOrder[];
 };
 
+export type ShopOrderStatusSummary = {
+  totalOrders: number;
+  pendingOrders: number;
+  shippingOrders: number;
+  completedOrders: number;
+};
+
 type FetchSellerOrdersParams = {
   shopId: string;
   orderStatus?: string;
   page?: number;
   pageSize?: number;
 };
+
+const toSellerOrder = (order: any): SellerOrder => ({
+  orderId: String(order.orderId ?? order.id ?? ""),
+  customer:
+    order.customer ??
+    ({
+      id: order.customerId,
+      name:
+        order.customerName ??
+        order.receiverName ??
+        order.buyerName ??
+        order.userName,
+      email: order.customerEmail ?? order.buyerEmail ?? order.userEmail,
+    } satisfies SellerOrderCustomer),
+  orderAmount: Number(order.orderAmount ?? order.totalAmount ?? 0),
+  orderStatus: String(order.orderStatus ?? order.status ?? "pending"),
+  createdAt: order.createdAt,
+  createdDate: order.createdDate,
+  orderDate: order.orderDate,
+});
 
 export const fetchSellerOrders = async ({
   shopId,
@@ -132,7 +200,6 @@ export const fetchSellerOrders = async ({
   pageSize = 20,
 }: FetchSellerOrdersParams): Promise<SellerOrdersResponse> => {
   const params = new URLSearchParams({
-    orderStatus,
     page: String(page),
     pageSize: String(pageSize),
   });
@@ -153,16 +220,51 @@ export const fetchSellerOrders = async ({
     throw new Error(data.message || "Khong the tai danh sach don hang");
   }
 
-  const items = Array.isArray(data)
-    ? data
-    : Array.isArray(data.items)
-      ? data.items
-      : [];
+  const items = normalizeItems(data).map(toSellerOrder);
+  const filteredItems =
+    orderStatus && orderStatus !== "all"
+      ? items.filter(
+          (item: SellerOrder) =>
+            item.orderStatus.toLowerCase() === orderStatus.toLowerCase(),
+        )
+      : items;
 
   return {
-    total: Number(data.total ?? items.length),
+    total:
+      orderStatus && orderStatus !== "all"
+        ? filteredItems.length
+        : Number(data.total ?? data.data?.total ?? filteredItems.length),
     page: Number(data.page ?? page),
     pageSize: Number(data.pageSize ?? pageSize),
-    items,
+    items: filteredItems,
+  };
+};
+
+export const fetchShopOrderStatusSummary = async (
+  shopId: string,
+): Promise<ShopOrderStatusSummary> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/order-status-summary`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the tai thong ke don hang");
+  }
+
+  const payload = data?.data ?? data;
+
+  return {
+    totalOrders: Number(payload.totalOrders ?? 0),
+    pendingOrders: Number(payload.pendingOrders ?? 0),
+    shippingOrders: Number(payload.shippingOrders ?? 0),
+    completedOrders: Number(payload.completedOrders ?? 0),
   };
 };

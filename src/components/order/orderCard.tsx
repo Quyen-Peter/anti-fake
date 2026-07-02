@@ -6,34 +6,69 @@ type Props = {
   order: Order;
 };
 
+const statusLabels: Record<string, string> = {
+  pending: "Chờ xác nhận",
+  confirmed: "Đã xác nhận",
+  processing: "Đang xử lý",
+  shipping: "Đang giao hàng",
+  shipped: "Đang giao hàng",
+  completed: "Hoàn thành",
+  delivered: "Đã giao hàng",
+  cancelled: "Đã hủy",
+  canceled: "Đã hủy",
+};
+
+const paymentMethodLabels: Record<string, string> = {
+  COD: "Thanh toán khi nhận hàng",
+  PAYOS: "Thanh toán PayOS",
+  VNPAY: "VNPay",
+  MOMO: "MoMo",
+  ZALOPAY: "ZaloPay",
+  BANKTRANSFER: "Chuyển khoản ngân hàng",
+};
+
+const formatOrderCode = (orderCode: string) =>
+  orderCode.startsWith("#") ? orderCode : `#${orderCode}`;
+
+const getStatusLabel = (status: string) =>
+  statusLabels[status.toLowerCase()] ?? status;
+
+const getPaymentMethodLabel = (paymentMethod: string) =>
+  paymentMethodLabels[paymentMethod.toUpperCase()] ?? paymentMethod;
+
 export default function OrderCard({ order }: Props) {
   const navigate = useNavigate();
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
+  const firstProduct = order.firstProduct ?? {
+    name: "Sản phẩm",
+    variant: "",
+    quantity: 1,
+    price: 0,
+    image: "",
+  };
 
   return (
     <div className="order-card-user">
       <div className="order-header-user">
-        <span className="order-code">#{order.orderCode}</span>
-
-        <span className="order-status">{order.status}</span>
+        <span className="order-code">{formatOrderCode(order.orderCode)}</span>
+        <span className="order-status">{getStatusLabel(order.status)}</span>
       </div>
 
       <div className="order-shop">{order.shopName}</div>
 
       <div className="order-product">
         <img
-          src={order.firstProduct.image}
-          alt=""
+          src={firstProduct.image || "https://picsum.photos/seed/order/200/200"}
+          alt={firstProduct.name}
           className="order-product-image"
         />
 
         <div className="order-product-info">
-          <h3>{order.firstProduct.name}</h3>
+          <h3>{firstProduct.name}</h3>
+          <p>{firstProduct.variant || "Không có phân loại"}</p>
+          <span>x{firstProduct.quantity}</span>
 
-          <p>{order.firstProduct.variant}</p>
-
-          <span>x{order.firstProduct.quantity}</span>
           {order.otherProducts > 0 && (
             <div className="order-other-products">
               +{order.otherProducts} sản phẩm khác
@@ -42,11 +77,11 @@ export default function OrderCard({ order }: Props) {
         </div>
 
         <div className="order-product-price">
-          <strong>{formatPrice(order.firstProduct.price)}đ</strong>
-
+          <strong>{formatPrice(firstProduct.price)}đ</strong>
           <small>Giá sản phẩm</small>
         </div>
       </div>
+
       <div className="order-footer">
         <div className="order-payment-info">
           <div>
@@ -56,7 +91,7 @@ export default function OrderCard({ order }: Props) {
 
           <div>
             <span>Hình thức thanh toán</span>
-            <b>{order.paymentMethod}</b>
+            <b>{getPaymentMethodLabel(order.paymentMethod)}</b>
           </div>
         </div>
 

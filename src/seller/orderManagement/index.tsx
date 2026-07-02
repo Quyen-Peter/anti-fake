@@ -177,7 +177,7 @@ export default function OrderManagement() {
         </div>
       </div>
 
-      <OrderStats />
+      <OrderStats shopId={shopId} />
 
       <div className="seller-order-table-card">
         <OrderFilters

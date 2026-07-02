@@ -12,6 +12,9 @@ import LoadingOverlay from "../../components/loadingOverlay";
 import ProductGallery from "../../components/product/productGallery";
 import { fetchOfferReviews } from "../../services/review.api";
 import { getShopChatThread } from "../../services/chat.api";
+import ProductCard from "../../components/product/productCard";
+import { searchOffers } from "../../services/product.api";
+import type { ProductView } from "../../type/product";
 
 type ReviewItem = {
   id: string;
@@ -32,6 +35,7 @@ export default function ProductDetail() {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReview, setTotalReview] = useState(0);
   const [loadingReviews, setLoadingReviews] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<ProductView[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -80,7 +84,40 @@ export default function ProductDetail() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    if (!product?.categoryId || !product?.id) {
+      setRelatedProducts([]);
+      return;
+    }
+
+    const loadRelatedProducts = async () => {
+      try {
+        const data = await searchOffers({
+          categoryId: product.categoryId,
+          page: 1,
+          pageSize: 9,
+        });
+        const items = Array.isArray(data)
+          ? data
+          : Array.isArray(data.items)
+            ? data.items
+            : [];
+
+        setRelatedProducts(
+          items
+            .filter((item: ProductView) => item.id !== product.id)
+            .slice(0, 8),
+        );
+      } catch (error) {
+        console.error(error);
+        setRelatedProducts([]);
+      }
+    };
+
+    loadRelatedProducts();
+  }, [product?.categoryId, product?.id]);
 
   const getOrCreateChatThread = async (shopId: string) => {
     try {
@@ -118,7 +155,7 @@ export default function ProductDetail() {
       <div className="pd-top">
         <ProductGallery images={product.imageUrls} />
 
-        <ProductInfo product={product} />
+        <ProductInfo product={product} shop={shop} />
       </div>
 
       <div className="pd-shop-box">
@@ -176,6 +213,21 @@ export default function ProductDetail() {
         </div>
         <ProductSpecification product={product} />
       </div>
+
+
+      {relatedProducts.length > 0 && (
+        <section className="pd-related-section">
+          <div className="pd-related-header">
+            <h2>Có thể bạn sẽ thích</h2>
+          </div>
+
+          <div className="pd-related-grid">
+            {relatedProducts.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

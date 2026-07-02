@@ -39,12 +39,6 @@ export interface CartCheckoutRequest {
 
 export interface CartCheckoutResponse {
   orderId?: string;
-  orderCode?: string;
-  amount?: number;
-  totalAmount?: number;
-  paymentAmount?: number;
-  qrCodeUrl?: string;
-  qrImageUrl?: string;
+  orderCode?: string | number;
   checkoutUrl?: string;
-  paymentUrl?: string;
 }

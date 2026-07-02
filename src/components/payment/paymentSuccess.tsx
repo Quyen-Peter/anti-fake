@@ -1,9 +1,39 @@
 import { CheckCircle, Clock, CreditCard, ReceiptText } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../css/components/payment/paymentSuccess.css";
-import { useNavigate } from "react-router-dom";
+
+type CheckoutSuccessState = {
+  checkout?: {
+    orderId?: string;
+    orderCode?: string | number;
+  };
+  paymentMethod?: string;
+  paymentStatus?: string;
+};
+
+const paymentMethodLabel: Record<string, string> = {
+  COD: "Thanh toán khi nhận hàng",
+  PAYOS: "Thanh toán PayOS",
+};
+
+const paymentStatusLabel: Record<string, string> = {
+  PENDING: "Chờ thanh toán",
+  PAID: "Đã thanh toán",
+  COD_PENDING: "Chờ thanh toán khi nhận hàng",
+};
+
+const normalizeMethod = (method?: string) => method?.toUpperCase() ?? "PAYOS";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state ?? {}) as CheckoutSuccessState;
+  const paymentMethod = normalizeMethod(state.paymentMethod);
+  const isCod = paymentMethod === "COD";
+  const transactionCode =
+    state.checkout?.orderCode ?? state.checkout?.orderId ?? "Đang cập nhật";
+  const status = state.paymentStatus ?? (isCod ? "COD_PENDING" : "PAID");
+
   return (
     <main className="payment-success-page">
       <section className="payment-success-card">
@@ -11,11 +41,11 @@ export default function PaymentSuccess() {
           <CheckCircle size={42} />
         </div>
 
-        <h1>Thanh toán thành công!</h1>
+        <h1>{isCod ? "Đặt hàng thành công!" : "Thanh toán thành công!"}</h1>
 
         <p className="payment-success-subtitle">
-          Giao dịch của bạn đã được xác nhận. Đơn hàng sẽ được xử lý và chuẩn
-          bị vận chuyển trong thời gian sớm nhất.
+          Đơn hàng của bạn đã được ghi nhận. Thông tin đơn hàng sẽ được cập nhật
+          trong tài khoản của bạn.
         </p>
 
         <div className="payment-success-info">
@@ -23,7 +53,7 @@ export default function PaymentSuccess() {
             <ReceiptText size={22} />
             <div>
               <span>Mã giao dịch</span>
-              <strong>#AF-992834-2024</strong>
+              <strong>{transactionCode}</strong>
             </div>
           </article>
 
@@ -31,7 +61,7 @@ export default function PaymentSuccess() {
             <CreditCard size={22} />
             <div>
               <span>Phương thức</span>
-              <strong>Thanh toán QR</strong>
+              <strong>{paymentMethodLabel[paymentMethod] ?? paymentMethod}</strong>
             </div>
           </article>
 
@@ -39,7 +69,7 @@ export default function PaymentSuccess() {
             <Clock size={22} />
             <div>
               <span>Trạng thái</span>
-              <strong>Đã thanh toán</strong>
+              <strong>{paymentStatusLabel[status] ?? status}</strong>
             </div>
           </article>
         </div>

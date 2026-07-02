@@ -1,13 +1,28 @@
-import { ArrowLeft, CircleHelp, Landmark, QrCode, ShieldCheck, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleHelp,
+  Landmark,
+  QrCode,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { usePayOS, type PayOSConfig } from "@payos/payos-checkout";
 
 import "../../css/components/payment/paymentModel.css";
+import { useEffect, useMemo } from "react";
 
 type PaymentModelProps = {
   amount?: number;
-  orderCode?: string;
+  orderCode?: string | number;
   onBack?: () => void;
   onSupport?: () => void;
+};
+
+type CheckoutState = {
+  orderId: string;
+  orderCode: string | number;
+  checkoutUrl: string;
 };
 
 const formatCurrency = (value: number) =>
@@ -16,15 +31,17 @@ const formatCurrency = (value: number) =>
 const firstValue = <T,>(...values: Array<T | undefined | null>) =>
   values.find((value) => value !== undefined && value !== null);
 
-const toEmbeddedPayOSUrl = (checkoutUrl: string) => {
-  if (!checkoutUrl) return "";
+const isCheckoutState = (value: unknown): value is CheckoutState => {
+  if (!value || typeof value !== "object") return false;
 
-  const embeddedUrl = checkoutUrl.replace("/web/", "/embedded/");
-  const separator = embeddedUrl.includes("?") ? "&" : "?";
+  const checkout = value as Partial<CheckoutState>;
 
-  return `${embeddedUrl}${separator}redirect_uri=${encodeURIComponent(
-    window.location.origin + "/payment-success",
-  )}`;
+  return Boolean(
+    checkout.orderId &&
+    checkout.orderCode &&
+    typeof checkout.checkoutUrl === "string" &&
+    checkout.checkoutUrl.startsWith("https://pay.payos.vn/"),
+  );
 };
 
 export default function PaymentModel({
@@ -35,25 +52,57 @@ export default function PaymentModel({
 }: PaymentModelProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const checkout = location.state?.checkout ?? {};
+  const checkout = location.state?.checkout;
+  const hasCheckout = isCheckoutState(checkout);
 
-  const displayAmount = Number(
+  const displayAmount = Number(firstValue(amount, location.state?.amount, 0));
+  const displayOrderCode = String(
     firstValue(
-      amount,
-      location.state?.amount,
-      checkout.amount,
-      checkout.totalAmount,
-      checkout.paymentAmount,
-      0,
+      orderCode,
+      hasCheckout ? checkout.orderCode : undefined,
+      hasCheckout ? checkout.orderId : undefined,
+      "Đang tạo",
     ),
   );
-  const displayOrderCode = String(
-    firstValue(orderCode, checkout.orderCode, checkout.orderId, "Đang tạo"),
+  const checkoutUrl = hasCheckout ? checkout.checkoutUrl : "";
+
+
+  const payOSConfig = useMemo<PayOSConfig>(
+    () => ({
+      RETURN_URL: `${window.location.origin}/payment`,
+      ELEMENT_ID: "payos-checkout-frame",
+      CHECKOUT_URL: checkoutUrl,
+      embedded: true,
+
+      onSuccess: () => {
+        navigate("/payment-success", {
+          replace: true,
+          state: {
+            checkout,
+            paymentMethod: "PAYOS",
+            paymentStatus: "PAID",
+          },
+        });
+      },
+
+      onCancel: () => {
+        console.log("Đã hủy thanh toán");
+      },
+
+      onExit: () => {
+        console.log("Đóng cửa sổ thanh toán");
+      },
+    }),
+    [checkoutUrl, navigate],
   );
-  const checkoutUrl = String(
-    firstValue(checkout.checkoutUrl, checkout.paymentUrl, "") ?? "",
-  );
-  const embeddedCheckoutUrl = toEmbeddedPayOSUrl(checkoutUrl);
+
+  const { open } = usePayOS(payOSConfig);
+
+  useEffect(() => {
+    if (!checkoutUrl) return;
+
+    open();
+  }, [checkoutUrl, open]);
 
   return (
     <section className="payment-model-page">
@@ -61,9 +110,7 @@ export default function PaymentModel({
         <header className="payment-model-header">
           <div>
             <h1>Thanh toán đơn hàng</h1>
-            <p>
-              Quý khách vui lòng quét mã QR bên dưới để hoàn tất giao dịch.
-            </p>
+            <p>Quét mã QR PayOS bên dưới để hoàn tất giao dịch.</p>
           </div>
 
           <div className="payment-order-code">
@@ -79,18 +126,11 @@ export default function PaymentModel({
               Giao dịch an toàn
             </div>
 
-            {embeddedCheckoutUrl ? (
-              <div className="payment-embed-frame">
-                <iframe
-                  title="QR thanh toán PayOS"
-                  src={embeddedCheckoutUrl}
-                  allow="clipboard-write"
-                />
-              </div>
+            {checkoutUrl ? (
+              <div id="payos-checkout-frame" className="payment-embed-frame" />
             ) : (
               <div className="payment-qr-frame">
                 <div className="payment-qr-placeholder">
-                  <QrCode size={86} />
                   <span>Chưa có thông tin thanh toán</span>
                 </div>
               </div>

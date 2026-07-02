@@ -45,17 +45,30 @@ export default function CheckoutSummary({
     try {
       setLoading(true);
 
+      const paymentMethod = toPaymentMethod(payment);
       const checkout = await checkoutCart({
         cartItemIds,
-        paymentMethod: toPaymentMethod(payment),
+        paymentMethod,
         shippingOptionCode,
         affiliateCode: affiliateCode.trim() || undefined,
       });
 
+      if (paymentMethod === "COD") {
+        navigate("/payment-success", {
+          replace: true,
+          state: {
+            checkout,
+            paymentMethod,
+            paymentStatus: "COD_PENDING",
+          },
+        });
+        return;
+      }
+
       navigate("/payment", {
         state: {
           checkout,
-          amount: checkout.amount ?? checkout.totalAmount ?? checkout.paymentAmount ?? total,
+          amount: total,
         },
       });
     } catch (error) {

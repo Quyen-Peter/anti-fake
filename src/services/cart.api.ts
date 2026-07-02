@@ -8,6 +8,14 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const pickCheckoutValue = (data: any, key: "orderId" | "orderCode" | "checkoutUrl") =>
+  data?.[key] ??
+  data?.data?.[key] ??
+  data?.order?.[key] ??
+  data?.data?.order?.[key] ??
+  data?.orders?.[0]?.[key] ??
+  data?.data?.orders?.[0]?.[key];
+
 
 export const addToCart = async (
   offerId: string,
@@ -93,7 +101,18 @@ export const checkoutCart = async (
     throw new Error(data.message || "Khong the tao thanh toan");
   }
 
-  return data;
+  const checkout = {
+    ...data,
+    orderId: pickCheckoutValue(data, "orderId") ?? data?.id ?? data?.data?.id,
+    orderCode: pickCheckoutValue(data, "orderCode") ?? data?.code ?? data?.data?.code,
+    checkoutUrl: pickCheckoutValue(data, "checkoutUrl") ?? data?.paymentUrl,
+  };
+
+  if (payload.paymentMethod === "PAYOS" && !checkout.checkoutUrl) {
+    throw new Error("API checkout PAYOS thieu checkoutUrl");
+  }
+
+  return checkout;
 };
 
 

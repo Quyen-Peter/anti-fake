@@ -1,12 +1,56 @@
 import { QrCode, ShieldCheck, ShoppingCart } from "lucide-react";
 import { useState } from "react";
-import { addToCart } from "../../services/cart.api";
+import { useNavigate } from "react-router-dom";
+import { addToCart, fetchCart } from "../../services/cart.api";
 import { toast } from "sonner";
 
-export default function ProductInfo({ product }: any) {
-  const [quantity, setQuantity] = useState(
-    product.salesMode === "WHOLESALE" ? product.minWholesaleQty : 1,
-  );
+const getCartItemId = (value: any) =>
+  value?.id ??
+  value?.cartItemId ??
+  value?.cartItem?.id ??
+  value?.item?.id ??
+  value?.data?.id ??
+  value?.data?.cartItemId ??
+  value?.data?.cartItem?.id ??
+  value?.data?.item?.id;
+
+const findCartItem = (cart: any, product: any, shopId?: string | number) => {
+  const shops = Array.isArray(cart?.shops) ? cart.shops : [];
+  const targetShopId = shopId ? String(shopId) : "";
+  const productId = String(product.id);
+
+  for (const cartShop of shops) {
+    if (
+      targetShopId &&
+      String(cartShop.shopId ?? cartShop.id) !== targetShopId
+    ) {
+      continue;
+    }
+
+    const items = Array.isArray(cartShop.items) ? cartShop.items : [];
+    const item = items.find((cartItem: any) => {
+      const offerId = cartItem.offerId ?? cartItem.productId ?? cartItem.offer?.id;
+
+      if (offerId && String(offerId) === productId) return true;
+
+      return (
+        cartItem.offerTitleSnapshot === product.title &&
+        Number(cartItem.unitPriceSnapshot) === Number(product.price)
+      );
+    });
+
+    if (item) return item;
+  }
+
+  return null;
+};
+
+export default function ProductInfo({ product, shop }: any) {
+  const navigate = useNavigate();
+  const minQuantity =
+    product.salesMode === "WHOLESALE" ? product.minWholesaleQty : 1;
+  const [quantity, setQuantity] = useState(minQuantity);
+  const [buyLoading, setBuyLoading] = useState(false);
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
@@ -21,6 +65,56 @@ export default function ProductInfo({ product }: any) {
     } catch (error) {
       console.error(error);
       toast.error("Thêm giỏ hàng thất bại");
+    }
+  };
+
+  const handleBuyNow = async () => {
+    try {
+      setBuyLoading(true);
+
+      const shopId = shop?.shopId ?? shop?.id ?? product.shopId;
+      const shopName = shop?.shopName ?? product.shopName ?? "Shop";
+      const cartItem = await addToCart(product.id, quantity);
+      const cart = await fetchCart();
+      const cartItemFromCart = findCartItem(cart, product, shopId);
+      const cartItemId = getCartItemId(cartItem) ?? cartItemFromCart?.id;
+
+      if (!cartItemId) {
+        throw new Error("Khong tim thay san pham trong gio hang");
+      }
+
+      if (!shopId) {
+        throw new Error("Khong tim thay thong tin shop");
+      }
+
+      navigate("/checkout", {
+        state: {
+          shops: [
+            {
+              shopId: String(shopId),
+              shopName,
+              items: [
+                {
+                  id: String(cartItemId),
+                  thumbnailUrl:
+                    product.thumbnailUrl ?? product.imageUrls?.[0] ?? "",
+                  offerTitleSnapshot: product.title,
+                  unitPriceSnapshot: product.price,
+                  currencySnapshot: product.currency ?? "VND",
+                  quantity,
+                },
+              ],
+            },
+          ],
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error ? error.message : "Khong the mua ngay",
+      );
+    } finally {
+      setBuyLoading(false);
     }
   };
 
@@ -61,7 +155,7 @@ export default function ProductInfo({ product }: any) {
         <div className="pd-quantity-control">
           <button
             onClick={() =>
-              setQuantity(Math.max(product.minWholesaleQty, quantity - 1))
+              setQuantity(Math.max(minQuantity, quantity - 1))
             }
           >
             -
@@ -87,7 +181,13 @@ export default function ProductInfo({ product }: any) {
           <ShoppingCart size={20} /> Thêm vào giỏ hàng
         </button>
 
-        <button className="pd-buy-btn">Mua ngay</button>
+        <button
+          className="pd-buy-btn"
+          disabled={buyLoading}
+          onClick={handleBuyNow}
+        >
+          {buyLoading ? "Dang xu ly..." : "Mua ngay"}
+        </button>
       </div>
 
       <div className="pd-verify-box">

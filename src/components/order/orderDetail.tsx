@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Phone, ShieldCheck, User } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, ShieldCheck, Star, User } from "lucide-react";
+import { toast } from "sonner";
 import "../../css/components/order/orderDetail.css";
-import type { OrderDetail } from "../../type/order";
-import { fetchOrderDetail } from "../../services/order.api";
+import type { OrderDetail, OrderItem } from "../../type/order";
+import { cancelOrder, fetchOrderDetail } from "../../services/order.api";
+import { createOfferReview } from "../../services/review.api";
+import ConfirmModal from "../common/confirmModal";
+import LoadingOverlay from "../loadingOverlay";
 
 const statusLabels: Record<string, string> = {
   pending: "Chờ xác nhận",
-  confirmed: "Đã xác nhận",
   processing: "Đang xử lý",
-  shipping: "Đang giao hàng",
+  shipping: "Đang giao",
   completed: "Hoàn thành",
+  delivered: "Đã giao",
   cancelled: "Đã hủy",
+  canceled: "Đã hủy",
 };
 
 const paymentStatusLabels: Record<string, string> = {
@@ -39,12 +44,21 @@ const formatDate = (value?: string) => {
 const label = (map: Record<string, string>, value?: string) =>
   value ? map[value.toLowerCase()] ?? map[value.toUpperCase()] ?? value : "Đang cập nhật";
 
+const getOfferId = (item: OrderItem) => item.offerId || item.productId;
+
 export default function OrderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activeReviewItemId, setActiveReviewItemId] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReviewId, setSubmittingReviewId] = useState("");
+  const [reviewedItemIds, setReviewedItemIds] = useState<string[]>([]);
+  const [cancellingOrder, setCancellingOrder] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -76,7 +90,63 @@ export default function OrderDetailPage() {
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
 
-  if (loading) return <div className="order-detail-page">Đang tải đơn hàng...</div>;
+  const orderStatus = order?.status.toLowerCase() ?? "";
+  const isCompleted = orderStatus === "completed" || orderStatus === "delivered";
+  const isPending = orderStatus === "pending";
+
+  const openReviewBox = (itemId: string) => {
+    setActiveReviewItemId((current) => (current === itemId ? "" : itemId));
+    setReviewRating(5);
+    setReviewComment("");
+  };
+
+  const handleSubmitReview = async (item: OrderItem) => {
+    const offerId = getOfferId(item);
+
+    if (!offerId) {
+      toast.error("Không tìm thấy sản phẩm để đánh giá");
+      return;
+    }
+
+    if (!reviewComment.trim()) {
+      toast.error("Vui lòng nhập nội dung đánh giá");
+      return;
+    }
+
+    try {
+      setSubmittingReviewId(item.id);
+      await createOfferReview(offerId, {
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+      setReviewedItemIds((current) => [...current, item.id]);
+      setActiveReviewItemId("");
+      setReviewComment("");
+      toast.success("Đánh giá sản phẩm thành công");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Đánh giá sản phẩm thất bại");
+    } finally {
+      setSubmittingReviewId("");
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!order) return;
+
+    try {
+      setCancellingOrder(true);
+      await cancelOrder(order.id);
+      setOrder({ ...order, status: "cancelled" });
+      setShowCancelConfirm(false);
+      toast.success("Đã hủy đơn hàng");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Hủy đơn hàng thất bại");
+    } finally {
+      setCancellingOrder(false);
+    }
+  };
+
+  if (loading) return <div className="order-detail-page"><LoadingOverlay/></div>;
   if (error) return <div className="order-detail-page">{error}</div>;
   if (!order) return <div className="order-detail-page">Không tìm thấy đơn hàng.</div>;
 
@@ -95,12 +165,11 @@ export default function OrderDetailPage() {
       <div className="od-section">
         <h2>Tiến độ đơn hàng</h2>
         <div className="od-progress">
-          {["pending", "confirmed", "processing", "shipping", "completed"].map(
+          {["pending","processing", "shipping", "completed"].map(
             (status, index) => {
               const current = order.status.toLowerCase();
               const currentIndex = [
                 "pending",
-                "confirmed",
                 "processing",
                 "shipping",
                 "completed",
@@ -163,14 +232,74 @@ export default function OrderDetailPage() {
         <div key={shop.id ?? shop.shopId} className="od-section">
           <div className="od-shop-title">{shop.name ?? shop.shopName}</div>
           {shop.items.map((item) => (
-            <div key={item.id} className="od-item">
-              <img src={item.thumbnailUrl} alt={item.productName} />
-              <div className="od-item-info">
-                <h3>{item.productName}</h3>
-                {item.variantName && <p>{item.variantName}</p>}
-                <span>Số lượng: {item.quantity}</span>
+            <div key={item.id} className="od-item-block">
+              <div className="od-item">
+                <img src={item.thumbnailUrl} alt={item.productName} />
+                <div className="od-item-info">
+                  <h3>{item.productName}</h3>
+                  {item.variantName && <p>{item.variantName}</p>}
+                  <span>Số lượng: {item.quantity}</span>
+                </div>
+                <div className="od-item-side">
+                  <div className="od-item-price">{formatPrice(item.totalPrice)}đ</div>
+                  {isCompleted && !reviewedItemIds.includes(item.id) && (
+                    <button
+                      type="button"
+                      className="od-review-toggle"
+                      onClick={() => openReviewBox(item.id)}
+                    >
+                      Đánh giá
+                    </button>
+                  )}
+                  {reviewedItemIds.includes(item.id) && (
+                    <span className="od-reviewed-label">Đã đánh giá</span>
+                  )}
+                </div>
               </div>
-              <div className="od-item-price">{formatPrice(item.totalPrice)}đ</div>
+
+              {activeReviewItemId === item.id && (
+                <div className="od-review-box">
+                  <div className="od-review-stars" aria-label="Chọn số sao">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className={star <= reviewRating ? "active" : ""}
+                        onClick={() => setReviewRating(star)}
+                        aria-label={`${star} sao`}
+                      >
+                        <Star
+                          size={20}
+                          fill={star <= reviewRating ? "currentColor" : "none"}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(event) => setReviewComment(event.target.value)}
+                    placeholder="Nhập nội dung đánh giá sản phẩm"
+                    rows={3}
+                  />
+                  <div className="od-review-actions">
+                    <button
+                      type="button"
+                      className="od-btn"
+                      onClick={() => setActiveReviewItemId("")}
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="button"
+                      className="od-btn primary"
+                      disabled={submittingReviewId === item.id}
+                      onClick={() => handleSubmitReview(item)}
+                    >
+                      {submittingReviewId === item.id ? "Đang gửi..." : "Gửi đánh giá"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -220,8 +349,29 @@ export default function OrderDetailPage() {
       )}
 
       <div className="od-actions">
-        <button className="od-btn primary">Mua lại</button>
+        {isPending && (
+          <button
+            className="od-btn danger"
+            disabled={cancellingOrder}
+            onClick={() => setShowCancelConfirm(true)}
+          >
+            {cancellingOrder ? "Đang hủy..." : "Hủy đơn hàng"}
+          </button>
+        )}
+        {isCompleted && <button className="od-btn primary">Mua lại</button>}
       </div>
+
+      <ConfirmModal
+        open={showCancelConfirm}
+        title="Hủy đơn hàng"
+        message="Bạn có chắc muốn hủy đơn hàng này không? Hành động này không thể hoàn tác."
+        confirmText="Hủy đơn"
+        cancelText="Không"
+        danger
+        loading={cancellingOrder}
+        onConfirm={handleCancelOrder}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </div>
   );
 }

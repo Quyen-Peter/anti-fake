@@ -1,7 +1,20 @@
 import { authFetch } from "../ultil/auth";
-import type { Order, OrderDetail } from "../type/order";
+import type { Order, OrderDetail, OrderItem } from "../type/order";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+type RawOrderItem = Partial<OrderItem> & {
+  offerId?: string;
+  productId?: string;
+};
+
+type RawOrderShop = {
+  id?: string;
+  shopId?: string;
+  name?: string;
+  shopName?: string;
+  items?: RawOrderItem[];
+};
 
 const normalizeItems = (data: any) => {
   if (Array.isArray(data)) return data;
@@ -124,16 +137,41 @@ export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> =>
 
   return {
     ...data,
+    id: data.id ?? data.orderId,
     shops: Array.isArray(data.shops)
-      ? data.shops.map((shop: any) => ({
+      ? data.shops.map((shop: RawOrderShop) => ({
           ...shop,
           id: shop.id ?? shop.shopId,
           name: shop.name ?? shop.shopName,
-          items: Array.isArray(shop.items) ? shop.items : [],
+          items: Array.isArray(shop.items)
+            ? shop.items.map((item: RawOrderItem) => ({
+                ...item,
+                offerId: item.offerId ?? item.productId,
+                productId: item.productId ?? item.offerId,
+              }))
+            : [],
         }))
       : [],
     histories: Array.isArray(data.histories) ? data.histories : [],
   };
+};
+
+export const cancelOrder = async (orderId: string) => {
+  const response = await authFetch(`${BASE_URL}/api/orders/${orderId}/cancel`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Khong the huy don hang");
+  }
+
+  return data;
 };
 
 export type SellerOrderCustomer = {

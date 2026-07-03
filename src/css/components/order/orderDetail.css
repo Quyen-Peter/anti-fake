@@ -141,7 +141,15 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-.od-item:last-child {
+.od-item-block:last-child .od-item {
+  border-bottom: none;
+}
+
+.od-item-block {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.od-item-block:last-child {
   border-bottom: none;
 }
 
@@ -180,6 +188,73 @@
   font-size: 18px;
   font-weight: 700;
   color: #dc2626;
+}
+
+.od-item-side {
+  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.od-review-toggle {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid #dc2626;
+  background: #fff;
+  color: #dc2626;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.od-reviewed-label {
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.od-review-box {
+  margin: 0 30px 14px 128px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #f0e4e4;
+}
+
+.od-review-stars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.od-review-stars button {
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.od-review-stars button.active {
+  color: #f59e0b;
+}
+
+.od-review-box textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+}
+
+.od-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .od-total {
@@ -226,6 +301,17 @@
   background: #dc2626;
   color: white;
   border: none;
+}
+
+.od-btn.danger {
+  background: #fff;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.od-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* Mobile */
@@ -278,6 +364,7 @@
   .od-item {
     gap: 10px;
     padding: 6px 10px;
+    align-items: flex-start;
   }
 
   .od-item img {
@@ -300,8 +387,20 @@
   .od-item-price {
     font-size: 14px;
   }
-  .od-item-price {
-    font-size: 14px;
+  .od-item-side {
+    min-width: 88px;
+    gap: 6px;
+  }
+  .od-review-toggle {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  .od-review-box {
+    margin: 0 10px 12px;
+  }
+  .od-review-actions {
+    flex-direction: column-reverse;
   }
 }
 

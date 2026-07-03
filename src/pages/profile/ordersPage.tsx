@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import OrderCard from "../../components/order/orderCard";
 import { fetchMyOrders } from "../../services/order.api";
 import type { Order } from "../../type/order";
+import LoadingOverlay from "../../components/loadingOverlay";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -35,7 +36,7 @@ export default function OrdersPage() {
   }, []);
 
   if (loading) {
-    return <div>Dang tai danh sach don hang...</div>;
+    return <div><LoadingOverlay/></div>;
   }
 
   if (error) {

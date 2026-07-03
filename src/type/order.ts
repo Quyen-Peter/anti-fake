@@ -41,6 +41,7 @@ export interface OrderHistory {
 
 export interface OrderItem {
   id: string;
+  offerId?: string;
   productId: string;
   productName: string;
   thumbnailUrl: string;

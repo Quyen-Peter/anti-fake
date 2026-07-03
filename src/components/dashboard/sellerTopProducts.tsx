@@ -1,30 +1,42 @@
-export default function SellerTopProducts() {
-  const products = [
-    {
-      id: 1,
-      name: "Túi xách da",
-      sold: "124 lượt bán",
-      price: "2.450k",
-    },
-    {
-      id: 4,
-      name: "Đồng hồ cơ",
-      sold: "90 lượt bán",
-      price: "15.800k",
-    },
-    {
-      id: 3,
-      name: "Sneaker Limited",
-      sold: "76 lượt bán",
-      price: "3.200k",
-    },
-    {
-      id: 2,
-      name: "Smartphone V-Gold Smartphone V-Gold Smartphone V-Gold",
-      sold: "54 lượt bán",
-      price: "22.500k",
-    },
-  ];
+import { useEffect, useState } from "react";
+import {
+  fetchShopBestSellingProducts,
+  type ShopBestSellingProduct,
+} from "../../services/shop.api";
+
+type SellerTopProductsProps = {
+  shopId?: string;
+};
+
+const formatCurrency = (value?: number, currency = "VND") =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value ?? 0);
+
+export default function SellerTopProducts({ shopId }: SellerTopProductsProps) {
+  const [products, setProducts] = useState<ShopBestSellingProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!shopId) return;
+
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchShopBestSellingProducts(shopId, 4);
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, [shopId]);
 
   return (
     <div className="seller-top-card">
@@ -32,24 +44,37 @@ export default function SellerTopProducts() {
         <h3>Bán chạy nhất</h3>
       </div>
 
-      {products.map((p, index) => (
-        <div
-          key={index}
-          className="seller-top-item"
-        >
-          <img
-            src={`https://picsum.photos/60?random=${p.id}`}
-            alt=""
-          />
-
-          <div className="seller-top-info">
-            <h4>{p.name}</h4>
-            <span>{p.sold}</span>
-          </div>
-
-          <b>{p.price}</b>
+      {loading && (
+        <div className="seller-dashboard-orders-state">
+          Đang tải sản phẩm...
         </div>
-      ))}
+      )}
+
+      {!loading && products.length === 0 && (
+        <div className="seller-dashboard-orders-state">
+          Chưa có sản phẩm bán chạy
+        </div>
+      )}
+
+      {!loading &&
+        products.map((product) => (
+          <div
+            key={product.id}
+            className="seller-top-item"
+          >
+            <img
+              src={product.thumbnailUrl || "https://picsum.photos/60?random=1"}
+              alt={product.title}
+            />
+
+            <div className="seller-top-info">
+              <h4>{product.title}</h4>
+              <span>Đã bán {product.soldQuantity ?? 0}</span>
+            </div>
+
+            <b>{formatCurrency(product.price, product.currency)}</b>
+          </div>
+        ))}
     </div>
   );
 }

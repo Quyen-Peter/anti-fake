@@ -392,3 +392,59 @@
   z-index: 990;
   background: #fff;
 }
+
+.shop-best-selling {
+  max-width: 1300px;
+  margin: 20px auto 0;
+  padding: 0 20px 80px;
+}
+
+.shop-best-selling-header h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.shop-best-selling-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.shop-best-selling-state {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  text-align: center;
+}
+
+@media (max-width: 576px) {
+  .shop-best-selling {
+    margin-top: 14px;
+    padding: 0 10px 60px;
+  }
+
+  .shop-best-selling-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 820px) {
+  .shop-best-selling {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .shop-best-selling-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1024px) {
+  .shop-best-selling-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

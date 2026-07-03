@@ -1,30 +1,102 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   DollarSign,
   ShoppingBag,
   Package,
 } from "lucide-react";
+import {
+  getShopSummaryMetrics,
+  type ShopSummaryMetricsResponse,
+} from "../../services/shop.api";
 
-export default function SellerStats() {
-  const stats = [
-    {
-      title: "Doanh thu",
-      value: "128.500.000đ",
-      icon: DollarSign,
-      change: "+12.5%",
-    },
-    {
-      title: "Đơn hàng",
-      value: "432",
-      icon: ShoppingBag,
-      change: "+9.2%",
-    },
-    {
-      title: "Sản phẩm",
-      value: "1,024",
-      icon: Package,
-      change: "-2.1%",
-    },
-  ];
+type SellerStatsProps = {
+  shopId?: string;
+};
+
+const getTodayRange = () => {
+  const now = new Date();
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const to = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
+
+  return {
+    from: from.toISOString(),
+    to: to.toISOString(),
+  };
+};
+
+const formatCurrency = (value?: number) =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(value ?? 0);
+
+const formatNumber = (value?: number) =>
+  new Intl.NumberFormat("vi-VN").format(value ?? 0);
+
+const formatChange = (value?: number) => {
+  const percent = value ?? 0;
+  const prefix = percent > 0 ? "+" : "";
+  return `${prefix}${percent}%`;
+};
+
+export default function SellerStats({ shopId }: SellerStatsProps) {
+  const [metrics, setMetrics] = useState<ShopSummaryMetricsResponse | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!shopId) return;
+
+    const loadMetrics = async () => {
+      try {
+        setLoading(true);
+        const { from, to } = getTodayRange();
+        const data = await getShopSummaryMetrics(shopId, from, to);
+        setMetrics(data);
+      } catch (error) {
+        console.error(error);
+        setMetrics(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMetrics();
+  }, [shopId]);
+
+  const stats = useMemo(
+    () => [
+      {
+        title: "Doanh thu",
+        value: loading ? "..." : formatCurrency(metrics?.revenue?.value),
+        icon: DollarSign,
+        change: formatChange(metrics?.revenue?.growthPercent),
+      },
+      {
+        title: "Đơn hàng",
+        value: loading ? "..." : formatNumber(metrics?.orders?.value),
+        icon: ShoppingBag,
+        change: formatChange(metrics?.orders?.growthPercent),
+      },
+      {
+        title: "Sản phẩm bán ra",
+        value: loading ? "..." : formatNumber(metrics?.offers?.value),
+        icon: Package,
+        change: formatChange(metrics?.offers?.growthPercent),
+      },
+    ],
+    [loading, metrics],
+  );
 
   return (
     <div className="seller-stats-grid">

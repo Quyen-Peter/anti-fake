@@ -59,6 +59,7 @@ const mapOrder = (order: SellerOrder): ViewOrder => ({
 });
 
 export default function SellerDashboard() {
+  const [shopId, setShopId] = useState("");
   const [orders, setOrders] = useState<ViewOrder[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [ordersError, setOrdersError] = useState("");
@@ -71,16 +72,19 @@ export default function SellerDashboard() {
 
         const shopData = await getMyShop();
         const shop = normalizeMyShop(shopData);
-        const shopId = shop?.shopId || shop?.id;
+        const nextShopId = shop?.shopId || shop?.id;
 
-        if (!shopId) {
+        if (!nextShopId) {
+          setShopId("");
           setOrders([]);
           setOrdersError("Khong tim thay cua hang cua ban");
           return;
         }
 
+        setShopId(String(nextShopId));
+
         const data = await fetchSellerOrders({
-          shopId: String(shopId),
+          shopId: String(nextShopId),
           orderStatus: "pending",
           page: 1,
           pageSize: 5,
@@ -133,11 +137,11 @@ export default function SellerDashboard() {
 
   return (
     <div className="seller-dashboard">
-      <SellerStats />
+      <SellerStats shopId={shopId} />
 
       <div className="seller-dashboard-middle">
         <SellerRevenueChart />
-        <SellerTopProducts />
+        <SellerTopProducts shopId={shopId} />
       </div>
 
       <div className="seller-orders-card">

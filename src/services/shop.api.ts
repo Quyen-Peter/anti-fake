@@ -39,6 +39,36 @@ export type ShopOffersResponse = {
   items: ShopOffer[];
 };
 
+export type ShopSummaryMetric = {
+  value: number;
+  growthPercent: number;
+};
+
+export type ShopSummaryMetricsResponse = {
+  range?: {
+    from?: string;
+    to?: string;
+    days?: number;
+  };
+  revenue?: ShopSummaryMetric;
+  orders?: ShopSummaryMetric;
+  offers?: ShopSummaryMetric;
+};
+
+export type ShopBestSellingProduct = {
+  id: string;
+  title: string;
+  price: number;
+  currency?: string;
+  availableQuantity?: number;
+  soldQuantity?: number;
+  verificationLevel?: string;
+  offerStatus?: string;
+  salesMode?: string;
+  thumbnailUrl?: string;
+  createdAt?: string;
+};
+
 export const fetchShops = async (
   page: number,
   pageSize: number,
@@ -203,4 +233,57 @@ export const fetchShopOffers = async (
     pageSize: Number(data.pageSize ?? pageSize),
     items: Array.isArray(data.items) ? data.items : [],
   };
+};
+
+
+export const getShopSummaryMetrics = async (
+  shopId: string,
+  from: string,
+  to: string
+): Promise<ShopSummaryMetricsResponse> => {
+  const params = new URLSearchParams({ from, to });
+
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/summary-metrics?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Lấy thống kê thất bại");
+  }
+
+  return data;
+};
+
+export const fetchShopBestSellingProducts = async (
+  shopId: string,
+  limit = 10,
+): Promise<ShopBestSellingProduct[]> => {
+  const params = new URLSearchParams({ limit: String(limit) });
+
+  const response = await fetch(
+    `${BASE_URL}/api/shops/${shopId}/best-selling-products?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay san pham ban chay");
+  }
+
+  const payload = data?.data ?? data?.items ?? data;
+  return Array.isArray(payload) ? payload : [];
 };

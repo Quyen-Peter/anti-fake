@@ -69,6 +69,38 @@ export type ShopBestSellingProduct = {
   createdAt?: string;
 };
 
+export type ShopDocumentRequirement = {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  required?: boolean;
+  multipleFilesAllowed?: boolean;
+  sortOrder?: number;
+  document?: unknown;
+};
+
+export type ShopDocumentRequirementsResponse = {
+  shopType?: {
+    id?: string;
+    code?: string;
+    name?: string;
+    description?: string;
+  };
+  requirements: ShopDocumentRequirement[];
+};
+
+export type SubmitShopDocumentItem = {
+  docType: string;
+  mimeType: string;
+  fileUrl: string;
+  publicId: string;
+};
+
+export type SubmitShopDocumentsPayload = {
+  items: SubmitShopDocumentItem[];
+};
+
 export type UpdateShopProfilePayload = {
   shopName: string;
   businessType: string;
@@ -84,26 +116,22 @@ export const fetchShops = async (
   page: number,
   pageSize: number,
 ) => {
-  try {
-    const response = await fetch(
-      `${BASE_URL}/api/shops?page=${page}&pageSize=${pageSize}`,
-      {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+  const response = await fetch(
+    `${BASE_URL}/api/shops?page=${page}&pageSize=${pageSize}`,
+    {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+      },
     }
-  
-    const data =   await response.json()
-    return data;
-  } catch (error) {
-    throw error;
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
   }
+
+  const data =   await response.json()
+  return data;
 };
 
 export const fetchShopByOffer = async (offerId: string) => {
@@ -208,6 +236,56 @@ export const createShop = async (payload: CreateShopPayload) => {
   return data;
 };
 
+export const fetchShopDocumentRequirements = async (
+  shopId: string,
+): Promise<ShopDocumentRequirementsResponse> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/document-requirements`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay danh sach giay to can nop");
+  }
+
+  const payload = data?.data ?? data;
+  return {
+    shopType: payload?.shopType,
+    requirements: Array.isArray(payload?.requirements)
+      ? payload.requirements
+      : [],
+  };
+};
+
+export const submitShopDocuments = async (
+  shopId: string,
+  payload: SubmitShopDocumentsPayload,
+) => {
+  const response = await authFetch(`${BASE_URL}/api/shops/${shopId}/documents`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể nộp hồ sơ pháp lý của shop");
+  }
+
+  return data;
+};
+
 export const fetchShopCategories = async (shopId: string) => {
   const response = await fetch(`${BASE_URL}/api/shops/${shopId}/categories`, {
     method: "GET",
@@ -226,11 +304,20 @@ export const fetchShopCategories = async (shopId: string) => {
   if (!Array.isArray(payload)) return [];
 
   return payload
-    .map((item: any) => ({
-      id: item.id ?? item.categoryId,
-      name: item.name ?? item.categoryName,
-    }))
-    .filter((item: ShopCategory) => item.id && item.name);
+    .map((item: Record<string, unknown>): ShopCategory | null => {
+      const id = item.id ?? item.categoryId;
+      const name = item.name ?? item.categoryName;
+
+      if (
+        (typeof id !== "string" && typeof id !== "number") ||
+        typeof name !== "string"
+      ) {
+        return null;
+      }
+
+      return { id, name };
+    })
+    .filter((item): item is ShopCategory => Boolean(item));
 };
 
 

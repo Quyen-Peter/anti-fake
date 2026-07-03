@@ -353,6 +353,61 @@
   margin-top: 18px;
 }
 
+.seller-register-document-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.seller-register-document-title h2 {
+  margin: 0;
+}
+
+.seller-register-document-title span {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #fff0f1;
+  color: #9b0019;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.seller-register-requirement-list {
+  display: grid;
+  gap: 14px;
+}
+
+.seller-register-requirement-item {
+  border: 1px solid #f0d0d0;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fffdfd;
+}
+
+.seller-register-requirement-copy {
+  margin-bottom: 12px;
+}
+
+.seller-register-requirement-copy strong {
+  color: #2a1111;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.seller-register-requirement-copy strong span {
+  color: #b00020;
+}
+
+.seller-register-requirement-copy p {
+  margin: 6px 0 0;
+  color: #7b5d5d;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .seller-register-upload {
   min-height: 160px;
   border: 1px dashed #e4b7b7;
@@ -392,6 +447,22 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
+}
+
+.seller-register-preview-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 10px;
+}
+
+.seller-register-preview-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #f0d0d0;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #fff;
 }
 
 .seller-register-upload-btn {
@@ -545,5 +616,10 @@
   .seller-register-outline-btn,
   .seller-register-link-btn {
     width: 100%;
+  }
+
+  .seller-register-document-title {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

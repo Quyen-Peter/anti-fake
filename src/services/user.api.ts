@@ -7,6 +7,19 @@ export type UpdateUserProfilePayload = {
   displayName: string;
 };
 
+export type SubmitUserKycDocument = {
+  side: "FRONT" | "BACK";
+  assetType: "IMAGE";
+  mimeType: string;
+  fileUrl: string;
+  publicId: string;
+};
+
+export type SubmitUserKycPayload = {
+  idType: string;
+  documents: SubmitUserKycDocument[];
+};
+
 export const uploadUserAvatar = async (avatar: File) => {
   const formData = new FormData();
   formData.append("avatar", avatar);
@@ -23,6 +36,25 @@ export const uploadUserAvatar = async (avatar: File) => {
 
   if (!response.ok) {
     throw new Error(data.message || "Cập nhật ảnh đại diện thất bại");
+  }
+
+  return data;
+};
+
+export const submitUserKyc = async (payload: SubmitUserKycPayload) => {
+  const response = await authFetch(`${BASE_URL}/api/user/kyc`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể gửi hồ sơ KYC");
   }
 
   return data;

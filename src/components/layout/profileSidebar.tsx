@@ -11,10 +11,18 @@ import {
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import LoadingOverlay from "../loadingOverlay";
+import "../../css/components/layout/profileSidebar.css";
 import { logout } from "../../services/auth.api";
 import { getMyShop } from "../../services/shop.api";
-import "../../css/components/layout/profileSidebar.css";
+import LoadingOverlay from "../loadingOverlay";
+
+type MyShop = {
+  id?: string;
+  shopId?: string;
+  status?: string;
+  kycStatus?: string;
+  shopStatus?: string;
+};
 
 const menus = [
   {
@@ -54,35 +62,36 @@ const menus = [
   },
 ];
 
+const normalizeMyShop = (data: unknown): MyShop | null => {
+  const payload =
+    data && typeof data === "object"
+      ? (data as { data?: unknown; items?: unknown }).data ??
+        (data as { items?: unknown }).items ??
+        data
+      : data;
+
+  if (Array.isArray(payload)) {
+    return (payload[0] as MyShop | undefined) ?? null;
+  }
+
+  return payload && typeof payload === "object" ? (payload as MyShop) : null;
+};
+
+const getShopStatus = (shop: MyShop) =>
+  String(shop.status ?? shop.kycStatus ?? shop.shopStatus ?? "")
+    .trim()
+    .toLowerCase();
+
+const isRejectedShop = (status: string) =>
+  status.includes("reject") ||
+  status.includes("rejected") ||
+  status.includes("declined") ||
+  status.includes("failed");
+
 export default function ProfileSidebar() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [checkingShop, setCheckingShop] = useState(false);
-
-  const normalizeMyShop = (data: any) => {
-    const payload = data?.data ?? data?.items ?? data;
-
-    if (Array.isArray(payload)) {
-      return payload[0] ?? null;
-    }
-
-    if (payload && typeof payload === "object") {
-      return payload;
-    }
-
-    return null;
-  };
-
-  const getShopStatus = (shop: any) =>
-    String(shop?.status ?? shop?.kycStatus ?? shop?.shopStatus ?? "")
-      .trim()
-      .toLowerCase();
-
-  const isRejectedShop = (status: string) =>
-    status.includes("reject") ||
-    status.includes("rejected") ||
-    status.includes("declined") ||
-    status.includes("failed");
 
   const handleMyShopClick = async () => {
     if (checkingShop) return;
@@ -90,41 +99,57 @@ export default function ProfileSidebar() {
     setCheckingShop(true);
 
     try {
-      const data = await getMyShop();
-      const shop = normalizeMyShop(data);
+      const shop = normalizeMyShop(await getMyShop());
       const shopId = shop?.shopId || shop?.id;
 
       setOpen(false);
 
-      if (!shop) {
+      if (!shop || !shopId) {
         navigate("/register");
         return;
       }
 
       const status = getShopStatus(shop);
 
-      // if (status === "pending_kyc") {
-      //   navigate("/register", {
-      //     state: { initialStep: 3, registrationStatus: "pending_kyc" },
-      //   });
-      //   return;
-      // }
-
-      if (isRejectedShop(status)) {
+      if (status === "pending_kyc") {
         navigate("/register", {
-          state: { initialStep: 3, registrationStatus: "rejected" },
+          state: { initialStep: 2, shopId: String(shopId) },
         });
         return;
       }
 
-      if (!shopId) {
-        navigate("/register");
+      if (status === "pending_verification") {
+        navigate("/register", {
+          state: {
+            initialStep: 3,
+            registrationStatus: "pending_kyc",
+            shopId: String(shopId),
+          },
+        });
         return;
       }
 
-      navigate("/seller/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Không thể kiểm tra cửa hàng");
+      if (status === "verified") {
+        navigate("/seller/dashboard");
+        return;
+      }
+
+      if (isRejectedShop(status)) {
+        navigate("/register", {
+          state: {
+            initialStep: 3,
+            registrationStatus: "rejected",
+            shopId: String(shopId),
+          },
+        });
+        return;
+      }
+
+      navigate("/register");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Không thể kiểm tra cửa hàng",
+      );
     } finally {
       setCheckingShop(false);
     }

@@ -1,0 +1,124 @@
+.admin-sidebar {
+  width: 240px;
+  height: calc(100vh - 64px);
+  border-right: 1px solid #f0d4d4;
+  padding: 22px 14px;
+  display: flex;
+  flex-direction: column;
+  background: #fffafa;
+  color: #2a1111;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  z-index: 10;
+  overflow-y: auto;
+}
+
+.admin-sidebar-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.admin-sidebar-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: #b00020;
+  color: #fff;
+}
+
+.admin-sidebar-badge strong,
+.admin-sidebar-badge small {
+  display: block;
+}
+
+.admin-sidebar-badge strong {
+  color: #b00020;
+  font-size: 13px;
+}
+
+.admin-sidebar-badge small {
+  color: #7d6262;
+  font-size: 11px;
+}
+
+.admin-sidebar-nav {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-sidebar-link {
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #5f4747;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-sidebar-link.active,
+.admin-sidebar-link:hover {
+  background: #f1dddd;
+  color: #7f0018;
+}
+
+.admin-sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid #efd0d0;
+  padding-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-report-btn,
+.admin-sidebar-logout {
+  height: 42px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-report-btn {
+  border: 0;
+  background: #b00020;
+  color: #fff;
+}
+
+.admin-sidebar-logout {
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: #b00020;
+}
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    position: static;
+    border-right: 0;
+    border-bottom: 1px solid #f0d4d4;
+  }
+
+  .admin-sidebar-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-sidebar-nav {
+    grid-template-columns: 1fr;
+  }
+}

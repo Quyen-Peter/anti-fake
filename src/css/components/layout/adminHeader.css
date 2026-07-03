@@ -1,0 +1,94 @@
+.admin-header {
+  height: 64px;
+  border-bottom: 1px solid #f0d4d4;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px;
+  background: #fffafa;
+  color: #2a1111;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.admin-header-brand {
+  color: #b00020;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+
+
+.admin-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-header-actions button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #5c4444;
+  cursor: pointer;
+  position: relative;
+}
+
+.admin-header-actions button span {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #b00020;
+}
+
+.admin-header-profile {
+  border-left: 1px solid #ecd0d0;
+  padding-left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-header-profile div {
+  display: grid;
+  text-align: right;
+}
+
+.admin-header-profile strong {
+  font-size: 13px;
+}
+
+.admin-header-profile small {
+  color: #8b6b6b;
+  font-size: 11px;
+}
+
+.admin-header-profile img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 0 14px;
+  }
+
+
+
+  .admin-header-profile div {
+    display: none;
+  }
+}

@@ -27,6 +27,7 @@ import LiveRoomPage from "./pages/live";
 import CheckoutPage from "./pages/checkout";
 import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
+import AdminLayout from "./layouts/adminLayout";
 import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
 import OrderManagement from "./seller/orderManagement";
@@ -38,6 +39,12 @@ import SellerRegistration from "./components/sellerRegistration/sellerRegistrati
 import PaymentModel from "./components/payment/paymentModel";
 import PaymentFailedPage from "./components/payment/paymentFailed";
 import PaymentSuccess from "./components/payment/paymentSuccess";
+import AdminDashboardPage from "./pages/admin";
+import AdminUsersPage from "./pages/admin/users";
+import AdminShopRegistrationsPage from "./pages/admin/shopRegistrations";
+import AdminProductRegistrationsPage from "./pages/admin/productRegistrations";
+import AdminVouchersPage from "./pages/admin/vouchers";
+import AdminWithdrawRequestsPage from "./pages/admin/withdrawRequests";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -126,6 +133,25 @@ function App() {
               <Route path="orders/:orderId" element={<SellerOrderDetail />} />
               <Route path="wallet" element={<SellerWallet />} />
               <Route path="shop-info" element={<SellerShopInfo />} />
+            </Route>
+
+            {/* admin */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route
+                path="shop-registrations"
+                element={<AdminShopRegistrationsPage />}
+              />
+              <Route
+                path="product-registrations"
+                element={<AdminProductRegistrationsPage />}
+              />
+              <Route path="vouchers" element={<AdminVouchersPage />} />
+              <Route
+                path="withdraw-requests"
+                element={<AdminWithdrawRequestsPage />}
+              />
             </Route>
           </Routes>
         </div>

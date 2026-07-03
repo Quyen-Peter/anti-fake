@@ -52,7 +52,7 @@ const menus = [
   },
   {
     label: "Cài đặt tài khoản",
-    path: "/register",
+    path: "/admin",
     icon: Settings,
   },
   {

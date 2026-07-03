@@ -1,8 +1,8 @@
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { login } from "../../services/auth.api";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useLocation, useNavigate } from "react-router-dom";
+import { login } from "../../services/auth.api";
 import { saveToken, saveUser } from "../../ultil/auth";
 
 type Props = {
@@ -11,21 +11,18 @@ type Props = {
 
 export default function LoginPage({ onSwitch }: Props) {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const from = location.state?.from || "/";
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     if (!username.trim()) {
       toast.error("Vui lòng nhập email hoặc số điện thoại");
@@ -45,19 +42,17 @@ export default function LoginPage({ onSwitch }: Props) {
         password,
       });
 
-      saveToken( data.accessToken);
-
-      saveUser( data.user);
+      saveToken(data.accessToken);
+      saveUser(data.user);
       toast.success("Đăng nhập thành công");
-      navigate(from);
+
+      const role = String(data.user?.role ?? "").toLowerCase();
+      navigate(role === "admin" ? "/admin" : "/");
     } catch (error) {
       console.error("Login Error:", error);
-
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Không thể kết nối máy chủ");
-      }
+      toast.error(
+        error instanceof Error ? error.message : "Không thể kết nối máy chủ",
+      );
     } finally {
       setLoading(false);
     }
@@ -71,37 +66,32 @@ export default function LoginPage({ onSwitch }: Props) {
         </div>
 
         <h1>Chào mừng trở lại</h1>
-
         <p className="login-subtitle">Truy cập hệ thống AntiFake của bạn</p>
 
         <form className="login-form" onSubmit={handleLogin}>
-          <label>Email hoặc Số điện thoại</label>
-
+          <label>Email hoặc số điện thoại</label>
           <div className="login-input">
             <User size={18} />
-
             <input
               type="text"
               placeholder="name@example.com"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(event) => setUsername(event.target.value)}
             />
           </div>
 
           <div className="login-password-header">
             <label>Mật khẩu</label>
-
             <button type="button">Quên mật khẩu?</button>
           </div>
 
           <div className="login-input">
             <Lock size={18} />
-
             <input
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
             />
 
             {showPassword ? (
@@ -123,7 +113,6 @@ export default function LoginPage({ onSwitch }: Props) {
 
           <label className="login-remember">
             <input type="checkbox" />
-
             <span>Ghi nhớ đăng nhập</span>
           </label>
 
@@ -133,7 +122,7 @@ export default function LoginPage({ onSwitch }: Props) {
         </form>
 
         <div className="login-divider">
-          <span>HOẶC TIẾP TỤC VỚI</span>
+          <span>Hoặc tiếp tục với</span>
         </div>
 
         <div className="social-buttons">

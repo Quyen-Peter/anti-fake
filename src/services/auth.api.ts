@@ -21,6 +21,7 @@ export interface LoginResponse {
     email: string;
     phone: string;
     displayName: string;
+    avatar?: string | null;
     role: string;
     accountStatus: string;
     createdAt: string;

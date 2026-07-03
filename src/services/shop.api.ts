@@ -69,6 +69,17 @@ export type ShopBestSellingProduct = {
   createdAt?: string;
 };
 
+export type UpdateShopProfilePayload = {
+  shopName: string;
+  businessType: string;
+  taxCode: string;
+  warehouseAddress: string;
+  warehouseProvinceCode: string;
+  warehouseProvinceName: string;
+  warehouseWardCode: string;
+  warehouseWardName: string;
+};
+
 export const fetchShops = async (
   page: number,
   pageSize: number,
@@ -151,6 +162,28 @@ export const getMyShop = async () => {
 
   if (!response.ok) {
     throw new Error(data.message || "Không thể lấy thông tin cửa hàng");
+  }
+
+  return data;
+};
+
+export const updateShopProfile = async (
+  shopId: string,
+  payload: UpdateShopProfilePayload,
+) => {
+  const response = await authFetch(`${BASE_URL}/api/shops/${shopId}/profile`, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the cap nhat thong tin cua hang");
   }
 
   return data;

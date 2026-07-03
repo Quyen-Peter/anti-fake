@@ -31,6 +31,7 @@ import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
 import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
+import SellerShopInfo from "./seller/shopInfo";
 import ProfileAddress from "./pages/profile/addressPage";
 import SellerOrderDetail from "./components/orderManagement/orderDetail";
 import SellerRegistration from "./components/sellerRegistration/sellerRegistration";
@@ -124,6 +125,7 @@ function App() {
               <Route path="orders" element={<OrderManagement />} />
               <Route path="orders/:orderId" element={<SellerOrderDetail />} />
               <Route path="wallet" element={<SellerWallet />} />
+              <Route path="shop-info" element={<SellerShopInfo />} />
             </Route>
           </Routes>
         </div>

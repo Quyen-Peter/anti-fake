@@ -115,6 +115,107 @@
   border: 2px solid #f0f0f0;
 }
 
+.seller-header-shop {
+  position: relative;
+}
+
+.seller-header-avatar-btn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.seller-header-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f1;
+  color: #c91c1c;
+  font-weight: 700;
+}
+
+.seller-header-shop-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.seller-header-shop-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.seller-header-shop-menu-head img,
+.seller-header-shop-menu-head span {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.seller-header-shop-menu-head img {
+  object-fit: cover;
+}
+
+.seller-header-shop-menu-head span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f1;
+  color: #c91c1c;
+  font-weight: 700;
+}
+
+.seller-header-shop-menu-head strong {
+  display: block;
+  color: #222;
+  font-size: 14px;
+}
+
+.seller-header-shop-menu-head small {
+  display: block;
+  margin-top: 3px;
+  color: #777;
+  font-size: 12px;
+}
+
+.seller-header-shop-menu-list {
+  padding: 6px;
+}
+
+.seller-header-shop-menu-list button {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.seller-header-shop-menu-list button:hover {
+  background: #f7f7f7;
+  color: #d70018;
+}
+
 /* Mobile */
 @media (max-width: 576px) {
   .seller-header {
@@ -166,6 +267,11 @@
   .seller-header-avatar {
     width: 40px;
     height: 40px;
+  }
+
+  .seller-header-shop-menu {
+    right: -10px;
+    width: 240px;
   }
 }
 

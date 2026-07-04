@@ -318,21 +318,24 @@ export default function SellerRegistration() {
     setSubmitting(true);
 
     try {
-      const shopDocumentItems = documentRequirements.flatMap((requirement) =>
+      const shopDocumentEntries = documentRequirements.flatMap((requirement) =>
         (files.requirements[requirement.id] ?? []).map((asset) => ({
           docType: requirement.code,
-          mimeType: asset.mimeType,
-          fileUrl: asset.previewUrl,
-          publicId: makePublicId(
-            `shops/${shopId}/documents/${requirement.code}`,
-            asset.name,
-          ),
+          file: asset.file,
         })),
       );
 
-      if (shopDocumentItems.length > 0) {
+      if (shopDocumentEntries.length > 10) {
+        toast.error("Chi duoc nop toi da 10 anh ho so phap ly shop");
+        return;
+      }
+
+      if (shopDocumentEntries.length > 0) {
         try {
-          await submitShopDocuments(shopId, { items: shopDocumentItems });
+          await submitShopDocuments(shopId, {
+            docTypes: shopDocumentEntries.map((entry) => entry.docType),
+            files: shopDocumentEntries.map((entry) => entry.file),
+          });
         } catch (error: unknown) {
           throw new Error(
             `Nộp hồ sơ pháp lý shop thất bại: ${getErrorMessage(

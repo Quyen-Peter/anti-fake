@@ -90,15 +90,9 @@ export type ShopDocumentRequirementsResponse = {
   requirements: ShopDocumentRequirement[];
 };
 
-export type SubmitShopDocumentItem = {
-  docType: string;
-  mimeType: string;
-  fileUrl: string;
-  publicId: string;
-};
-
 export type SubmitShopDocumentsPayload = {
-  items: SubmitShopDocumentItem[];
+  docTypes: string[];
+  files: File[];
 };
 
 export type UpdateShopProfilePayload = {
@@ -268,13 +262,18 @@ export const submitShopDocuments = async (
   shopId: string,
   payload: SubmitShopDocumentsPayload,
 ) => {
+  const formData = new FormData();
+  formData.append("docTypes", payload.docTypes.join(","));
+  payload.files.forEach((file) => {
+    formData.append("files", file);
+  });
+
   const response = await authFetch(`${BASE_URL}/api/shops/${shopId}/documents`, {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   const data = await response.json();

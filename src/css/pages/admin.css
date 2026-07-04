@@ -234,6 +234,13 @@
   font-size: 11px;
 }
 
+.admin-cell-muted {
+  display: block;
+  margin-top: 4px;
+  color: #806464;
+  font-size: 11px;
+}
+
 .admin-status {
   border-radius: 999px;
   padding: 5px 9px;
@@ -278,6 +285,16 @@
   color: #b00020;
 }
 
+.admin-table-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.admin-table-actions button:disabled:hover {
+  background: transparent;
+  color: #674c4c;
+}
+
 .admin-table-state {
   padding: 34px 18px !important;
   color: #7b5d5d;
@@ -286,6 +303,38 @@
 
 .admin-table-state.error {
   color: #b00020;
+}
+
+.admin-pagination {
+  border-top: 1px solid #f1d6d6;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #704d4d;
+  font-size: 13px;
+}
+
+.admin-pagination div {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-pagination button {
+  height: 34px;
+  border: 1px solid #efd0d0;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fff6f6;
+  color: #5d4444;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.admin-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .admin-overview {

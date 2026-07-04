@@ -10,7 +10,12 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { fetchAdminUsers, type AdminUser } from "../../../services/admin.api";
+import ConfirmModal from "../../../components/common/confirmModal";
+import {
+  banAdminUser,
+  fetchAdminUsers,
+  type AdminUser,
+} from "../../../services/admin.api";
 
 const NO_SHOP_LABEL = "Chưa có cửa hàng";
 
@@ -33,8 +38,18 @@ const formatDate = (value?: string) => {
 
 const getStatusType = (status?: string) => {
   const value = String(status ?? "").toLowerCase();
-  if (value === "active") return "active";
-  if (["locked", "blocked", "banned", "disabled"].includes(value)) {
+  if (
+    value === "active" ||
+    value.includes("dang hoat dong") ||
+    value.includes("đang hoạt động")
+  ) {
+    return "active";
+  }
+  if (
+    ["inactive", "locked", "blocked", "banned", "disabled"].includes(value) ||
+    value.includes("ngung hoat dong") ||
+    value.includes("ngừng hoạt động")
+  ) {
     return "banned";
   }
   if (value.includes("pending")) return "pending";
@@ -56,6 +71,8 @@ export default function AdminUsersPage() {
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [userToBan, setUserToBan] = useState<AdminUser | null>(null);
+  const [banningUserId, setBanningUserId] = useState("");
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -136,6 +153,30 @@ export default function AdminUsersPage() {
       tone: "red",
     },
   ];
+
+  const handleBanUser = async () => {
+    if (!userToBan || banningUserId) return;
+
+    setBanningUserId(userToBan.id);
+    try {
+      const bannedUser = await banAdminUser(userToBan.id);
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === userToBan.id
+            ? { ...user, ...bannedUser, accountStatus: "inactive" }
+            : user,
+        ),
+      );
+      toast.success("Da khoa nguoi dung");
+      setUserToBan(null);
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Khong the khoa nguoi dung",
+      );
+    } finally {
+      setBanningUserId("");
+    }
+  };
 
   return (
     <section className="admin-page">
@@ -238,6 +279,8 @@ export default function AdminUsersPage() {
                   const name = user.displayName || user.email || "Người dùng";
                   const statusType = getStatusType(user.accountStatus);
                   const statusLabel = getStatusLabel(user.accountStatus);
+                  const isBanned = statusType === "banned";
+                  const isBanning = banningUserId === user.id;
 
                   return (
                     <tr key={user.id}>
@@ -275,7 +318,12 @@ export default function AdminUsersPage() {
                           <button type="button" aria-label="Xem chi tiết">
                             <Eye size={16} />
                           </button>
-                          <button type="button" aria-label="Cấm người dùng">
+                          <button
+                            type="button"
+                            aria-label="Cấm người dùng"
+                            disabled={isBanned || isBanning}
+                            onClick={() => setUserToBan(user)}
+                          >
                             <Ban size={16} />
                           </button>
                           <button type="button" aria-label="Gửi email">
@@ -290,6 +338,21 @@ export default function AdminUsersPage() {
           </table>
         </div>
       </div>
+
+      <ConfirmModal
+        open={Boolean(userToBan)}
+        title="Khoa nguoi dung"
+        message={`Ban co chac muon khoa ${
+          userToBan?.displayName || userToBan?.email || "nguoi dung nay"
+        } khong?`}
+        confirmText="Khoa"
+        danger
+        loading={Boolean(banningUserId)}
+        onConfirm={handleBanUser}
+        onCancel={() => {
+          if (!banningUserId) setUserToBan(null);
+        }}
+      />
     </section>
   );
 }

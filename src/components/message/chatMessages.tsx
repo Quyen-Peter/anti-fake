@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChatRealtimeEvent } from "../../hooks/useChatRealtime";
 import type { ChatMessage } from "../../type/message";
 import { getChatMessages } from "../../services/chat.api";
@@ -6,10 +6,20 @@ import { getUser } from "../../ultil/auth";
 
 type RawMessage = {
   id?: string;
+  _id?: string;
+  clientMessageId?: string;
   senderUserId?: string;
+  senderId?: string;
+  userId?: string;
+  sender?: {
+    id?: string;
+  };
   body?: string;
+  content?: string;
+  text?: string;
   sentAt?: string;
   createdAt?: string;
+  updatedAt?: string;
 };
 
 type Props = {
@@ -29,14 +39,18 @@ const mapMessage = (
   roomId: string,
   currentUserId?: string
 ): ChatMessage | null => {
-  if (!msg.id) return null;
+  const id = msg.id || msg._id || msg.clientMessageId;
+  if (!id) return null;
+
+  const senderUserId =
+    msg.senderUserId || msg.senderId || msg.userId || msg.sender?.id;
 
   return {
-    id: msg.id,
+    id,
     roomId,
-    sender: msg.senderUserId === currentUserId ? "USER" : "SHOP",
-    content: msg.body,
-    createdAt: formatTime(msg.sentAt || msg.createdAt),
+    sender: senderUserId === currentUserId ? "USER" : "SHOP",
+    content: msg.body || msg.content || msg.text,
+    createdAt: formatTime(msg.sentAt || msg.createdAt || msg.updatedAt),
     seen: true,
   };
 };
@@ -50,36 +64,48 @@ export default function ChatMessages({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const loadMessages = useCallback(async (showLoading = true) => {
     if (!roomId) return;
 
-    const loadMessages = async () => {
-      try {
+    try {
+      if (showLoading) {
         setLoading(true);
+      }
 
-        const user = getUser();
-        const data = await getChatMessages(roomId);
+      const user = getUser();
+      const data = await getChatMessages(roomId);
+      const rawMessages = Array.isArray(data.messages) ? data.messages : [];
 
-        const mappedMessages: ChatMessage[] = data.messages
-          .map((msg: RawMessage) => mapMessage(msg, data.id, user?.id))
-          .filter(Boolean);
+      const mappedMessages = rawMessages
+        .map((msg: RawMessage) => mapMessage(msg, data.id || roomId, user?.id))
+        .filter((message: ChatMessage | null): message is ChatMessage =>
+          Boolean(message),
+        );
 
-        setMessages(mappedMessages);
-      } catch (error) {
-        console.error(error);
-      } finally {
+      setMessages(mappedMessages);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (showLoading) {
         setLoading(false);
       }
-    };
-
-    loadMessages();
+    }
   }, [roomId]);
 
   useEffect(() => {
-    if (!realtimeEvent?.message) return;
+    loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
+    if (!realtimeEvent) return;
 
     const eventRoomId = realtimeEvent.threadId || realtimeEvent.roomId;
     if (eventRoomId !== roomId) return;
+
+    if (!realtimeEvent.message) {
+      loadMessages(false);
+      return;
+    }
 
     const user = getUser();
     const newMessage = mapMessage(
@@ -88,7 +114,10 @@ export default function ChatMessages({
       user?.id
     );
 
-    if (!newMessage) return;
+    if (!newMessage || !newMessage.content) {
+      loadMessages(false);
+      return;
+    }
 
     setMessages((current) => {
       if (current.some((message) => message.id === newMessage.id)) {
@@ -97,7 +126,7 @@ export default function ChatMessages({
 
       return [...current, newMessage];
     });
-  }, [realtimeEvent, roomId]);
+  }, [loadMessages, realtimeEvent, roomId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -137,7 +166,7 @@ export default function ChatMessages({
       {typingUserIds.length > 0 && (
         <div className="chat-message-community chat-message-shop">
           <div className="chat-bubble">
-            <p className="chat-text">Dang go...</p>
+            <p className="chat-text">Đang soạn tin...</p>
           </div>
         </div>
       )}

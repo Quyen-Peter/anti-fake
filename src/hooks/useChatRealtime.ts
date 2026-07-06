@@ -16,6 +16,7 @@ export type ChatRealtimeEvent = {
 
 type PresenceUpdateEvent = {
   threadId?: string;
+  roomId?: string;
   userId?: string;
   online?: boolean;
   onlineUserIds?: string[];
@@ -23,23 +24,83 @@ type PresenceUpdateEvent = {
 
 type TypingEvent = {
   threadId?: string;
+  roomId?: string;
   userId?: string;
   isTyping?: boolean;
 };
 
 type UseChatRealtimeOptions = {
   threadId: string;
+  threadIds?: string[];
   onThreadUpdate?: (thread: unknown) => void;
   onMessage?: (event: ChatRealtimeEvent) => void;
+  onAnyMessage?: (event: ChatRealtimeEvent) => void;
   onReconnect?: () => void;
 };
 
 const PRESENCE_HEARTBEAT_INTERVAL_MS = 15_000;
+const MESSAGE_EVENTS = [
+  "chat:message.created",
+  "chat:message",
+  "message:created",
+  "message.created",
+  "message:new",
+  "new_message",
+];
+const DEBUG_CHAT_REALTIME = import.meta.env.DEV;
+
+const asRecord = (value: unknown): Record<string, unknown> | null =>
+  value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+
+const getString = (...values: unknown[]) => {
+  const value = values.find(
+    (item) => typeof item === "string" && item.trim().length > 0,
+  );
+
+  return typeof value === "string" ? value : undefined;
+};
+
+const normalizeChatEvent = (payload: unknown): ChatRealtimeEvent => {
+  const root = asRecord(payload) || {};
+  const data = asRecord(root.data) || asRecord(root.payload) || root;
+  const message =
+    data.message ||
+    data.chatMessage ||
+    data.data ||
+    (data.body || data.content || data.text ? data : undefined);
+  const messageRecord = asRecord(message);
+  const thread = data.thread || data.room || messageRecord?.thread;
+  const threadRecord = asRecord(thread);
+  const roomRecord = asRecord(data.room);
+
+  const threadId = getString(
+    data.threadId,
+    data.roomId,
+    data.chatThreadId,
+    data.conversationId,
+    threadRecord?.id,
+    roomRecord?.id,
+    messageRecord?.threadId,
+    messageRecord?.roomId,
+    messageRecord?.chatThreadId,
+    messageRecord?.conversationId,
+  );
+
+  return {
+    ...data,
+    threadId,
+    roomId: getString(data.roomId, threadId),
+    thread,
+    message,
+  };
+};
 
 export function useChatRealtime({
   threadId,
+  threadIds = [],
   onThreadUpdate,
   onMessage,
+  onAnyMessage,
   onReconnect,
 }: UseChatRealtimeOptions) {
   const session = getToken();
@@ -48,9 +109,12 @@ export function useChatRealtime({
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [typingUserIds, setTypingUserIds] = useState<string[]>([]);
   const threadIdRef = useRef(threadId);
+  const threadIdsRef = useRef(threadIds);
   const updateRef = useRef(onThreadUpdate);
   const messageRef = useRef(onMessage);
+  const anyMessageRef = useRef(onAnyMessage);
   const reconnectRef = useRef(onReconnect);
+  const joinedThreadIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     threadIdRef.current = threadId;
@@ -59,12 +123,20 @@ export function useChatRealtime({
   }, [threadId]);
 
   useEffect(() => {
+    threadIdsRef.current = threadIds;
+  }, [threadIds]);
+
+  useEffect(() => {
     updateRef.current = onThreadUpdate;
   }, [onThreadUpdate]);
 
   useEffect(() => {
     messageRef.current = onMessage;
   }, [onMessage]);
+
+  useEffect(() => {
+    anyMessageRef.current = onAnyMessage;
+  }, [onAnyMessage]);
 
   useEffect(() => {
     reconnectRef.current = onReconnect;
@@ -83,19 +155,35 @@ export function useChatRealtime({
       socket.emit("presence:heartbeat");
     }
 
+    function joinThread(nextThreadId?: string) {
+      if (!nextThreadId || joinedThreadIdsRef.current.has(nextThreadId)) {
+        return;
+      }
+
+      socket.emit("chat:join", { threadId: nextThreadId, roomId: nextThreadId }, (ack?: ChatAck) => {
+        if (ack && !ack.ok) {
+          setLastError(ack.error);
+          return;
+        }
+
+        joinedThreadIdsRef.current.add(nextThreadId);
+      });
+    }
+
     function handleConnect() {
       setConnected(true);
       setLastError(null);
+      joinedThreadIdsRef.current.clear();
       emitHeartbeat();
       heartbeatIntervalId = window.setInterval(emitHeartbeat, PRESENCE_HEARTBEAT_INTERVAL_MS);
       reconnectRef.current?.();
-      if (threadIdRef.current) {
-        socket.emit("chat:join", { threadId: threadIdRef.current });
-      }
+      joinThread(threadIdRef.current);
+      threadIdsRef.current.forEach(joinThread);
     }
 
     function handleDisconnect() {
       setConnected(false);
+      joinedThreadIdsRef.current.clear();
       if (heartbeatIntervalId !== null) {
         window.clearInterval(heartbeatIntervalId);
         heartbeatIntervalId = null;
@@ -108,21 +196,51 @@ export function useChatRealtime({
     }
 
     function handleChatError(payload: { error?: string }) {
+      if (DEBUG_CHAT_REALTIME) {
+        console.log("[chat realtime:error]", payload);
+      }
+
       setLastError(payload.error || "Chat realtime error");
     }
 
-    function handleMessageCreated(event: ChatRealtimeEvent) {
-      const eventThreadId = event.threadId || event.roomId;
+    function handleAnyEvent(eventName: string, ...args: unknown[]) {
+      if (!DEBUG_CHAT_REALTIME) return;
+
+      console.log("[chat realtime:any]", {
+        eventName,
+        args,
+        currentThreadId: threadIdRef.current,
+      });
+    }
+
+    function handleMessageCreated(eventName: string, event: ChatRealtimeEvent) {
+      const normalizedEvent = normalizeChatEvent(event);
+      const eventThreadId = normalizedEvent.threadId || normalizedEvent.roomId;
+
+      if (DEBUG_CHAT_REALTIME) {
+        console.log("[chat realtime:message]", {
+          eventName,
+          raw: event,
+          normalized: normalizedEvent,
+          eventThreadId,
+          currentThreadId: threadIdRef.current,
+          isCurrentRoom: eventThreadId === threadIdRef.current,
+        });
+      }
+
+      anyMessageRef.current?.(normalizedEvent);
+
       if (eventThreadId === threadIdRef.current) {
-        if (event.thread) {
-          updateRef.current?.(event.thread);
+        if (normalizedEvent.thread) {
+          updateRef.current?.(normalizedEvent.thread);
         }
-        messageRef.current?.(event);
+        messageRef.current?.(normalizedEvent);
       }
     }
 
     function handlePresenceUpdate(event: PresenceUpdateEvent) {
-      if (event.threadId !== threadIdRef.current) {
+      const eventThreadId = event.threadId || event.roomId;
+      if (eventThreadId !== threadIdRef.current) {
         return;
       }
 
@@ -145,7 +263,18 @@ export function useChatRealtime({
     }
 
     function handleTyping(event: TypingEvent) {
-      if (event.threadId !== threadIdRef.current || !event.userId) {
+      const eventThreadId = event.threadId || event.roomId;
+
+      if (DEBUG_CHAT_REALTIME) {
+        console.log("[chat realtime:typing]", {
+          raw: event,
+          eventThreadId,
+          currentThreadId: threadIdRef.current,
+          isCurrentRoom: eventThreadId === threadIdRef.current,
+        });
+      }
+
+      if (eventThreadId !== threadIdRef.current || !event.userId) {
         return;
       }
 
@@ -164,7 +293,18 @@ export function useChatRealtime({
     socket.on("disconnect", handleDisconnect);
     socket.on("connect_error", handleConnectError);
     socket.on("chat:error", handleChatError);
-    socket.on("chat:message.created", handleMessageCreated);
+    socket.onAny(handleAnyEvent);
+
+    const messageHandlers = MESSAGE_EVENTS.map((eventName) => {
+      const handler = (event: ChatRealtimeEvent) =>
+        handleMessageCreated(eventName, event);
+
+      socket.on(eventName, handler);
+      return {
+        eventName,
+        handler,
+      };
+    });
     socket.on("presence:update", handlePresenceUpdate);
     socket.on("chat:typing", handleTyping);
 
@@ -182,23 +322,50 @@ export function useChatRealtime({
       socket.off("disconnect", handleDisconnect);
       socket.off("connect_error", handleConnectError);
       socket.off("chat:error", handleChatError);
-      socket.off("chat:message.created", handleMessageCreated);
+      socket.offAny(handleAnyEvent);
+      messageHandlers.forEach(({ eventName, handler }) => {
+        socket.off(eventName, handler);
+      });
       socket.off("presence:update", handlePresenceUpdate);
       socket.off("chat:typing", handleTyping);
     };
   }, [session]);
 
   useEffect(() => {
-    if (!threadId || !socket.connected) {
+    if (!threadId || !socket.connected || joinedThreadIdsRef.current.has(threadId)) {
       return;
     }
 
-    socket.emit("chat:join", { threadId }, (ack?: ChatAck) => {
+    socket.emit("chat:join", { threadId, roomId: threadId }, (ack?: ChatAck) => {
       if (ack && !ack.ok) {
         setLastError(ack.error);
+        return;
       }
+
+      joinedThreadIdsRef.current.add(threadId);
     });
   }, [threadId]);
+
+  useEffect(() => {
+    if (!socket.connected) {
+      return;
+    }
+
+    threadIds.forEach((nextThreadId) => {
+      if (!nextThreadId || joinedThreadIdsRef.current.has(nextThreadId)) {
+        return;
+      }
+
+      socket.emit("chat:join", { threadId: nextThreadId, roomId: nextThreadId }, (ack?: ChatAck) => {
+        if (ack && !ack.ok) {
+          setLastError(ack.error);
+          return;
+        }
+
+        joinedThreadIdsRef.current.add(nextThreadId);
+      });
+    });
+  }, [threadIds]);
 
   const sendMessage = useCallback(
     (body: string, clientMessageId: string) =>
@@ -212,7 +379,9 @@ export function useChatRealtime({
           "chat:send",
           {
             threadId,
+            roomId: threadId,
             body,
+            content: body,
             clientMessageId,
           },
           (error: Error | null, ack?: ChatAck) => {
@@ -237,7 +406,7 @@ export function useChatRealtime({
         return;
       }
 
-      socket.emit("chat:typing", { threadId, isTyping });
+      socket.emit("chat:typing", { threadId, roomId: threadId, isTyping });
     },
     [threadId],
   );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import "../../css/pages/message.css";
@@ -33,9 +33,13 @@ export default function MessagePage() {
     loadThreads();
   }, [loadThreads]);
 
+  const threadIds = useMemo(() => rooms.map((room) => room.id), [rooms]);
+
   const realtime = useChatRealtime({
     threadId: roomId || "",
+    threadIds,
     onMessage: setRealtimeEvent,
+    onAnyMessage: loadThreads,
     onReconnect: loadThreads,
   });
 

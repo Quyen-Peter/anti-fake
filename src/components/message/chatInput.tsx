@@ -84,7 +84,7 @@ export default function ChatInput({
         <input
           type="text"
           value={message}
-          placeholder="Nhap tin nhan..."
+          placeholder="Nhập tin nhắn..."
           onChange={(e) => {
             setMessage(e.target.value);
             onTyping?.(Boolean(e.target.value.trim()));

@@ -2,12 +2,37 @@ import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { login } from "../../services/auth.api";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { firebaseLogin, login } from "../../services/auth.api";
+import { getFirebaseAuth } from "../../services/firebase";
 import { saveToken, saveUser } from "../../ultil/auth";
 
 type Props = {
   onSwitch: () => void;
 };
+
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="google-icon">
+      <path
+        fill="#4285F4"
+        d="M21.6 12.23c0-.78-.07-1.53-.2-2.23H12v4.22h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.32 2.98-7.51z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 22c2.7 0 4.96-.9 6.62-2.43l-3.24-2.5c-.9.6-2.04.95-3.38.95-2.6 0-4.8-1.76-5.59-4.12H3.07v2.58A10 10 0 0 0 12 22z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.41 13.9a6 6 0 0 1 0-3.8V7.52H3.07a10 10 0 0 0 0 8.96l3.34-2.58z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.98c1.47 0 2.8.5 3.84 1.5l2.88-2.88C16.96 2.96 14.7 2 12 2a10 10 0 0 0-8.93 5.52l3.34 2.58C7.2 7.74 9.4 5.98 12 5.98z"
+      />
+    </svg>
+  );
+}
 
 export default function LoginPage({ onSwitch }: Props) {
   const navigate = useNavigate();
@@ -52,6 +77,39 @@ export default function LoginPage({ onSwitch }: Props) {
       console.error("Login Error:", error);
       toast.error(
         error instanceof Error ? error.message : "Không thể kết nối máy chủ",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      const firebaseCredential = await signInWithPopup(
+        getFirebaseAuth(),
+        provider,
+      );
+      const idToken = await firebaseCredential.user.getIdToken();
+      const data = await firebaseLogin({
+        idToken,
+        displayName: firebaseCredential.user.displayName ?? undefined,
+      });
+
+      saveToken(data.accessToken);
+      saveUser(data.user);
+      toast.success("Đăng nhập Google thành công");
+
+      const role = String(data.user?.role ?? "").toLowerCase();
+      navigate(role === "admin" ? "/admin" : "/");
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Không thể đăng nhập Google",
       );
     } finally {
       setLoading(false);
@@ -126,7 +184,10 @@ export default function LoginPage({ onSwitch }: Props) {
         </div>
 
         <div className="social-buttons">
-          <button type="button">Google</button>
+          <button type="button" onClick={handleGoogleLogin} disabled={loading}>
+            <GoogleMark />
+            Google
+          </button>
         </div>
 
         <div className="login-register">

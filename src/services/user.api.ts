@@ -7,17 +7,10 @@ export type UpdateUserProfilePayload = {
   displayName: string;
 };
 
-export type SubmitUserKycDocument = {
-  side: "FRONT" | "BACK";
-  assetType: "IMAGE";
-  mimeType: string;
-  fileUrl: string;
-  publicId: string;
-};
-
 export type SubmitUserKycPayload = {
   idType: string;
-  documents: SubmitUserKycDocument[];
+  front: File;
+  back: File;
 };
 
 export const uploadUserAvatar = async (avatar: File) => {
@@ -42,13 +35,17 @@ export const uploadUserAvatar = async (avatar: File) => {
 };
 
 export const submitUserKyc = async (payload: SubmitUserKycPayload) => {
+  const formData = new FormData();
+  formData.append("idType", payload.idType);
+  formData.append("front", payload.front);
+  formData.append("back", payload.back);
+
   const response = await authFetch(`${BASE_URL}/api/user/kyc`, {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   const data = await response.json();

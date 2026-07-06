@@ -12,9 +12,11 @@ import {
   updateCartItemQuantity,
 } from "../../services/cart.api";
 import { toast } from "sonner";
+import { useCartStore } from "../../store/cartStore";
 
 export default function CartPage() {
   const [cartShops, setCartShops] = useState<any[]>([]);
+  const refreshCart = useCartStore((state) => state.refreshCart);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -30,6 +32,7 @@ export default function CartPage() {
             })),
           })),
         );
+        refreshCart();
       } catch (error) {
         console.error(error);
       }
@@ -75,6 +78,7 @@ export default function CartPage() {
           }))
           .filter((shop) => shop.items.length > 0),
       );
+      refreshCart();
     } catch (error) {
       console.error(error);
       toast.error("Xóa thất bại!");

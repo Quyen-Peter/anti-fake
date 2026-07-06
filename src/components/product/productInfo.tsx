@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCart } from "../../services/cart.api";
 import { toast } from "sonner";
+import { useCartStore } from "../../store/cartStore";
 
 const getCartItemId = (value: any) =>
   value?.id ??
@@ -51,6 +52,7 @@ export default function ProductInfo({ product, shop }: any) {
     product.salesMode === "WHOLESALE" ? product.minWholesaleQty : 1;
   const [quantity, setQuantity] = useState(minQuantity);
   const [buyLoading, setBuyLoading] = useState(false);
+    const refreshCart = useCartStore((state) => state.refreshCart);
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
@@ -60,6 +62,7 @@ export default function ProductInfo({ product, shop }: any) {
       const result = await addToCart(product.id, quantity);
 
       console.log(result);
+      refreshCart();
 
       toast.success("Đã thêm vào giỏ hàng");
     } catch (error) {

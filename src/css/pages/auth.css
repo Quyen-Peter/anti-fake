@@ -299,7 +299,7 @@
 
 .social-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
@@ -317,11 +317,26 @@
   cursor: pointer;
 
   transition: 0.25s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .social-buttons button:hover {
   background: #fafafa;
   border-color: #d1d5db;
+}
+
+.social-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
 }
 
 /* ===================== */

@@ -13,7 +13,9 @@ import {
   UserCircle2,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCartStore } from "../../store/cartStore";
+import { getToken } from "../../ultil/auth";
 
 export default function Header() {
   const location = useLocation();
@@ -31,6 +33,17 @@ export default function Header() {
       handleSearch();
     }
   };
+
+  const cartCount = useCartStore((state) => state.cartCount);
+  const refreshCart = useCartStore((state) => state.refreshCart);
+
+  useEffect(() => {
+    if (location.pathname === "/auth" || !getToken()) {
+      return;
+    }
+
+    refreshCart();
+  }, [location.pathname, refreshCart]);
 
   const menus = [
     {
@@ -132,7 +145,7 @@ export default function Header() {
 
         <Link to="/cart" className="icon-btn cart-btn">
           <ShoppingCart size={22} />
-          <span className="badge">2</span>
+          <span className="badge">{cartCount}</span>
         </Link>
 
         <Link to="/notification" className="icon-btn">

@@ -13,6 +13,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface FirebaseLoginRequest {
+  idToken: string;
+  displayName?: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -51,6 +56,29 @@ export const login = async (
 
   if (!response.ok) {
     throw new Error(data.message || "Đăng nhập thất bại");
+  }
+
+  connectSocket(data.accessToken);
+  return data;
+};
+
+export const firebaseLogin = async (
+  payload: FirebaseLoginRequest
+): Promise<LoginResponse> => {
+  const response = await fetch(`${BASE_URL}/api/auth/firebase-login`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Dang nhap Google that bai");
   }
 
   connectSocket(data.accessToken);
@@ -109,7 +137,6 @@ export const refreshToken = async () => {
     removeToken();
     removeUser();
     connectSocket().disconnect();
-    window.location.href = "/auth";
     throw new Error(data.message || "Làm mới token thất bại");
   }
 

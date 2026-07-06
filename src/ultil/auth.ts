@@ -1,7 +1,6 @@
 import { toast } from "sonner";
 import { refreshToken } from "../services/auth.api";
 
-
 const ACCESS_TOKEN_KEY = "accessToken";
 const USER_KEY = "user";
 
@@ -30,12 +29,15 @@ export const removeUser = () => {
   localStorage.removeItem(USER_KEY);
 };
 
-
 export const authFetch = async (
   input: RequestInfo,
   init: RequestInit = {}
 ) => {
   let token = getToken();
+
+  if (!token) {
+    throw new Error("Vui long dang nhap");
+  }
 
   let response = await fetch(input, {
     ...init,
@@ -64,8 +66,12 @@ export const authFetch = async (
   } catch {
     removeToken();
     removeUser();
-    toast.error("Phiên đăng nhập đã hết hạn");
-    throw new Error("Phiên đăng nhập đã hết hạn");
+    toast.error("Phien dang nhap da het han");
 
+    if (window.location.pathname !== "/auth") {
+      window.location.assign("/auth");
+    }
+
+    throw new Error("Phien dang nhap da het han");
   }
 };

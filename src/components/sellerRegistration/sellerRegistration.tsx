@@ -127,9 +127,6 @@ const revokeUploadedFiles = (uploadedFiles: UploadedFiles) => {
   });
 };
 
-const makePublicId = (prefix: string, name: string) =>
-  `${prefix}/${Date.now()}-${name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
-
 export default function SellerRegistration() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -350,22 +347,8 @@ export default function SellerRegistration() {
       try {
         await submitUserKyc({
           idType: form.identityType,
-          documents: [
-            {
-              side: "FRONT",
-              assetType: "IMAGE",
-              mimeType: files.identityFront.mimeType,
-              fileUrl: files.identityFront.previewUrl,
-              publicId: makePublicId("kyc/front", files.identityFront.name),
-            },
-            {
-              side: "BACK",
-              assetType: "IMAGE",
-              mimeType: files.identityBack.mimeType,
-              fileUrl: files.identityBack.previewUrl,
-              publicId: makePublicId("kyc/back", files.identityBack.name),
-            },
-          ],
+          front: files.identityFront.file,
+          back: files.identityBack.file,
         });
       } catch (error: unknown) {
         throw new Error(

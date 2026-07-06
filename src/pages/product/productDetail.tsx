@@ -37,6 +37,7 @@ export default function ProductDetail() {
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<ProductView[]>([]);
 
+
   useEffect(() => {
     if (!id) return;
 

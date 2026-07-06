@@ -9,6 +9,7 @@ import {
 } from "../../services/address.api";
 import { toast } from "sonner";
 import type { AddressProvince, AddressWard } from "../../type/address";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   onClose: () => void;
@@ -17,6 +18,8 @@ type Props = {
 
 export default function CreateAddress({ onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
   const [loadingProvinces, setLoadingProvinces] = useState(false);
   const [loadingWards, setLoadingWards] = useState(false);
   const [provinces, setProvinces] = useState<AddressProvince[]>([]);
@@ -140,6 +143,7 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
 
     try {
       setLoading(true);
+      showLoading("Đang lưu địa chỉ...");
 
       const data = await createAddress({
         recipientName: form.recipientName.trim(),
@@ -164,6 +168,7 @@ export default function CreateAddress({ onClose, onSuccess }: Props) {
       );
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 

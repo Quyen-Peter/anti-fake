@@ -7,6 +7,7 @@ import type { Comment } from "../../type/community";
 import { getToken, getUser } from "../../ultil/auth";
 import CommentInput from "./commentInput";
 import CommentList from "./commentList";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   open: boolean;
@@ -26,6 +27,8 @@ export default function CommentBottomSheet({ open, onClose, postId }: Props) {
   const [replyTo, setReplyTo] = useState<ReplyTarget | null>(null);
   const [pendingComments, setPendingComments] = useState<Comment[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     if (!open) {
@@ -122,6 +125,7 @@ export default function CommentBottomSheet({ open, onClose, postId }: Props) {
     );
 
     setSubmitting(true);
+    showLoading(currentReplyTo ? "Đang gửi phản hồi..." : "Đang gửi bình luận...");
     setPendingComments((currentComments) => [
       optimisticComment,
       ...currentComments,
@@ -162,6 +166,7 @@ export default function CommentBottomSheet({ open, onClose, postId }: Props) {
       })
       .finally(() => {
         setSubmitting(false);
+        hideLoading();
       });
   };
 

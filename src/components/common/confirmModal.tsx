@@ -1,4 +1,5 @@
 import "../../css/components/common/confirmModal.css";
+import LoadingOverlay from "../loadingOverlay";
 
 interface Props {
   /**
@@ -105,6 +106,7 @@ export default function ConfirmModal({
       className="confirm-modal-overlay"
       onClick={onCancel}
     >
+      {loading && <LoadingOverlay message="Đang xử lý..." />}
       <div
         className="confirm-modal"
         onClick={(e) => e.stopPropagation()}

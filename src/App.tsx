@@ -45,6 +45,7 @@ import AdminShopRegistrationsPage from "./pages/admin/shopRegistrations";
 import AdminProductRegistrationsPage from "./pages/admin/productRegistrations";
 import AdminVouchersPage from "./pages/admin/vouchers";
 import AdminWithdrawRequestsPage from "./pages/admin/withdrawRequests";
+import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -62,6 +63,7 @@ function App() {
     <BrowserRouter>
       <div>
         <Toaster richColors position="top-center" />
+        <GlobalLoadingOverlay />
         <ScrollToTop />
         <div className="app-container">
           <Routes>

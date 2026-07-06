@@ -8,6 +8,7 @@ import {
   updateAddress,
 } from "../../services/address.api";
 import "../../css/components/address/createAddress.css";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   address: Address;
@@ -17,6 +18,8 @@ type Props = {
 
 export default function UpdateAddress({ address, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
   const [loadingProvinces, setLoadingProvinces] = useState(false);
   const [loadingWards, setLoadingWards] = useState(false);
   const [provinces, setProvinces] = useState<AddressProvince[]>([]);
@@ -153,6 +156,7 @@ export default function UpdateAddress({ address, onClose, onSuccess }: Props) {
 
     try {
       setLoading(true);
+      showLoading("Đang lưu địa chỉ...");
 
       const data = await updateAddress(address.id, {
         recipientName: form.recipientName.trim(),
@@ -177,6 +181,7 @@ export default function UpdateAddress({ address, onClose, onSuccess }: Props) {
       );
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 

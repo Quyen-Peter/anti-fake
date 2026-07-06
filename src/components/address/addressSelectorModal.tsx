@@ -9,6 +9,7 @@ import {
   setDefaultAddress,
 } from "../../services/address.api";
 import CreateAddress from "./createAddress";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 interface Props {
   open: boolean;
@@ -24,6 +25,8 @@ export default function AddressSelectorModal({
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   const [openCreate, setOpenCreate] = useState(false);
 
@@ -54,6 +57,7 @@ export default function AddressSelectorModal({
   const handleConfirm = async () => {
     try {
       setLoading(true);
+      showLoading("Đang lưu địa chỉ...");
 
       await setDefaultAddress(selectedId);
 
@@ -62,6 +66,7 @@ export default function AddressSelectorModal({
       onClose();
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 

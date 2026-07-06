@@ -15,6 +15,7 @@ import { getShopChatThread } from "../../services/chat.api";
 import ProductCard from "../../components/product/productCard";
 import { searchOffers } from "../../services/product.api";
 import type { ProductView } from "../../type/product";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type ReviewItem = {
   id: string;
@@ -28,6 +29,8 @@ type ReviewItem = {
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
   const [activeTab, setActiveTab] = useState("description");
   const [product, setProduct] = useState<any>();
   const [shop, setShop] = useState<any>();
@@ -123,6 +126,7 @@ export default function ProductDetail() {
   const getOrCreateChatThread = async (shopId: string) => {
     try {
 
+      showLoading("Đang mở cuộc trò chuyện...");
       const response = await getShopChatThread(shopId);
 
       if (!response?.success || !response?.threadId) {
@@ -140,6 +144,8 @@ export default function ProductDetail() {
           error?.message ||
           "Đã xảy ra lỗi khi tạo cuộc trò chuyện",
       );
+    } finally {
+      hideLoading();
     }
   };
 

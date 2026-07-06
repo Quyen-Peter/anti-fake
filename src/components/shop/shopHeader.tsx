@@ -11,6 +11,7 @@ import { formatJoinTime, formatSale } from "../../ultil/format";
 import { useNavigate } from "react-router-dom";
 
 import { getShopChatThread } from "../../services/chat.api";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   shop: shopCard;
@@ -18,9 +19,12 @@ type Props = {
 
 export default function ShopHeader({ shop }: Props) {
   const navigate = useNavigate();
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   const getOrCreateChatThread = async (shopId: string) => {
     try {
+      showLoading("Đang mở cuộc trò chuyện...");
       const response = await getShopChatThread(shopId);
 
       if (!response?.success || !response?.threadId) {
@@ -38,6 +42,8 @@ export default function ShopHeader({ shop }: Props) {
           error?.message ||
           "Đã xảy ra lỗi khi tạo cuộc trò chuyện",
       );
+    } finally {
+      hideLoading();
     }
   };
 

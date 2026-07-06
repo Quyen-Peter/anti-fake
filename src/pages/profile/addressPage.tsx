@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import ConfirmModal from "../../components/common/confirmModal";
 import UpdateAddress from "../../components/address/updateAddress";
 import EmptyState from "../../components/common/emptyState";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 interface Address {
   id: string;
@@ -30,6 +31,8 @@ export default function ProfileAddress() {
   const [showModal, setShowModal] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     loadAddresses();
@@ -50,6 +53,7 @@ export default function ProfileAddress() {
 
   const handleDelete = async (id: string) => {
     try {
+      showLoading("Đang xóa địa chỉ...");
       await deleteAddress(id);
       loadAddresses();
       setShowDelete(false);
@@ -58,11 +62,14 @@ export default function ProfileAddress() {
       console.error(error);
       setShowDelete(false);
       toast.error("Xóa địa chỉ thất bại!");
+    } finally {
+      hideLoading();
     }
   };
 
   const handleSetDefault = async (id: string) => {
     try {
+      showLoading("Đang cập nhật địa chỉ...");
       await setDefaultAddress(id);
       loadAddresses();
 
@@ -70,6 +77,8 @@ export default function ProfileAddress() {
     } catch (error) {
       console.error(error);
       toast.error("Cập nhật thất bại!");
+    } finally {
+      hideLoading();
     }
   };
 

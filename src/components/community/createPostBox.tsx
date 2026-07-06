@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Image, X } from "lucide-react";
 import { createSocialPost } from "../../services/community.api";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type CreatePostBoxProps = {
   onCreated?: () => void;
@@ -19,6 +20,8 @@ export default function CreatePostBox({ onCreated }: CreatePostBoxProps) {
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imagesRef = useRef<SelectedImage[]>([]);
 
@@ -89,6 +92,7 @@ export default function CreatePostBox({ onCreated }: CreatePostBoxProps) {
     }
 
     setSubmitting(true);
+    showLoading("Đang đăng bài...");
     setError("");
 
     try {
@@ -103,6 +107,7 @@ export default function CreatePostBox({ onCreated }: CreatePostBoxProps) {
       setError(err.message || "Dang bai viet that bai");
     } finally {
       setSubmitting(false);
+      hideLoading();
     }
   };
 

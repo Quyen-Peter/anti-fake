@@ -2,6 +2,7 @@ import { User, Mail, Phone, Lock, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { register } from "../../services/auth.api";
 import { toast } from "sonner";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   onSwitch: () => void;
@@ -13,6 +14,9 @@ export default function RegisterPage({ onSwitch }: Props) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -96,6 +100,8 @@ export default function RegisterPage({ onSwitch }: Props) {
     }
 
     try {
+      setLoading(true);
+      showLoading("Đang đăng ký...");
       const res = await register({
         email,
         phone,
@@ -116,6 +122,9 @@ export default function RegisterPage({ onSwitch }: Props) {
       } else {
         alert("Không thể kết nối tới máy chủ");
       }
+    } finally {
+      setLoading(false);
+      hideLoading();
     }
   };
 
@@ -216,7 +225,7 @@ export default function RegisterPage({ onSwitch }: Props) {
             Đã có tài khoản? Đăng nhập
           </button>
 
-          <button type="submit" className="register-btn">
+          <button type="submit" className="register-btn" disabled={loading}>
             Đăng ký ngay
           </button>
         </form>

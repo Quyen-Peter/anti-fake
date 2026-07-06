@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import "../../css/pages/profile/userProfile.css";
 import { updateUserProfile, uploadUserAvatar } from "../../services/user.api";
 import { getUser, saveUser } from "../../ultil/auth";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type ProfileForm = {
   displayName: string;
@@ -45,6 +46,8 @@ export default function UserProfile() {
   const [avatarError, setAvatarError] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -103,6 +106,7 @@ export default function UserProfile() {
     const nextDisplayName = form.fullName.trim() || form.displayName.trim();
 
     setSaving(true);
+    showLoading("Đang lưu hồ sơ...");
 
     try {
       const profileResponse = await updateUserProfile({
@@ -146,6 +150,7 @@ export default function UserProfile() {
       toast.error(err.message || "Cập nhật hồ sơ thất bại");
     } finally {
       setSaving(false);
+      hideLoading();
     }
   };
 

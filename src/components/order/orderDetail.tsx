@@ -18,6 +18,7 @@ import { cancelOrder, fetchOrderDetail } from "../../services/order.api";
 import { createOfferReview } from "../../services/review.api";
 import ConfirmModal from "../common/confirmModal";
 import LoadingOverlay from "../loadingOverlay";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 const statusLabels: Record<string, string> = {
   pending: "Chờ xác nhận",
@@ -69,6 +70,8 @@ export default function OrderDetailPage() {
   const [reviewedItemIds, setReviewedItemIds] = useState<string[]>([]);
   const [cancellingOrder, setCancellingOrder] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -125,6 +128,7 @@ export default function OrderDetailPage() {
 
     try {
       setSubmittingReviewId(item.id);
+      showLoading("Đang gửi đánh giá...");
       await createOfferReview(offerId, {
         rating: reviewRating,
         comment: reviewComment.trim(),
@@ -137,6 +141,7 @@ export default function OrderDetailPage() {
       toast.error(error instanceof Error ? error.message : "Đánh giá sản phẩm thất bại");
     } finally {
       setSubmittingReviewId("");
+      hideLoading();
     }
   };
 
@@ -145,6 +150,7 @@ export default function OrderDetailPage() {
 
     try {
       setCancellingOrder(true);
+      showLoading("Đang hủy đơn hàng...");
       await cancelOrder(order.id);
       setOrder({ ...order, status: "cancelled" });
       setShowCancelConfirm(false);
@@ -153,6 +159,7 @@ export default function OrderDetailPage() {
       toast.error(error instanceof Error ? error.message : "Hủy đơn hàng thất bại");
     } finally {
       setCancellingOrder(false);
+      hideLoading();
     }
   };
 

@@ -20,6 +20,7 @@ import {
   type UpdateShopProfilePayload,
 } from "../../services/shop.api";
 import type { AddressProvince, AddressWard } from "../../type/address";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 import "../../css/pages/sellerShopInfo.css";
 
 const SELLER_SHOP_CACHE_KEY = "sellerShop";
@@ -97,6 +98,8 @@ export default function SellerShopInfo() {
   const [shop, setShop] = useState<SellerShopInfo | null>(() => readCachedShop());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
   const [editField, setEditField] = useState<EditField | null>(null);
   const [editValue, setEditValue] = useState("");
   const [warehouseForm, setWarehouseForm] = useState<WarehouseForm>({
@@ -198,6 +201,7 @@ export default function SellerShopInfo() {
 
     try {
       setSaving(true);
+      showLoading("Đang lưu thông tin cửa hàng...");
       const payload = toProfilePayload(shop, {
         [editField]: editValue.trim(),
       });
@@ -212,6 +216,7 @@ export default function SellerShopInfo() {
       toast.error(error instanceof Error ? error.message : "Cập nhật thất bại");
     } finally {
       setSaving(false);
+      hideLoading();
     }
   };
 
@@ -235,6 +240,7 @@ export default function SellerShopInfo() {
 
     try {
       setSaving(true);
+      showLoading("Đang lưu địa chỉ kho...");
       const payload = toProfilePayload(shop, {
         warehouseAddress: warehouseForm.warehouseAddress.trim(),
         warehouseProvinceCode: warehouseForm.warehouseProvinceCode,
@@ -253,6 +259,7 @@ export default function SellerShopInfo() {
       toast.error(error instanceof Error ? error.message : "Cập nhật thất bại");
     } finally {
       setSaving(false);
+      hideLoading();
     }
   };
 

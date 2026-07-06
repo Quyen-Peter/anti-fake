@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { checkoutCart } from "../../services/cart.api";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 interface Props {
   cartItemIds: string[];
@@ -30,20 +31,23 @@ export default function CheckoutSummary({
   const navigate = useNavigate();
   const [affiliateCode, setAffiliateCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   const handleCheckout = async () => {
     if (cartItemIds.length === 0) {
-      toast.error("Vui long chon san pham truoc khi thanh toan");
+      toast.error("Vui lòng chọn sản phẩm trước khi thanh toán");
       return;
     }
 
     if (!shippingOptionCode) {
-      toast.error("Vui long chon phuong thuc van chuyen");
+      toast.error("Vui lòng chọn phương thức vận chuyển");
       return;
     }
 
     try {
       setLoading(true);
+      showLoading("Đang tạo thanh toán...");
 
       const paymentMethod = toPaymentMethod(payment);
       const checkout = await checkoutCart({
@@ -74,10 +78,11 @@ export default function CheckoutSummary({
     } catch (error) {
       console.error(error);
       toast.error(
-        error instanceof Error ? error.message : "Khong the tao thanh toan",
+        error instanceof Error ? error.message : "Không thể tạo thanh toán",
       );
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 
@@ -112,7 +117,6 @@ export default function CheckoutSummary({
 
       <div className="summary-total-checkout">
         <span>Tổng cộng</span>
-
         <strong>{total.toLocaleString()}đ</strong>
       </div>
 
@@ -122,7 +126,7 @@ export default function CheckoutSummary({
         disabled={loading}
         onClick={handleCheckout}
       >
-        {loading ? "Đang tạo thanh toán..." : "Đặt hàng"}
+        Đặt hàng
       </button>
     </div>
   );

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCart } from "../../services/cart.api";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/cartStore";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 const getCartItemId = (value: any) =>
   value?.id ??
@@ -52,6 +53,9 @@ export default function ProductInfo({ product, shop }: any) {
     product.salesMode === "WHOLESALE" ? product.minWholesaleQty : 1;
   const [quantity, setQuantity] = useState(minQuantity);
   const [buyLoading, setBuyLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
     const refreshCart = useCartStore((state) => state.refreshCart);
 
   const formatPrice = (price: number) =>
@@ -59,6 +63,8 @@ export default function ProductInfo({ product, shop }: any) {
 
   const handleAddToCart = async () => {
     try {
+      setCartLoading(true);
+      showLoading("Đang thêm vào giỏ hàng...");
       const result = await addToCart(product.id, quantity);
 
       console.log(result);
@@ -68,12 +74,16 @@ export default function ProductInfo({ product, shop }: any) {
     } catch (error) {
       console.error(error);
       toast.error("Thêm giỏ hàng thất bại");
+    } finally {
+      setCartLoading(false);
+      hideLoading();
     }
   };
 
   const handleBuyNow = async () => {
     try {
       setBuyLoading(true);
+      showLoading("Đang chuẩn bị đơn hàng...");
 
       const shopId = shop?.shopId ?? shop?.id ?? product.shopId;
       const shopName = shop?.shopName ?? product.shopName ?? "Shop";
@@ -118,6 +128,7 @@ export default function ProductInfo({ product, shop }: any) {
       );
     } finally {
       setBuyLoading(false);
+      hideLoading();
     }
   };
 
@@ -180,16 +191,20 @@ export default function ProductInfo({ product, shop }: any) {
       </div>
 
       <div className="pd-action-buttons">
-        <button className="pd-cart-btn" onClick={handleAddToCart}>
+        <button
+          className="pd-cart-btn"
+          disabled={cartLoading || buyLoading}
+          onClick={handleAddToCart}
+        >
           <ShoppingCart size={20} /> Thêm vào giỏ hàng
         </button>
 
         <button
           className="pd-buy-btn"
-          disabled={buyLoading}
+          disabled={buyLoading || cartLoading}
           onClick={handleBuyNow}
         >
-          {buyLoading ? "Dang xu ly..." : "Mua ngay"}
+          Mua ngay
         </button>
       </div>
 

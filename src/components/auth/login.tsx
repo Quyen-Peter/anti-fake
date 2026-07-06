@@ -6,6 +6,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { firebaseLogin, login } from "../../services/auth.api";
 import { getFirebaseAuth } from "../../services/firebase";
 import { saveToken, saveUser } from "../../ultil/auth";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 type Props = {
   onSwitch: () => void;
@@ -36,6 +37,8 @@ function GoogleMark() {
 
 export default function LoginPage({ onSwitch }: Props) {
   const navigate = useNavigate();
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -61,6 +64,7 @@ export default function LoginPage({ onSwitch }: Props) {
 
     try {
       setLoading(true);
+      showLoading("Đang đăng nhập...");
 
       const data = await login({
         username,
@@ -80,12 +84,14 @@ export default function LoginPage({ onSwitch }: Props) {
       );
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
+      showLoading("Đang đăng nhập với Google...");
 
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
@@ -113,6 +119,7 @@ export default function LoginPage({ onSwitch }: Props) {
       );
     } finally {
       setLoading(false);
+      hideLoading();
     }
   };
 
@@ -175,7 +182,7 @@ export default function LoginPage({ onSwitch }: Props) {
           </label>
 
           <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            Đăng nhập
           </button>
         </form>
 

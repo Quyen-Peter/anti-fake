@@ -13,10 +13,13 @@ import {
 } from "../../services/cart.api";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/cartStore";
+import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
 export default function CartPage() {
   const [cartShops, setCartShops] = useState<any[]>([]);
   const refreshCart = useCartStore((state) => state.refreshCart);
+  const showLoading = useGlobalLoadingStore((state) => state.showLoading);
+  const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -45,6 +48,7 @@ export default function CartPage() {
     try {
       if (quantity < 1) return;
 
+      showLoading("Đang cập nhật giỏ hàng...");
       await updateCartItemQuantity(itemId, quantity);
 
       setCartShops((prev) =>
@@ -62,12 +66,15 @@ export default function CartPage() {
       );
     } catch (error) {
       console.error(error);
+    } finally {
+      hideLoading();
     }
   };
 
   const handleDeleteItem = async (itemId: string) => {
     try {
 
+      showLoading("Đang xóa sản phẩm...");
       await deleteCartItem(itemId);
 
       setCartShops((prev) =>
@@ -82,6 +89,8 @@ export default function CartPage() {
     } catch (error) {
       console.error(error);
       toast.error("Xóa thất bại!");
+    } finally {
+      hideLoading();
     }
   };
 

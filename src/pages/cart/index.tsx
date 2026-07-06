@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Store } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Search, ShoppingCart, Store } from "lucide-react";
 
 import CartItem from "../../components/cart/cartItem";
 import CartSummary from "../../components/cart/cartSummary";
+import EmptyState from "../../components/common/emptyState";
 
 import "../../css/pages/cart.css";
 
@@ -164,6 +166,26 @@ export default function CartPage() {
       items: shop.items.filter((item: any) => item.selected),
     }))
     .filter((shop) => shop.items.length > 0);
+
+  if (totalItems === 0) {
+    return (
+      <div className="cart-page cart-page-empty">
+        <EmptyState
+          className="cart-empty-state"
+          icon={<ShoppingCart size={34} />}
+          title="Giỏ hàng của bạn đang trống"
+          description="Hãy thêm sản phẩm yêu thích vào giỏ hàng để có thể mua nhanh hơn ở lần tiếp theo."
+          action={
+            <Link to="/search">
+              <Search size={18} />
+              Tìm sản phẩm
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="cart-page">
       <div className="cart-left">

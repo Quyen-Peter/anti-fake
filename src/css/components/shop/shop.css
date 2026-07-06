@@ -394,9 +394,11 @@
 }
 
 .shop-best-selling {
+  width: 100%;
   max-width: 1300px;
   margin: 20px auto 0;
   padding: 0 20px 80px;
+  box-sizing: border-box;
 }
 
 .shop-best-selling-header h3 {
@@ -419,6 +421,18 @@
   text-align: center;
 }
 
+.shop-best-selling-empty {
+  width: 100%;
+  min-height: 340px;
+  padding: 56px 24px;
+  box-sizing: border-box;
+  border-style: dashed;
+}
+
+.shop-best-selling-empty p {
+  max-width: 520px;
+}
+
 @media (max-width: 576px) {
   .shop-best-selling {
     margin-top: 14px;
@@ -428,6 +442,11 @@
   .shop-best-selling-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+  }
+
+  .shop-best-selling-empty {
+    min-height: 260px;
+    padding: 34px 16px;
   }
 }
 

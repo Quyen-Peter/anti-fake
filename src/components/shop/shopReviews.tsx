@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { PackageOpen } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { PackageOpen, Search } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import ProductCard from "../product/productCard";
 import EmptyState from "../common/emptyState";
 import {
@@ -64,8 +64,14 @@ export default function ShopReviews() {
         <EmptyState
           icon={<PackageOpen size={32} />}
           title="Chưa có sản phẩm bán chạy"
-          description="Khi shop có dữ liệu bán hàng, các sản phẩm nổi bật sẽ xuất hiện tại đây."
-          className="shop-best-selling-state"
+          description="Shop chưa có đủ dữ liệu bán hàng để hiển thị danh sách nổi bật."
+          className="shop-best-selling-empty"
+          action={
+            <Link to={shopId ? `/shop/${shopId}/products` : "/search"}>
+              <Search size={18} />
+              Xem sản phẩm của shop
+            </Link>
+          }
         />
       )}
 

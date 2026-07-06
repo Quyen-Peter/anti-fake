@@ -12,6 +12,14 @@
   position: relative;
 }
 
+.cart-page-empty {
+  display: block;
+}
+
+.cart-empty-state {
+  min-height: 420px;
+}
+
 /* ================= HEADER ================= */
 
 .cart-header {

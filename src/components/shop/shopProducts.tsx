@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { SearchX } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
 import SearchHeader from "../layout/searchHeader";
 import SearchSidebar, { type SearchCategory } from "../layout/searchSidebar";
 import ProductCard from "../product/productCard";
 import LoadingOverlay from "../loadingOverlay";
+import EmptyState from "../common/emptyState";
 import { searchOffers } from "../../services/product.api";
 import { fetchShopCategories } from "../../services/shop.api";
 import "../../css/components/shop/shopProduct.css";
@@ -109,10 +111,12 @@ export default function ShopProducts() {
           {loading && <LoadingOverlay />}
 
           {!loading && sortedProducts.length === 0 && (
-            <div className="shop-products-empty">
-              <h3>Không tìm thấy sản phẩm</h3>
-              <p>Hãy thử thay đổi danh mục hoặc khoảng giá.</p>
-            </div>
+            <EmptyState
+              icon={<SearchX size={32} />}
+              title="Không tìm thấy sản phẩm"
+              description="Hãy thử thay đổi danh mục, từ khóa hoặc khoảng giá."
+              className="shop-products-empty"
+            />
           )}
 
           {!loading &&

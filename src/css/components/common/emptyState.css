@@ -1,0 +1,83 @@
+.app-empty-state {
+  min-height: 280px;
+  padding: 44px 20px;
+  border: 1px solid #ececec;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.app-empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff3f3;
+  color: #d92525;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.app-empty-state.is-warning .app-empty-state-icon {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.app-empty-state h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.app-empty-state p {
+  max-width: 440px;
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.app-empty-state-action {
+  margin-top: 22px;
+}
+
+.app-empty-state-action button,
+.app-empty-state-action a {
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: #d92525;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.app-empty-state-action button:hover,
+.app-empty-state-action a:hover {
+  background: #bd1f1f;
+}
+
+@media (max-width: 576px) {
+  .app-empty-state {
+    min-height: 240px;
+    padding: 34px 16px;
+    border-radius: 14px;
+  }
+
+  .app-empty-state h3 {
+    font-size: 18px;
+  }
+}

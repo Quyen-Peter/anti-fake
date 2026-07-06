@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Phone, ShieldCheck, Star, User } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  MapPin,
+  PackageOpen,
+  Phone,
+  ShieldCheck,
+  Star,
+  User,
+} from "lucide-react";
 import { toast } from "sonner";
 import "../../css/components/order/orderDetail.css";
+import "../../css/pages/ordersPage.css";
 import type { OrderDetail, OrderItem } from "../../type/order";
 import { cancelOrder, fetchOrderDetail } from "../../services/order.api";
 import { createOfferReview } from "../../services/review.api";
@@ -146,9 +156,47 @@ export default function OrderDetailPage() {
     }
   };
 
-  if (loading) return <div className="order-detail-page"><LoadingOverlay/></div>;
-  if (error) return <div className="order-detail-page">{error}</div>;
-  if (!order) return <div className="order-detail-page">Không tìm thấy đơn hàng.</div>;
+  if (loading) {
+    return (
+      <div className="order-detail-page">
+        <LoadingOverlay />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="order-detail-page">
+        <div className="profile-orders-state is-error" role="alert">
+          <div className="profile-orders-state-icon">
+            <AlertCircle size={30} />
+          </div>
+          <h2>Không thể tải chi tiết đơn hàng</h2>
+          <p>{error}</p>
+          <button type="button" onClick={() => navigate("/profile/orders")}>
+            Quay lại đơn mua
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="order-detail-page">
+        <div className="profile-orders-state" role="status">
+          <div className="profile-orders-state-icon">
+            <PackageOpen size={34} />
+          </div>
+          <h2>Không tìm thấy đơn hàng</h2>
+          <p>Đơn hàng này không tồn tại hoặc đã được cập nhật ở nơi khác.</p>
+          <button type="button" onClick={() => navigate("/profile/orders")}>
+            Quay lại đơn mua
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="order-detail-page">

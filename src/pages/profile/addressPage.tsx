@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, Plus } from "lucide-react";
+import { Building2, MapPin, Plus } from "lucide-react";
 
 import "../../css/pages/profile/address.css";
 import {
@@ -11,6 +11,7 @@ import CreateAddress from "../../components/address/createAddress";
 import { toast } from "sonner";
 import ConfirmModal from "../../components/common/confirmModal";
 import UpdateAddress from "../../components/address/updateAddress";
+import EmptyState from "../../components/common/emptyState";
 
 interface Address {
   id: string;
@@ -97,7 +98,18 @@ export default function ProfileAddress() {
       {loading ? (
         <div className="profile-address-loading">Đang tải địa chỉ...</div>
       ) : addresses.length === 0 ? (
-        <div className="profile-address-empty">Không có địa chỉ nào</div>
+        <EmptyState
+          icon={<MapPin size={30} />}
+          title="Bạn chưa có địa chỉ nào"
+          description="Thêm địa chỉ nhận hàng để việc thanh toán và giao hàng nhanh hơn."
+          className="profile-address-empty"
+          action={
+            <button type="button" onClick={() => setShowModal(true)}>
+              <Plus size={18} />
+              Thêm địa chỉ mới
+            </button>
+          }
+        />
       ) : (
         <div className="profile-address-list">
           {addresses.map((address) => (

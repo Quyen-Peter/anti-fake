@@ -1,0 +1,84 @@
+.profile-orders-page {
+  width: 100%;
+}
+
+.profile-orders-state {
+  min-height: 360px;
+  padding: 48px 24px;
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.profile-orders-state-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #fff3f3;
+  color: #d92525;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.profile-orders-state h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.profile-orders-state p {
+  max-width: 460px;
+  margin: 12px 0 24px;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.profile-orders-state button {
+  border: none;
+  border-radius: 12px;
+  background: #d92525;
+  color: #fff;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.profile-orders-state button:hover {
+  background: #bd1f1f;
+}
+
+.profile-orders-state.is-error .profile-orders-state-icon {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+@media (max-width: 576px) {
+  .profile-orders-state {
+    min-height: 300px;
+    padding: 36px 16px;
+    border-radius: 14px;
+  }
+
+  .profile-orders-state h2 {
+    font-size: 19px;
+  }
+
+  .profile-orders-state p {
+    font-size: 14px;
+  }
+}

@@ -1,13 +1,15 @@
+import { useEffect, useState } from "react";
+import { SearchX } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import SearchSidebar from "../../components/layout/searchSidebar";
 import "../../css/pages/search.css";
 import SearchHeader from "../../components/layout/searchHeader";
-import { useEffect, useState } from "react";
 import { searchOffers } from "../../services/product.api";
 import LoadingOverlay from "../../components/loadingOverlay";
 import ProductCard from "../../components/product/productCard";
 import { fetchCategories } from "../../services/category.api";
 import type { SearchCategory } from "../../components/layout/searchSidebar";
+import EmptyState from "../../components/common/emptyState";
 
 const normalizeList = (data: any) => {
   const payload = data?.data ?? data?.items ?? data;
@@ -104,10 +106,12 @@ export default function SearchPage() {
           {loading && <LoadingOverlay />}
 
           {!loading && sortedProducts.length === 0 && (
-            <div className="empty-search">
-              <h3>Không tìm thấy sản phẩm</h3>
-              <p>Hãy thử từ khóa khác hoặc thay đổi bộ lọc tìm kiếm.</p>
-            </div>
+            <EmptyState
+              icon={<SearchX size={32} />}
+              title="Không tìm thấy sản phẩm"
+              description="Hãy thử từ khóa khác hoặc thay đổi bộ lọc tìm kiếm."
+              className="empty-search"
+            />
           )}
 
           {!loading &&

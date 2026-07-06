@@ -1,6 +1,7 @@
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, PackageOpen, Pencil, Trash2 } from "lucide-react";
 
 import "../../css/components/productManagement/productTable.css";
+import EmptyState from "../common/emptyState";
 
 interface Product {
   id: number | string;
@@ -137,9 +138,12 @@ export default function ProductTable({ products }: Props) {
       </table>
 
       {products.length === 0 && (
-        <div className="seller-product-empty">
-          Không có sản phẩm nào
-        </div>
+        <EmptyState
+          icon={<PackageOpen size={30} />}
+          title="Không có sản phẩm nào"
+          description="Sản phẩm bạn tạo hoặc lọc được sẽ hiển thị trong danh sách này."
+          className="seller-product-empty"
+        />
       )}
     </div>
   );

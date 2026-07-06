@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../../css/components/product/review.css";
-import { Star } from "lucide-react";
+import { MessageSquareText, Star } from "lucide-react";
+import EmptyState from "../common/emptyState";
 
 type ReviewItem = {
   id: string;
@@ -36,7 +37,12 @@ export default function Review({ reviews, loading }: Props) {
       <h2>Đánh giá sản phẩm</h2>
 
       {reviews.length === 0 && (
-        <div className="pd-review-empty">Chưa có đánh giá nào</div>
+        <EmptyState
+          icon={<MessageSquareText size={30} />}
+          title="Chưa có đánh giá nào"
+          description="Những đánh giá sau khi mua hàng sẽ được hiển thị tại đây."
+          className="pd-review-empty"
+        />
       )}
 
       {paginatedReviews.map((item) => (

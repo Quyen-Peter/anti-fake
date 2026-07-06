@@ -1,6 +1,7 @@
-import { Eye } from "lucide-react";
+import { ClipboardList, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../../css/components/orderManagement/orderTable.css";
+import EmptyState from "../common/emptyState";
 
 interface Order {
   id: string;
@@ -55,7 +56,12 @@ export default function OrderTable({ orders }: Props) {
 
   if (orders.length === 0) {
     return (
-      <div className="seller-order-empty">Không tìm thấy đơn hàng nào</div>
+      <EmptyState
+        icon={<ClipboardList size={30} />}
+        title="Không tìm thấy đơn hàng nào"
+        description="Thử đổi bộ lọc, từ khóa tìm kiếm hoặc kiểm tra lại trạng thái đơn hàng."
+        className="seller-order-empty"
+      />
     );
   }
 

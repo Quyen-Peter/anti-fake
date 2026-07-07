@@ -199,7 +199,7 @@ export default function SellerHeader() {
       <div className="seller-header-right">
         <div
           className="seller-header-icon"
-          onClick={() => navigate("/messages")}
+          
         >
           <MessageSquareText size={22} />
           <span className="seller-header-badge">3</span>

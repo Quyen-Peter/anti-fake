@@ -62,9 +62,11 @@ export const getShopChatThread = async (
     throw new Error("Không thể lấy danh sách chat");
   }
 
-      const data = response.json();
+  const data = await response.json();
   return data;
 };
+
+
 
 
 export const sendMessage = async (

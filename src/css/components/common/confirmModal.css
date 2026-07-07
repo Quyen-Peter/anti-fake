@@ -83,6 +83,10 @@
 .confirm-submit-btn {
   background: #0f766e;
   color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .confirm-submit-danger {
@@ -93,6 +97,16 @@
 .confirm-submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.confirm-submit-btn.is-loading svg {
+  animation: confirmSpin 0.8s linear infinite;
+}
+
+@keyframes confirmSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 576px) {

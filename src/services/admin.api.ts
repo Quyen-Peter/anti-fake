@@ -24,6 +24,56 @@ export type AdminUser = {
   }>;
 };
 
+export type FetchAdminUsersParams = {
+  role?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export type AdminUsersResponse = {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  totalUser: number;
+  totalShop: number;
+  activeUser: number;
+  bannedUser: number;
+  items: AdminUser[];
+};
+
+export type AdminUserDetail = {
+  user: AdminUser & {
+    emailVerified?: boolean;
+    phoneVerified?: boolean;
+    sellerVerified?: boolean;
+    joinedAt?: string;
+    statistics?: {
+      orders?: number;
+      posts?: number;
+      reports?: number;
+      positiveRate?: number;
+    };
+  };
+  shop?: {
+    id: string;
+    shopName: string;
+    logo?: unknown;
+    banner?: unknown;
+    shopStatus?: string;
+    verificationStatus?: string;
+    createdAt?: string;
+    category?: string;
+    address?: string;
+    rating?: number;
+    reviewCount?: number;
+    productCount?: number;
+    totalSold?: number;
+    revenue?: number;
+  } | null;
+};
+
 export type AdminShopRegistrationOwner = {
   id: string;
   displayName?: string | null;
@@ -39,6 +89,54 @@ export type AdminShopRegistration = {
   avatar?: string | null;
   createdAt?: string;
   shopStatus?: string;
+};
+
+export type AdminShopVerificationDetail = {
+  shop: {
+    id: string;
+    shopName: string;
+    registrationType?: string | null;
+    businessType?: string | null;
+    taxCode?: string | null;
+    status?: string | null;
+    shopStatus?: string | null;
+    createdAt?: string;
+    physicalAddress?: string | null;
+    address?: string | null;
+  };
+  owner: {
+    id: string;
+    displayName?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    avatar?: string | null;
+    avatarUrl?: string | null;
+  };
+  categories: Array<{
+    id: string;
+    name: string;
+  }>;
+  kyc?: {
+    type?: string | null;
+    frontImage?: string | null;
+    backImage?: string | null;
+    status?: string | null;
+  } | null;
+  documents: Array<{
+    id: string;
+    code?: string | null;
+    name: string;
+    required?: boolean;
+    status?: string | null;
+    files?: string[];
+  }>;
+};
+
+export type AdminShopReviewStatus = "approved" | "rejected";
+
+export type ReviewAdminShopDocumentsPayload = {
+  reviewStatus: AdminShopReviewStatus;
+  reviewNote: string;
 };
 
 export type FetchAdminShopRegistrationsParams = {
@@ -92,11 +190,16 @@ export type AdminOffersResponse = {
   items: AdminOffer[];
 };
 
-export const fetchAdminUsers = async (role?: string): Promise<AdminUser[]> => {
-  const params = new URLSearchParams();
-  if (role) params.set("role", role);
+export const fetchAdminUsers = async (
+  params: FetchAdminUsersParams = {},
+): Promise<AdminUsersResponse> => {
+  const queryParams = new URLSearchParams();
+  if (params.role) queryParams.set("role", params.role);
+  if (params.status) queryParams.set("status", params.status);
+  queryParams.set("page", String(params.page ?? 1));
+  queryParams.set("pageSize", String(params.pageSize ?? 10));
 
-  const query = params.toString();
+  const query = queryParams.toString();
   const response = await authFetch(
     `${BASE_URL}/api/admin/users${query ? `?${query}` : ""}`,
     {
@@ -113,8 +216,24 @@ export const fetchAdminUsers = async (role?: string): Promise<AdminUser[]> => {
     throw new Error(data.message || "Không thể lấy danh sách người dùng");
   }
 
-  const payload = data?.data ?? data?.items ?? data;
-  return Array.isArray(payload) ? payload : [];
+  const payload = data?.data ?? data;
+  const items = Array.isArray(payload?.items)
+    ? payload.items
+    : Array.isArray(payload)
+      ? payload
+      : [];
+
+  return {
+    page: Number(payload?.page ?? params.page ?? 1),
+    pageSize: Number(payload?.pageSize ?? params.pageSize ?? 10),
+    totalItems: Number(payload?.totalItems ?? items.length),
+    totalPages: Number(payload?.totalPages ?? 1),
+    totalUser: Number(payload?.totalUser ?? payload?.totalItems ?? items.length),
+    totalShop: Number(payload?.totalShop ?? 0),
+    activeUser: Number(payload?.activeUser ?? 0),
+    bannedUser: Number(payload?.bannedUser ?? 0),
+    items,
+  };
 };
 
 export const banAdminUser = async (id: string): Promise<AdminUser> => {
@@ -129,6 +248,25 @@ export const banAdminUser = async (id: string): Promise<AdminUser> => {
 
   if (!response.ok) {
     throw new Error(data.message || "Khong the khoa nguoi dung");
+  }
+
+  return data?.data ?? data;
+};
+
+export const fetchAdminUserDetail = async (
+  id: string,
+): Promise<AdminUserDetail> => {
+  const response = await authFetch(`${BASE_URL}/api/admin/users/${id}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay chi tiet nguoi dung");
   }
 
   return data?.data ?? data;
@@ -170,6 +308,53 @@ export const fetchAdminShopRegistrations = async (
     totalPages: Number(payload?.totalPages ?? 1),
     items: Array.isArray(payload?.items) ? payload.items : [],
   };
+};
+
+export const fetchAdminShopVerificationDetail = async (
+  shopId: string,
+): Promise<AdminShopVerificationDetail> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/admin/${shopId}/verification-detail`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay ho so phap ly cua shop");
+  }
+
+  return data?.data ?? data;
+};
+
+export const reviewAdminShopDocuments = async (
+  shopId: string,
+  payload: ReviewAdminShopDocumentsPayload,
+) => {
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/admin/${shopId}/documents/review`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the duyet ho so shop");
+  }
+
+  return data?.data ?? data;
 };
 
 export const fetchAdminOffers = async (

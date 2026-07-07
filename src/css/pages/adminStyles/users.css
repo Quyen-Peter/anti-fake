@@ -1,0 +1,376 @@
+.admin-user-detail-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-user-profile-card,
+.admin-shop-profile-card {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-user-profile-top {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: center;
+}
+
+.admin-user-avatar,
+.admin-shop-logo {
+  border: 1px solid #f1d6d6;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff7f7;
+  color: #b00020;
+}
+
+.admin-user-avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 8px;
+}
+
+.admin-user-avatar img,
+.admin-shop-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-user-profile-title {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-user-profile-title h2,
+.admin-shop-profile-body h2 {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.admin-user-profile-title small,
+.admin-shop-profile-body small {
+  color: #806464;
+  overflow-wrap: anywhere;
+}
+
+.admin-user-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid #f3dada;
+  border-left: 1px solid #f3dada;
+}
+
+.admin-user-stat-grid.compact {
+  border-top: 0;
+}
+
+.admin-user-stat-grid span {
+  min-height: 72px;
+  padding: 12px;
+  border-right: 1px solid #f3dada;
+  border-bottom: 1px solid #f3dada;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  color: #704d4d;
+  font-size: 12px;
+  text-align: center;
+}
+
+.admin-user-stat-grid strong {
+  color: #b00020;
+  font-size: 16px;
+}
+
+.admin-shop-banner {
+  min-height: 112px;
+  border-radius: 8px 8px 0 0;
+  background: #b00020;
+  background-position: center;
+  background-size: cover;
+}
+
+.admin-shop-profile-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-shop-profile-body {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.admin-shop-logo {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  margin-top: -32px;
+  background: #fff;
+}
+
+.admin-shop-profile-card .admin-user-stat-grid {
+  margin: 0 20px 20px;
+}
+
+.admin-user-profile-card {
+  grid-template-columns: 120px minmax(0, 1fr) 176px;
+  gap: 22px;
+  align-items: start;
+  border-left: 4px solid #b00020;
+}
+
+.admin-user-media {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.admin-user-media .admin-product-badges {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-user-media .admin-status {
+  display: inline-flex;
+  justify-content: center;
+}
+
+.admin-user-profile-main {
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.admin-user-profile-title {
+  gap: 4px;
+}
+
+.admin-user-profile-title h2 {
+  font-size: 16px;
+}
+
+.admin-user-profile-title small {
+  color: #b00020;
+  font-weight: 800;
+}
+
+.admin-user-profile-divider {
+  height: 1px;
+  background: #f3dada;
+}
+
+.admin-user-info-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 34px;
+}
+
+.admin-user-info-matrix small {
+  display: block;
+  color: #806464;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-user-info-matrix strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: #2a1111;
+  font-size: 13px;
+}
+
+.admin-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-user-actions button {
+  min-height: 32px;
+  border: 1px solid #f0cccc;
+  border-radius: 8px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffaf9;
+  color: #5d4444;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-user-actions button.primary {
+  border-color: #b00020;
+  background: #b00020;
+  color: #fff;
+}
+
+.admin-user-actions button.danger {
+  background: #fff0f1;
+  color: #b00020;
+}
+
+.admin-user-actions button.is-loading svg,
+.admin-quick-actions button.is-loading svg {
+  animation: adminSpin 0.8s linear infinite;
+}
+
+.admin-user-stat-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: 0;
+}
+
+.admin-user-stat-grid.compact span {
+  min-height: 58px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff7f7;
+}
+
+.admin-user-shop-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.admin-shop-profile-card {
+  gap: 0;
+}
+
+.admin-shop-banner {
+  min-height: 118px;
+  border-radius: 0;
+}
+
+.admin-shop-profile-body {
+  grid-template-columns: 72px minmax(0, 1fr) 34px;
+  padding: 0 22px 10px;
+}
+
+.admin-shop-logo {
+  width: 72px;
+  height: 72px;
+  margin-top: -36px;
+}
+
+.admin-shop-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-shop-title h2 {
+  font-size: 15px;
+}
+
+.admin-shop-title svg {
+  color: #175cd3;
+  flex: 0 0 auto;
+}
+
+.admin-shop-more {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #5d4444;
+  cursor: pointer;
+}
+
+.admin-shop-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #f3dada;
+  border-left: 0;
+}
+
+.admin-shop-profile-card .admin-shop-stats {
+  margin: 10px 22px 18px;
+}
+
+.admin-shop-stats span {
+  border-right: 0;
+  min-height: 70px;
+}
+
+.admin-shop-meta-list {
+  display: grid;
+  gap: 10px;
+  padding: 0 22px 22px;
+}
+
+.admin-shop-meta-list div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  color: #704d4d;
+  font-size: 13px;
+}
+
+.admin-shop-meta-list strong {
+  justify-self: end;
+  color: #2a1111;
+  text-align: right;
+}
+
+.admin-shop-meta-list strong.success,
+.admin-shop-meta-list strong.category {
+  color: #027a48;
+}
+
+.admin-quick-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.admin-quick-panel h2 {
+  margin: 0;
+  color: #704d4d;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.admin-quick-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-quick-actions button {
+  min-height: 62px;
+  border: 1px solid #f0dddd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff7f7;
+  color: #2a1111;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-quick-actions svg {
+  color: #b00020;
+  flex: 0 0 auto;
+}
+

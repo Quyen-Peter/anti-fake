@@ -41,8 +41,11 @@ import PaymentFailedPage from "./components/payment/paymentFailed";
 import PaymentSuccess from "./components/payment/paymentSuccess";
 import AdminDashboardPage from "./pages/admin";
 import AdminUsersPage from "./pages/admin/users";
+import AdminUserDetailPage from "./pages/admin/users/detail";
 import AdminShopRegistrationsPage from "./pages/admin/shopRegistrations";
+import AdminShopVerificationDetailPage from "./pages/admin/shopRegistrations/detail";
 import AdminProductRegistrationsPage from "./pages/admin/productRegistrations";
+import AdminProductDetailPage from "./pages/admin/productRegistrations/detail";
 import AdminVouchersPage from "./pages/admin/vouchers";
 import AdminWithdrawRequestsPage from "./pages/admin/withdrawRequests";
 import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
@@ -141,13 +144,22 @@ function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboardPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="users/:userId" element={<AdminUserDetailPage />} />
               <Route
                 path="shop-registrations"
                 element={<AdminShopRegistrationsPage />}
               />
               <Route
+                path="shop-registrations/:shopId"
+                element={<AdminShopVerificationDetailPage />}
+              />
+              <Route
                 path="product-registrations"
                 element={<AdminProductRegistrationsPage />}
+              />
+              <Route
+                path="product-registrations/:offerId"
+                element={<AdminProductDetailPage />}
               />
               <Route path="vouchers" element={<AdminVouchersPage />} />
               <Route

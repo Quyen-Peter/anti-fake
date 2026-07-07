@@ -1,13 +1,7 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import "../../css/components/productManagement/createProduct.css";
+import { createOffer, type CreateOfferPayload } from "../../services/product.api";
 import {
   fetchShopCategories,
   getMyShop,
@@ -16,199 +10,235 @@ import {
 
 type CreateProductProps = {
   onCancel?: () => void;
+  onCreated?: () => void;
 };
 
-type ImageItem = {
-  id: string;
-  file: File;
-  preview: string;
-};
-
-type ProductForm = {
-  productImages: File[];
-  title: string;
-  categoryId: string;
-  brandId: string;
-  description: string;
-  descriptionImages: File[];
-  price: number;
-  currency: "VND";
-  salesMode: "RETAIL" | "WHOLESALE";
-  minWholesaleQty?: number;
-  availableQuantity: number;
-  itemCondition: "new" | "used";
+type ProductForm = Omit<
+  CreateOfferPayload,
+  | "price"
+  | "availableQuantity"
+  | "weightGrams"
+  | "lengthCm"
+  | "widthCm"
+  | "heightCm"
+> & {
+  price: string;
+  availableQuantity: string;
+  weightGrams: string;
+  lengthCm: string;
+  widthCm: string;
+  heightCm: string;
 };
 
 const MAX_PRODUCT_IMAGES = 4;
-const MAX_DESCRIPTION_IMAGES = 10;
 
 const initialForm: ProductForm = {
-  productImages: [],
-  title: "",
   categoryId: "",
   brandId: "",
+  title: "",
   description: "",
-  descriptionImages: [],
-  price: 0,
+  productImages: ["", "", "", ""],
+  price: "",
   currency: "VND",
-  salesMode: "RETAIL",
-  minWholesaleQty: undefined,
-  availableQuantity: 0,
   itemCondition: "new",
+  availableQuantity: "",
+  gtin: "",
+  model: "",
+  weightGrams: "",
+  lengthCm: "",
+  widthCm: "",
+  heightCm: "",
 };
 
-const normalizeMyShop = (data: any) => {
-  const payload = data?.data ?? data?.items ?? data;
+const normalizeMyShop = (data: unknown) => {
+  if (!data || typeof data !== "object") return null;
+  const record = data as Record<string, unknown>;
+  const payload = record.data ?? record.items ?? data;
+
   if (Array.isArray(payload)) return payload[0] ?? null;
-  return payload && typeof payload === "object" ? payload : null;
+  return payload && typeof payload === "object"
+    ? (payload as Record<string, unknown>)
+    : null;
 };
 
-export default function CreateProduct({ onCancel }: CreateProductProps) {
+const toPayloadNumber = (value: string) => Number(value || 0);
+
+const getErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
+
+const fileToDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Khong the doc file anh"));
+    reader.readAsDataURL(file);
+  });
+
+export default function CreateProduct({
+  onCancel,
+  onCreated,
+}: CreateProductProps) {
   const [form, setForm] = useState<ProductForm>(initialForm);
-  const [productImages, setProductImages] = useState<ImageItem[]>([]);
-  const [descriptionImageItems, setDescriptionImageItems] = useState<
-    ImageItem[]
-  >([]);
   const [categories, setCategories] = useState<ShopCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
-
-  const productImagesRef = useRef<ImageItem[]>([]);
-  const descriptionImagesRef = useRef<ImageItem[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    productImagesRef.current = productImages;
-    setForm((current) => ({
-      ...current,
-      productImages: productImages.map((image) => image.file),
-    }));
-  }, [productImages]);
+    let cancelled = false;
 
-  useEffect(() => {
-    descriptionImagesRef.current = descriptionImageItems;
-    setForm((current) => ({
-      ...current,
-      descriptionImages: descriptionImageItems.map((image) => image.file),
-    }));
-  }, [descriptionImageItems]);
-
-  useEffect(() => {
     const loadShopCategories = async () => {
       try {
         const shopData = await getMyShop();
         const shop = normalizeMyShop(shopData);
-        const shopId = shop?.shopId || shop?.id;
+        const shopId = shop?.shopId ?? shop?.id;
 
         if (!shopId) {
-          setCategories([]);
+          if (!cancelled) setCategories([]);
           return;
         }
 
         const data = await fetchShopCategories(String(shopId));
-        setCategories(data);
-      } catch (err: any) {
-        toast.error(err.message || "Không thể lấy danh mục cửa hàng");
+        if (!cancelled) setCategories(data);
+      } catch (error: unknown) {
+        toast.error(
+          getErrorMessage(error, "Không thể lấy danh mục cửa hàng"),
+        );
       } finally {
-        setLoadingCategories(false);
+        if (!cancelled) setLoadingCategories(false);
       }
     };
 
     loadShopCategories();
-  }, []);
 
-  useEffect(() => {
     return () => {
-      productImagesRef.current.forEach((image) =>
-        URL.revokeObjectURL(image.preview),
-      );
-      descriptionImagesRef.current.forEach((image) =>
-        URL.revokeObjectURL(image.preview),
-      );
+      cancelled = true;
     };
   }, []);
 
-  const createImageItems = (files: FileList | null) => {
-    if (!files) return [];
-
-    return Array.from(files)
-      .filter((file) => file.type.startsWith("image/"))
-      .map((file, index) => ({
-        id: `${Date.now()}-${file.name}-${index}`,
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-  };
-
-  const addImages = (
-    files: FileList | null,
-    currentCount: number,
-    maxImages: number,
-    setImages: Dispatch<SetStateAction<ImageItem[]>>,
+  const updateField = <K extends keyof ProductForm>(
+    field: K,
+    value: ProductForm[K],
   ) => {
-    const nextImages = createImageItems(files);
-    const availableSlots = maxImages - currentCount;
-    const acceptedImages = nextImages.slice(0, availableSlots);
-    const rejectedImages = nextImages.slice(availableSlots);
-
-    rejectedImages.forEach((image) => URL.revokeObjectURL(image.preview));
-    if (rejectedImages.length > 0) {
-      toast.warning(`Chỉ được tải tối đa ${maxImages} ảnh`);
-    }
-
-    setImages((currentImages) => [...currentImages, ...acceptedImages]);
+    setForm((current) => ({ ...current, [field]: value }));
   };
 
-  const handleProductImagesChange = (
+  const buildPayload = (): CreateOfferPayload => ({
+    ...form,
+    title: form.title.trim(),
+    description: form.description.trim(),
+    brandId: form.brandId.trim(),
+    gtin: form.gtin.trim(),
+    model: form.model.trim(),
+    productImages: form.productImages.map((image) => image.trim()).filter(Boolean),
+    price: toPayloadNumber(form.price),
+    availableQuantity: toPayloadNumber(form.availableQuantity),
+    weightGrams: toPayloadNumber(form.weightGrams),
+    lengthCm: toPayloadNumber(form.lengthCm),
+    widthCm: toPayloadNumber(form.widthCm),
+    heightCm: toPayloadNumber(form.heightCm),
+  });
+
+  const handleProductImagesChange = async (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
-    addImages(
-      event.target.files,
-      productImages.length,
-      MAX_PRODUCT_IMAGES,
-      setProductImages,
+    const files = Array.from(event.target.files ?? []).filter((file) =>
+      file.type.startsWith("image/"),
     );
     event.target.value = "";
+
+    if (files.length === 0) return;
+
+    const currentImages = form.productImages.filter(Boolean);
+    const availableSlots = MAX_PRODUCT_IMAGES - currentImages.length;
+
+    if (availableSlots <= 0) {
+      toast.warning(`Chỉ được chọn tối đa ${MAX_PRODUCT_IMAGES} ảnh`);
+      return;
+    }
+
+    const acceptedFiles = files.slice(0, availableSlots);
+    if (files.length > acceptedFiles.length) {
+      toast.warning(`Chỉ được chọn tối đa ${MAX_PRODUCT_IMAGES} ảnh`);
+    }
+
+    try {
+      const nextImages = await Promise.all(acceptedFiles.map(fileToDataUrl));
+      updateField("productImages", [...currentImages, ...nextImages]);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Không thể đọc ảnh sản phẩm"));
+    }
   };
 
-  const handleDescriptionImagesChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    addImages(
-      event.target.files,
-      descriptionImageItems.length,
-      MAX_DESCRIPTION_IMAGES,
-      setDescriptionImageItems,
+  const removeProductImage = (index: number) => {
+    const currentImages = form.productImages.filter(Boolean);
+    updateField(
+      "productImages",
+      currentImages.filter((_, currentIndex) => currentIndex !== index),
     );
-    event.target.value = "";
   };
 
-  const removeImage = (
-    imageId: string,
-    setImages: Dispatch<SetStateAction<ImageItem[]>>,
-  ) => {
-    setImages((currentImages) => {
-      const removedImage = currentImages.find((image) => image.id === imageId);
-      if (removedImage) URL.revokeObjectURL(removedImage.preview);
-      return currentImages.filter((image) => image.id !== imageId);
-    });
+  const validatePayload = (payload: CreateOfferPayload) => {
+    if (!payload.title || !payload.categoryId || !payload.brandId) {
+      return "Vui lòng nhập tên sản phẩm, danh mục và mã thương hiệu";
+    }
+
+    if (!payload.description) {
+      return "Vui lòng nhập mô tả sản phẩm";
+    }
+
+    if (payload.productImages.length === 0) {
+      return "Vui lòng thêm ít nhất một ảnh sản phẩm";
+    }
+
+    if (payload.productImages.length > MAX_PRODUCT_IMAGES) {
+      return `Chỉ được nhập tối đa ${MAX_PRODUCT_IMAGES} ảnh`;
+    }
+
+    if (payload.price <= 0) {
+      return "Giá sản phẩm phải lớn hơn 0";
+    }
+
+    if (payload.availableQuantity < 0) {
+      return "Số lượng có sẵn không được âm";
+    }
+
+    if (!payload.gtin || !payload.model) {
+      return "Vui lòng nhập GTIN và model sản phẩm";
+    }
+
+    if (
+      payload.weightGrams <= 0 ||
+      payload.lengthCm <= 0 ||
+      payload.widthCm <= 0 ||
+      payload.heightCm <= 0
+    ) {
+      return "Vui lòng nhập đầy đủ cân nặng và kích thước hợp lệ";
+    }
+
+    return "";
   };
 
-  const handleSubmit = () => {
-    if (form.productImages.length === 0) {
-      toast.error("Vui lòng thêm ít nhất một ảnh sản phẩm");
+  const handleSubmit = async () => {
+    const payload = buildPayload();
+    const validationError = validatePayload(payload);
+
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
-    if (!form.title.trim() || !form.categoryId || !form.brandId.trim()) {
-      toast.error("Vui lòng nhập đầy đủ thông tin cơ bản");
-      return;
-    }
+    setSubmitting(true);
 
-    if (!form.description.trim() || form.price <= 0 || form.availableQuantity < 0) {
-      toast.error("Vui lòng nhập đầy đủ mô tả, giá và số lượng");
-      return;
+    try {
+      await createOffer(payload);
+      toast.success("Tạo sản phẩm mới thành công");
+      onCreated?.();
+      onCancel?.();
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Không thể tạo sản phẩm mới"));
+    } finally {
+      setSubmitting(false);
     }
-
-    toast.success("Thông tin sản phẩm đã sẵn sàng để gửi API");
   };
 
   return (
@@ -226,14 +256,14 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
           <div className="form-group">
             <label className="required">Ảnh sản phẩm</label>
             <div className="upload-grid">
-              {productImages.map((image, index) => (
-                <div key={image.id} className="upload-preview">
-                  <img src={image.preview} alt={`Ảnh sản phẩm ${index + 1}`} />
+              {form.productImages.filter(Boolean).map((image, index) => (
+                <div key={index} className="upload-preview">
+                  <img src={image} alt={`Ảnh sản phẩm ${index + 1}`} />
                   <button
                     type="button"
                     className="upload-remove"
                     aria-label="Xóa ảnh sản phẩm"
-                    onClick={() => removeImage(image.id, setProductImages)}
+                    onClick={() => removeProductImage(index)}
                   >
                     x
                   </button>
@@ -241,10 +271,10 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 </div>
               ))}
 
-              {productImages.length < MAX_PRODUCT_IMAGES && (
+              {form.productImages.filter(Boolean).length < MAX_PRODUCT_IMAGES && (
                 <label className="upload-box">
                   <span>+</span>
-                  <span>Thêm ảnh</span>
+                  <span>Chọn ảnh</span>
                   <input
                     className="upload-input"
                     type="file"
@@ -255,7 +285,9 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 </label>
               )}
             </div>
-            <small>Tối đa 4 ảnh, ảnh đầu tiên là ảnh bìa</small>
+            <small>
+              Chọn tối đa 4 ảnh từ thư mục, ảnh đầu tiên là ảnh bìa.
+            </small>
           </div>
         </section>
 
@@ -265,10 +297,8 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
             <label className="required">Tên sản phẩm</label>
             <input
               value={form.title}
-              onChange={(event) =>
-                setForm({ ...form, title: event.target.value })
-              }
-              placeholder="Nhập tên sản phẩm..."
+              onChange={(event) => updateField("title", event.target.value)}
+              placeholder="Kem chống nắng SPF50 - lô 2026"
             />
           </div>
 
@@ -279,7 +309,7 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 value={form.categoryId}
                 disabled={loadingCategories}
                 onChange={(event) =>
-                  setForm({ ...form, categoryId: event.target.value })
+                  updateField("categoryId", event.target.value)
                 }
               >
                 <option value="">
@@ -297,73 +327,30 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
             </div>
 
             <div className="form-group">
-              <label className="required">Thương hiệu</label>
+              <label className="required">Mã thương hiệu</label>
               <input
                 value={form.brandId}
-                onChange={(event) =>
-                  setForm({ ...form, brandId: event.target.value })
-                }
-                placeholder="Nhập tên thương hiệu..."
+                onChange={(event) => updateField("brandId", event.target.value)}
+                placeholder="brand-id"
               />
             </div>
           </div>
-        </section>
 
-        <section className="create-section">
-          <h3>Mô tả</h3>
           <div className="form-group">
             <label className="required">Mô tả sản phẩm</label>
             <textarea
-              rows={8}
-              placeholder="Mô tả sản phẩm..."
+              rows={7}
               value={form.description}
               onChange={(event) =>
-                setForm({ ...form, description: event.target.value })
+                updateField("description", event.target.value)
               }
+              placeholder="Mô tả sản phẩm..."
             />
           </div>
-
-          <div className="description-upload">
-            {descriptionImageItems.length < MAX_DESCRIPTION_IMAGES && (
-              <label className="description-upload-btn">
-                + Thêm ảnh vào mô tả
-                <input
-                  className="upload-input"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleDescriptionImagesChange}
-                />
-              </label>
-            )}
-            <small className="create-product-help">
-              Tối đa 10 ảnh mô tả
-            </small>
-          </div>
-
-          {descriptionImageItems.length > 0 && (
-            <div className="description-images">
-              {descriptionImageItems.map((image, index) => (
-                <div key={image.id} className="description-image">
-                  <img src={image.preview} alt={`Ảnh mô tả ${index + 1}`} />
-                  <button
-                    type="button"
-                    className="upload-remove"
-                    aria-label="Xóa ảnh mô tả"
-                    onClick={() =>
-                      removeImage(image.id, setDescriptionImageItems)
-                    }
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </section>
 
         <section className="create-section">
-          <h3>Bán hàng</h3>
+          <h3>Giá bán và kho</h3>
           <div className="grid-3">
             <div className="form-group">
               <label className="required">Giá</label>
@@ -372,7 +359,7 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 min={0}
                 value={form.price}
                 onChange={(event) =>
-                  setForm({ ...form, price: Number(event.target.value) })
+                  updateField("price", event.target.value)
                 }
               />
             </div>
@@ -391,62 +378,42 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 min={0}
                 value={form.availableQuantity}
                 onChange={(event) =>
-                  setForm({
-                    ...form,
-                    availableQuantity: Number(event.target.value),
-                  })
+                  updateField("availableQuantity", event.target.value)
                 }
               />
             </div>
           </div>
-
-          <div className="grid-2">
-            <div className="form-group">
-              <label>Hình thức bán</label>
-              <select
-                value={form.salesMode}
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    salesMode: event.target.value as ProductForm["salesMode"],
-                    minWholesaleQty:
-                      event.target.value === "WHOLESALE" ? 1 : undefined,
-                  })
-                }
-              >
-                <option value="RETAIL">Bán lẻ</option>
-                <option value="WHOLESALE">Bán sỉ</option>
-              </select>
-            </div>
-
-            {form.salesMode === "WHOLESALE" && (
-              <div className="form-group">
-                <label>Số lượng bán sỉ tối thiểu</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={form.minWholesaleQty ?? 1}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      minWholesaleQty: Number(event.target.value),
-                    })
-                  }
-                />
-              </div>
-            )}
-          </div>
         </section>
 
         <section className="create-section">
-          <h3>Tình trạng</h3>
+          <h3>Nhận diện sản phẩm</h3>
+          <div className="grid-2">
+            <div className="form-group">
+              <label className="required">GTIN</label>
+              <input
+                value={form.gtin}
+                onChange={(event) => updateField("gtin", event.target.value)}
+                placeholder="8930000000141"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required">Model</label>
+              <input
+                value={form.model}
+                onChange={(event) => updateField("model", event.target.value)}
+                placeholder="Kem chống nắng SPF50"
+              />
+            </div>
+          </div>
+
           <div className="create-product-choice-group">
             <label className="create-product-choice">
               <input
                 type="radio"
                 name="itemCondition"
                 checked={form.itemCondition === "new"}
-                onChange={() => setForm({ ...form, itemCondition: "new" })}
+                onChange={() => updateField("itemCondition", "new")}
               />
               <span>Mới</span>
             </label>
@@ -455,21 +422,84 @@ export default function CreateProduct({ onCancel }: CreateProductProps) {
                 type="radio"
                 name="itemCondition"
                 checked={form.itemCondition === "used"}
-                onChange={() => setForm({ ...form, itemCondition: "used" })}
+                onChange={() => updateField("itemCondition", "used")}
               />
               <span>Đã qua sử dụng</span>
             </label>
           </div>
         </section>
 
+        <section className="create-section">
+          <h3>Vận chuyển</h3>
+          <div className="grid-4">
+            <div className="form-group">
+              <label className="required">Cân nặng (gram)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.weightGrams}
+                onChange={(event) =>
+                  updateField("weightGrams", event.target.value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required">Dài (cm)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.lengthCm}
+                onChange={(event) =>
+                  updateField("lengthCm", event.target.value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required">Rộng (cm)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.widthCm}
+                onChange={(event) =>
+                  updateField("widthCm", event.target.value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="required">Cao (cm)</label>
+              <input
+                type="number"
+                min={0}
+                value={form.heightCm}
+                onChange={(event) =>
+                  updateField("heightCm", event.target.value)
+                }
+              />
+            </div>
+          </div>
+        </section>
+
         <footer className="create-footer">
           <p>Kiểm tra lại thông tin trước khi xác nhận đăng sản phẩm.</p>
           <div>
-            <button className="btn-outline" type="button" onClick={onCancel}>
+            <button
+              className="btn-outline"
+              type="button"
+              disabled={submitting}
+              onClick={onCancel}
+            >
               Hủy
             </button>
-            <button className="btn-primary" type="button" onClick={handleSubmit}>
-              Xác nhận đăng sản phẩm
+            <button
+              className={`btn-primary ${submitting ? "btn-loading" : ""}`}
+              type="button"
+              disabled={submitting}
+              onClick={handleSubmit}
+            >
+              {submitting ? "Đang tạo..." : "Xác nhận đăng sản phẩm"}
             </button>
           </div>
         </footer>

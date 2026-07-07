@@ -1,4 +1,5 @@
 import "../../css/components/common/confirmModal.css";
+import { LoaderCircle } from "lucide-react";
 import LoadingOverlay from "../loadingOverlay";
 
 interface Props {
@@ -133,13 +134,12 @@ export default function ConfirmModal({
               danger
                 ? "confirm-submit-danger"
                 : ""
-            }`}
+            } ${loading ? "is-loading" : ""}`}
             onClick={onConfirm}
             disabled={loading}
           >
-            {loading
-              ? "Đang xử lý..."
-              : confirmText}
+            {loading && <LoaderCircle size={15} />}
+            {loading ? "Đang xử lý..." : confirmText}
           </button>
         </div>
       </div>

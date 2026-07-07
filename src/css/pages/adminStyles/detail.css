@@ -1,0 +1,369 @@
+.admin-detail-page {
+  max-width: 1180px;
+}
+
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #9b0019;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-detail-main,
+.admin-detail-side {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-detail-panel,
+.admin-detail-section {
+  border: 1px solid #f0cccc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.admin-detail-panel {
+  padding: 20px;
+}
+
+.admin-shop-summary-top,
+.admin-detail-section-head,
+.admin-legal-item,
+.admin-legal-content,
+.admin-legal-title {
+  display: flex;
+  align-items: center;
+}
+
+.admin-shop-summary-top {
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #f3dada;
+}
+
+.admin-shop-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-shop-identity > span,
+.admin-legal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: #ffe8e8;
+  color: #b00020;
+}
+
+.admin-shop-identity h2,
+.admin-detail-section-head h2 {
+  margin: 0;
+}
+
+.admin-shop-identity h2 {
+  font-size: 20px;
+}
+
+.admin-shop-identity small,
+.admin-detail-info-item small,
+.admin-owner-card small,
+.admin-legal-title small,
+.admin-legal-files small {
+  color: #806464;
+  font-size: 12px;
+}
+
+.admin-detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 18px;
+}
+
+.admin-detail-info-item {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-detail-info-item svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #b00020;
+}
+
+.admin-detail-info-item strong {
+  display: block;
+  margin-top: 4px;
+  color: #2a1111;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.admin-detail-section {
+  overflow: hidden;
+}
+
+.admin-detail-section-head {
+  gap: 8px;
+  padding-bottom: 14px;
+}
+
+.admin-detail-section > .admin-detail-section-head {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid #f3dada;
+}
+
+.admin-detail-section-head svg {
+  color: #b00020;
+}
+
+.admin-detail-section-head h2 {
+  font-size: 15px;
+}
+
+.admin-document-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.admin-document-preview {
+  overflow: hidden;
+  border: 1px solid #f1d6d6;
+  border-radius: 8px;
+  background: #fff9f9;
+}
+
+.admin-document-preview-head {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1d6d6;
+}
+
+.admin-document-preview-head strong {
+  font-size: 13px;
+}
+
+.admin-document-preview a {
+  display: block;
+}
+
+.admin-document-preview img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  display: block;
+  object-fit: cover;
+  background: #f4eeee;
+}
+
+.admin-document-empty,
+.admin-detail-state {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: 22px;
+  color: #806464;
+  background: #fff7f7;
+  text-align: center;
+}
+
+.admin-detail-state {
+  border: 1px solid #f0cccc;
+  border-radius: 8px;
+}
+
+.admin-detail-state.error {
+  color: #b00020;
+}
+
+.admin-legal-list {
+  display: grid;
+}
+
+.admin-legal-item {
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #f3dada;
+}
+
+.admin-legal-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-legal-content {
+  flex: 1;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-legal-title {
+  min-width: 160px;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-legal-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.admin-legal-files a {
+  min-height: 30px;
+  border: 1px solid #efd0d0;
+  border-radius: 8px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #9b0019;
+  background: #fff6f6;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-owner-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px 0 18px;
+  border-bottom: 1px solid #f3dada;
+  text-align: center;
+}
+
+.admin-owner-card img,
+.admin-owner-card > span {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+}
+
+.admin-owner-card img {
+  object-fit: cover;
+}
+
+.admin-owner-card > span {
+  display: grid;
+  place-items: center;
+  background: #b00020;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.admin-owner-meta {
+  display: grid;
+  gap: 14px;
+  padding-top: 16px;
+}
+
+.admin-category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-category-tags span {
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff0f1;
+  color: #704d4d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-review-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-review-note {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-review-note span {
+  color: #704d4d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-review-note textarea {
+  width: 100%;
+  min-height: 104px;
+  border: 1px solid #efd0d0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  resize: vertical;
+  color: #2a1111;
+  background: #fffdfd;
+  font: inherit;
+}
+
+.admin-review-note textarea:focus {
+  outline: none;
+  border-color: #b00020;
+  box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);
+}
+
+.admin-review-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-review-actions button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-review-actions button.approve {
+  background: #027a48;
+}
+
+.admin-review-actions button.reject {
+  background: #b00020;
+}
+
+.admin-review-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+

@@ -26,11 +26,19 @@ type Product = {
 
 const PAGE_SIZE = 20;
 
-const normalizeMyShop = (data: any) => {
-  const payload = data?.data ?? data?.items ?? data;
+const normalizeMyShop = (data: unknown) => {
+  if (!data || typeof data !== "object") return null;
+  const record = data as Record<string, unknown>;
+  const payload = record.data ?? record.items ?? data;
+
   if (Array.isArray(payload)) return payload[0] ?? null;
-  return payload && typeof payload === "object" ? payload : null;
+  return payload && typeof payload === "object"
+    ? (payload as Record<string, unknown>)
+    : null;
 };
+
+const getErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
 
 const formatCurrency = (value?: number, currency = "VND") =>
   typeof value === "number"
@@ -111,6 +119,7 @@ export default function ProductManagement() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [createVersion, setCreateVersion] = useState(0);
 
   useEffect(() => {
     const loadShop = async () => {
@@ -126,8 +135,8 @@ export default function ProductManagement() {
         }
 
         setShopId(String(nextShopId));
-      } catch (err: any) {
-        setError(err.message || "Khong the tai thong tin cua hang");
+      } catch (err: unknown) {
+        setError(getErrorMessage(err, "Khong the tai thong tin cua hang"));
         setLoading(false);
       }
     };
@@ -154,17 +163,17 @@ export default function ProductManagement() {
             mapOfferToProduct(offer, categoryData),
           ),
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
         setCategories([]);
         setProducts([]);
-        setError(err.message || "Khong the tai danh sach san pham");
+        setError(getErrorMessage(err, "Khong the tai danh sach san pham"));
       } finally {
         setLoading(false);
       }
     };
 
     loadProducts();
-  }, [shopId]);
+  }, [shopId, createVersion]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -337,7 +346,10 @@ export default function ProductManagement() {
             </div>
 
             <div className="create-product-body">
-              <CreateProduct onCancel={() => setOpenCreateProduct(false)} />
+              <CreateProduct
+                onCancel={() => setOpenCreateProduct(false)}
+                onCreated={() => setCreateVersion((current) => current + 1)}
+              />
             </div>
           </div>
         </div>

@@ -1,0 +1,101 @@
+@media (max-width: 1024px) {
+  .admin-stat-grid,
+  .admin-management-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-profile-top {
+    grid-template-columns: 86px minmax(0, 1fr);
+  }
+
+  .admin-user-stat-grid.compact {
+    grid-column: 1 / -1;
+  }
+
+  .admin-user-profile-card,
+  .admin-user-shop-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    display: block;
+  }
+
+  .admin-content {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 22px 14px;
+  }
+
+  .admin-page-heading,
+  .admin-table-toolbar {
+    flex-direction: column;
+  }
+
+  .admin-stat-grid,
+  .admin-management-grid,
+  .admin-detail-info-grid,
+  .admin-document-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-legal-content,
+  .admin-legal-item {
+    flex-direction: column;
+  }
+
+  .admin-legal-files {
+    justify-content: flex-start;
+  }
+
+  .admin-primary-btn,
+  .admin-table-toolbar select {
+    width: 100%;
+  }
+
+  .admin-product-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-product-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-user-profile-top,
+  .admin-shop-profile-body,
+  .admin-user-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-avatar,
+  .admin-shop-logo {
+    margin: 0;
+  }
+
+  .admin-shop-profile-body {
+    padding: 0 18px;
+  }
+
+  .admin-user-info-matrix,
+  .admin-user-stat-grid.compact,
+  .admin-shop-stats,
+  .admin-shop-meta-list div {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shop-meta-list strong {
+    justify-self: start;
+    text-align: left;
+  }
+}
+

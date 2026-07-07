@@ -1,0 +1,125 @@
+.admin-product-summary {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-product-hero {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-product-cover {
+  aspect-ratio: 1;
+  border: 1px solid #f1d6d6;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff7f7;
+  color: #806464;
+}
+
+.admin-product-cover img,
+.admin-product-gallery img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.admin-product-title {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-product-title h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.admin-product-title small {
+  color: #806464;
+  overflow-wrap: anywhere;
+}
+
+.admin-product-title > strong {
+  color: #b00020;
+  font-size: 22px;
+}
+
+.admin-product-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-product-description {
+  margin: 0;
+  color: #5d4444;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.admin-product-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+.admin-product-gallery a {
+  aspect-ratio: 1;
+  border: 1px solid #f1d6d6;
+  border-radius: 8px;
+  display: block;
+  overflow: hidden;
+  background: #fff7f7;
+}
+
+.admin-product-specs {
+  padding: 18px;
+}
+
+.admin-status-panel .admin-detail-section-head {
+  padding-bottom: 0;
+}
+
+.admin-status-form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-status-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-status-form span {
+  color: #704d4d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-status-form select {
+  height: 38px;
+  border: 1px solid #efd0d0;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fffdfd;
+  color: #2a1111;
+}
+
+.admin-status-form button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: #b00020;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+

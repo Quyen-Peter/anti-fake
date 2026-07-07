@@ -1,5 +1,6 @@
 import { Eye, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import {
   fetchAdminOffers,
@@ -236,12 +237,12 @@ export default function AdminProductRegistrationsPage() {
                       <td>{formatDate(offer.createdAt)}</td>
                       <td>
                         <div className="admin-table-actions">
-                          <button
-                            type="button"
+                          <Link
+                            to={`/admin/product-registrations/${offer.id}`}
                             aria-label={`Xem chi tiết ${offer.title}`}
                           >
                             <Eye size={16} />
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>

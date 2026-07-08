@@ -13,13 +13,14 @@ import {
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import {
   fetchAdminUserDetail,
   type AdminUserDetail,
 } from "../../../services/admin.api";
+import { createUserChatThread } from "../../../services/chat.api";
 
 const formatDate = (value?: string) => {
   if (!value) return "--";
@@ -94,9 +95,11 @@ const getMediaUrl = (media: unknown) => {
 
 export default function AdminUserDetailPage() {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<AdminUserDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [startingChat, setStartingChat] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -129,6 +132,29 @@ export default function AdminUserDetailPage() {
   const shopLogo = getMediaUrl(shop?.logo);
   const shopBanner = getMediaUrl(shop?.banner);
   const joinedAt = user?.joinedAt || user?.createdAt;
+
+  const startChatWithUser = async () => {
+    if (!user?.id || startingChat) return;
+
+    setStartingChat(true);
+
+    try {
+      const response = await createUserChatThread(user.id);
+
+      if (response.success && response.threadId) {
+        navigate(`/admin/chat/${response.threadId}`);
+        return;
+      }
+
+      toast.error("Không thể mở cuộc trò chuyện");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Không thể mở cuộc trò chuyện";
+      toast.error(message);
+    } finally {
+      setStartingChat(false);
+    }
+  };
 
   return (
     <section className="admin-page admin-detail-page">
@@ -211,6 +237,14 @@ export default function AdminUserDetailPage() {
                 <button type="button" className="danger">
                   <Ban size={13} />
                   Cấm
+                </button>
+                <button
+                  type="button"
+                  onClick={startChatWithUser}
+                  disabled={startingChat}
+                >
+                  <MessageSquare size={13} />
+                  {startingChat ? "Đang mở..." : "Nhắn tin"}
                 </button>
               </div>
             </div>

@@ -39,6 +39,13 @@ export default function ProductDetail() {
   const [totalReview, setTotalReview] = useState(0);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<ProductView[]>([]);
+  const shopId =
+    shop?.shopId ||
+    shop?.id ||
+    product?.shopId ||
+    product?.shop?.shopId ||
+    product?.shop?.id ||
+    "";
 
 
   useEffect(() => {
@@ -123,17 +130,22 @@ export default function ProductDetail() {
     loadRelatedProducts();
   }, [product?.categoryId, product?.id]);
 
-  const getOrCreateChatThread = async (shopId: string) => {
+  const getOrCreateChatThread = async (targetShopId: string) => {
+    if (!targetShopId) {
+      console.error("Missing shopId when creating chat thread", shop);
+      return;
+    }
+
     try {
 
       showLoading("Đang mở cuộc trò chuyện...");
-      const response = await getShopChatThread(shopId);
+      const response = await getShopChatThread(targetShopId);
 
       if (!response?.success || !response?.threadId) {
         throw new Error("Không thể tạo cuộc trò chuyện");
       }
 
-      navigate(`/messages/${response.threadId}`);
+      navigate(`/chat/${response.threadId}`);
 
       return;
     } catch (error: any) {
@@ -173,13 +185,14 @@ export default function ProductDetail() {
         <div className="pd-shop-right">
           <button
             className="pd-chat-btn"
-            onClick={() => getOrCreateChatThread(shop.id)}
+            disabled={!shopId}
+            onClick={() => getOrCreateChatThread(shopId)}
           >
             <MessageCircle size={18} />
             <span>Nhắn tin</span>
           </button>
 
-          <button className="pd-view-shop-btn" onClick={() => navigate(`/shop/${shop.id}`)}>
+          <button className="pd-view-shop-btn" disabled={!shopId} onClick={() => navigate(`/shop/${shopId}`)}>
             <Store size={18} />
             <span>Xem Shop</span>
           </button>

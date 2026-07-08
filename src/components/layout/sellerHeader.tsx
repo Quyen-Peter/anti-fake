@@ -194,17 +194,31 @@ export default function SellerHeader() {
             <BarChart3 size={18} />
             <span>Thống kê</span>
           </NavLink>
+
+          <NavLink
+            to="chat"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
+            <MessageSquareText size={18} />
+            <span>Chat</span>
+          </NavLink>
         </nav>
       </div>
 
       <div className="seller-header-right">
-        <div
+        <button
+          type="button"
           className="seller-header-icon"
-          
+          onClick={() => navigate("/seller/chat")}
+          aria-label="Chat"
         >
           <MessageSquareText size={22} />
           <span className="seller-header-badge">3</span>
-        </div>
+        </button>
 
         <div className="seller-header-icon">
           <Bell size={22} />

@@ -1,3 +1,8 @@
+.app-container:has(.admin-layout) {
+  margin: 0;
+  padding-bottom: 0;
+}
+
 .admin-layout {
   min-height: 100vh;
   background: #fff7f6;
@@ -28,6 +33,11 @@
   margin-left: 240px;
   padding: 36px;
   overflow: auto;
+}
+
+.admin-content-chat {
+  padding: 0;
+  overflow: hidden;
 }
 
 .admin-page {

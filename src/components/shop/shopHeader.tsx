@@ -31,7 +31,7 @@ export default function ShopHeader({ shop }: Props) {
         throw new Error("Không thể tạo cuộc trò chuyện");
       }
 
-      navigate(`/messages/${response.threadId}`);
+      navigate(`/chat/${response.threadId}`);
 
       return;
     } catch (error: any) {

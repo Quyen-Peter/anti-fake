@@ -1,10 +1,14 @@
-import { Eye, Clock3 } from "lucide-react";
+import { Clock3, Eye, MessageSquare } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import "../../css/components/orderManagement/orderCard.css";
+import { createUserChatThread } from "../../services/chat.api";
 
 interface Props {
   order: {
     id: string;
+    customerId?: string;
     customer: string;
     email: string;
     date: string;
@@ -15,6 +19,7 @@ interface Props {
 
 export default function OrderCard({ order }: Props) {
   const navigate = useNavigate();
+  const [startingChat, setStartingChat] = useState(false);
 
   const getStatus = () => {
     switch (order.status) {
@@ -54,6 +59,29 @@ export default function OrderCard({ order }: Props) {
   const status = getStatus();
   const orderId = encodeURIComponent(order.id.replace("#", ""));
 
+  const startChatWithCustomer = async () => {
+    if (!order.customerId || startingChat) return;
+
+    setStartingChat(true);
+
+    try {
+      const response = await createUserChatThread(order.customerId);
+
+      if (response.success && response.threadId) {
+        navigate(`/seller/chat/${response.threadId}`);
+        return;
+      }
+
+      toast.error("Không thể mở cuộc trò chuyện");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Không thể mở cuộc trò chuyện";
+      toast.error(message);
+    } finally {
+      setStartingChat(false);
+    }
+  };
+
   return (
     <div className="seller-mobile-order-card">
       <div className="seller-mobile-order-header">
@@ -80,6 +108,14 @@ export default function OrderCard({ order }: Props) {
             onClick={() => navigate(`/seller/orders/${orderId}`)}
           >
             <Eye size={18} />
+          </button>
+          <button
+            type="button"
+            aria-label="Nhắn tin với khách hàng"
+            disabled={!order.customerId || startingChat}
+            onClick={startChatWithCustomer}
+          >
+            <MessageSquare size={18} />
           </button>
         </div>
       </div>

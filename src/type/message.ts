@@ -10,6 +10,7 @@ export interface ChatRoom {
   id: string;
   chatUserID: string;
   chatUserName: string;
+  chatUserAvatar: string;
   lastMessage: LastMessage[];
   createdAt: string;
 }

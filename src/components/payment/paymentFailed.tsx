@@ -77,7 +77,7 @@ export default function PaymentFailedPage() {
           <button
             type="button"
             className="payment-help-btn"
-            onClick={() => navigate("/messages")}
+            onClick={() => navigate("/chat")}
           >
             <Headphones size={18} />
             Liên hệ hỗ trợ

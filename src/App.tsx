@@ -6,7 +6,7 @@ import ProfilePage from "./pages/profile";
 import AffiliatePage from "./pages/affiliate";
 import CartPage from "./pages/cart";
 import NotificationPage from "./pages/notification";
-import MessagePage from "./pages/message";
+import UserChatPage from "./pages/user/ChatPage";
 import QRPage from "./pages/qr";
 import SearchPage from "./pages/search";
 import WishlistPage from "./pages/wishlish";
@@ -34,6 +34,7 @@ import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
 import SellerShopInfo from "./seller/shopInfo";
 import SellerBusinessInfo from "./seller/businessInfo";
+import SellerChatPage from "./seller/ChatPage";
 import ProfileAddress from "./pages/profile/addressPage";
 import SellerOrderDetail from "./components/orderManagement/orderDetail";
 import SellerRegistration from "./components/sellerRegistration/sellerRegistration";
@@ -49,12 +50,25 @@ import AdminProductRegistrationsPage from "./pages/admin/productRegistrations";
 import AdminProductDetailPage from "./pages/admin/productRegistrations/detail";
 import AdminVouchersPage from "./pages/admin/vouchers";
 import AdminWithdrawRequestsPage from "./pages/admin/withdrawRequests";
+import AdminChatPage from "./pages/admin/ChatPage";
 import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
 
   useEffect(() => {
+    const isChatRoute =
+      pathname === "/chat" ||
+      pathname.startsWith("/chat/") ||
+      pathname === "/seller/chat" ||
+      pathname.startsWith("/seller/chat/") ||
+      pathname === "/admin/chat" ||
+      pathname.startsWith("/admin/chat/");
+
+    if (isChatRoute) {
+      return;
+    }
+
     // Scroll ve dau trang moi khi nguoi dung vao route hoac query moi.
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname, search]);
@@ -109,11 +123,27 @@ function App() {
                 path="/messages"
                 element={
                   <ProtectedRoute>
-                    <MessagePage />
+                    <UserChatPage />
                   </ProtectedRoute>
                 }
               />
-              <Route path="/messages/:roomId" element={<MessagePage />} />
+              <Route
+                path="/chat"
+                element={
+                  <ProtectedRoute>
+                    <UserChatPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/chat/:roomId"
+                element={
+                  <ProtectedRoute>
+                    <UserChatPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/messages/:roomId" element={<UserChatPage />} />
               <Route path="/qr" element={<QRPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
@@ -140,6 +170,8 @@ function App() {
               <Route path="wallet" element={<SellerWallet />} />
               <Route path="shop-info" element={<SellerShopInfo />} />
               <Route path="business-info" element={<SellerBusinessInfo />} />
+              <Route path="chat" element={<SellerChatPage />} />
+              <Route path="chat/:roomId" element={<SellerChatPage />} />
             </Route>
 
             {/* admin */}
@@ -164,6 +196,8 @@ function App() {
                 element={<AdminProductDetailPage />}
               />
               <Route path="vouchers" element={<AdminVouchersPage />} />
+              <Route path="chat" element={<AdminChatPage />} />
+              <Route path="chat/:roomId" element={<AdminChatPage />} />
               <Route
                 path="withdraw-requests"
                 element={<AdminWithdrawRequestsPage />}

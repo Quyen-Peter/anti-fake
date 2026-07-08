@@ -11,10 +11,7 @@ export default function ChatHeader({ room }: Props) {
 
   return (
     <div className="chat-header">
-      <button
-        className="chat-back-btn"
-        onClick={() => navigate("/messages")}
-      >
+      <button className="chat-back-btn" onClick={() => navigate("/chat")}>
         <ArrowLeft size={20} />
       </button>
 

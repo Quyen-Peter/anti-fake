@@ -4,6 +4,7 @@ import {
   FileCheck2,
   LayoutDashboard,
   LogOut,
+  MessageSquareText,
   ShieldCheck,
   TicketPercent,
   Users,
@@ -43,6 +44,11 @@ const adminMenus = [
     label: "Yêu cầu rút tiền của shop",
     path: "/admin/withdraw-requests",
     icon: Banknote,
+  },
+  {
+    label: "Chat",
+    path: "/admin/chat",
+    icon: MessageSquareText,
   },
 ];
 

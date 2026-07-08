@@ -1,8 +1,19 @@
 import { authFetch } from "../ultil/auth";
+import type { ChatRoom } from "../type/message";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const fetchChatThreads = async () => {
+type ChatMessagesResponse = {
+  id?: string;
+  messages?: unknown[];
+};
+
+export type ChatThreadResponse = {
+  success: boolean;
+  threadId: string;
+};
+
+export const fetchChatThreads = async (): Promise<ChatRoom[]> => {
   const response = await authFetch(
     `${BASE_URL}/api/chat/threads`,
     {
@@ -25,7 +36,7 @@ export const fetchChatThreads = async () => {
 export const getChatMessages = async (
   threadId: string,
   limit = 20
-) => {
+): Promise<ChatMessagesResponse> => {
 
   const response = await authFetch(
     `${BASE_URL}/api/chat/threads/${threadId}?limit=${limit}`,
@@ -45,9 +56,9 @@ export const getChatMessages = async (
 };
 
 
-export const getShopChatThread = async (
+export const createShopChatThread = async (
   shopId: string,
-) => {
+): Promise<ChatThreadResponse> => {
   const response = await authFetch(
     `${BASE_URL}/api/shops/${shopId}/chat-thread`,
     {
@@ -64,6 +75,29 @@ export const getShopChatThread = async (
 
   const data = await response.json();
   return data;
+};
+
+export const getShopChatThread = createShopChatThread;
+
+
+export const createUserChatThread = async (
+  userId: string,
+): Promise<ChatThreadResponse> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/users/${userId}/chat-thread`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Không thể tạo cuộc trò chuyện");
+  }
+
+  return await response.json();
 };
 
 

@@ -13,6 +13,7 @@ import { getMyShop } from "../../services/shop.api";
 
 type ViewOrder = {
   id: string;
+  customerId: string;
   customer: string;
   email: string;
   date: string;
@@ -53,6 +54,7 @@ const formatDate = (value?: string) => {
 
 const mapOrder = (order: SellerOrder): ViewOrder => ({
   id: order.orderId,
+  customerId: order.customer?.id || "",
   customer: order.customer?.name || "Khach hang",
   email: order.customer?.email || "",
   date: formatDate(order.createdAt || order.orderDate || order.createdDate),

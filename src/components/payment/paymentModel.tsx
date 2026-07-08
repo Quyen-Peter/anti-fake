@@ -205,7 +205,7 @@ export default function PaymentModel({
               <button
                 type="button"
                 className="payment-support-btn"
-                onClick={onSupport ?? (() => navigate("/messages"))}
+                onClick={onSupport ?? (() => navigate("/chat"))}
               >
                 <CircleHelp size={18} />
                 Cần hỗ trợ?

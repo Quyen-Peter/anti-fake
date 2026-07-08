@@ -1,10 +1,14 @@
-import { ClipboardList, Eye } from "lucide-react";
+import { ClipboardList, Eye, MessageSquare } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import "../../css/components/orderManagement/orderTable.css";
 import EmptyState from "../common/emptyState";
+import { createUserChatThread } from "../../services/chat.api";
 
 interface Order {
   id: string;
+  customerId?: string;
   customer: string;
   email: string;
   date: string;
@@ -18,6 +22,30 @@ interface Props {
 
 export default function OrderTable({ orders }: Props) {
   const navigate = useNavigate();
+  const [startingChatUserId, setStartingChatUserId] = useState("");
+
+  const startChatWithCustomer = async (customerId: string) => {
+    if (!customerId || startingChatUserId) return;
+
+    setStartingChatUserId(customerId);
+
+    try {
+      const response = await createUserChatThread(customerId);
+
+      if (response.success && response.threadId) {
+        navigate(`/seller/chat/${response.threadId}`);
+        return;
+      }
+
+      toast.error("Không thể mở cuộc trò chuyện");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Không thể mở cuộc trò chuyện";
+      toast.error(message);
+    } finally {
+      setStartingChatUserId("");
+    }
+  };
 
   const getStatus = (status: string) => {
     switch (status) {
@@ -114,6 +142,21 @@ export default function OrderTable({ orders }: Props) {
                     onClick={() => navigate(`/seller/orders/${orderId}`)}
                   >
                     <Eye size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Nhắn tin với khách hàng"
+                    disabled={
+                      !order.customerId ||
+                      startingChatUserId === order.customerId
+                    }
+                    onClick={() => {
+                      if (order.customerId) {
+                        startChatWithCustomer(order.customerId);
+                      }
+                    }}
+                  >
+                    <MessageSquare size={16} />
                   </button>
                 </div>
               </td>

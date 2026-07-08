@@ -138,7 +138,7 @@ export default function Header() {
 
           <span className="badge">4</span>
         </Link>
-        <Link to="/messages" className="icon-btn">
+        <Link to="/chat" className="icon-btn">
           <MessageSquareText size={22} />
           <span className="badge">3</span>
         </Link>

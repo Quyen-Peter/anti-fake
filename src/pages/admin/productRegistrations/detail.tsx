@@ -18,12 +18,16 @@ import {
   fetchOfferDetail,
   type OfferDetail,
 } from "../../../services/product.api";
+import {
+  updateAdminOfferModerationStatus,
+  type AdminOfferModerationStatus,
+} from "../../../services/admin.api";
 
-const statusOptions = [
-  { value: "active", label: "Đang mở bán" },
-  { value: "inactive", label: "Tạm ngưng bán" },
-  { value: "draft", label: "Bản nháp" },
-  { value: "banned", label: "Bị khóa" },
+const statusOptions: Array<{ value: AdminOfferModerationStatus; label: string }> = [
+  { value: "pending", label: "Chờ duyệt" },
+  { value: "approved", label: "Đã duyệt" },
+  { value: "rejected", label: "Từ chối" },
+  { value: "banned", label: "Bị cấm" },
 ];
 
 const getStatusType = (status?: string) => {
@@ -89,8 +93,11 @@ function InfoItem({
 export default function AdminProductDetailPage() {
   const { offerId } = useParams();
   const [offer, setOffer] = useState<OfferDetail | null>(null);
-  const [nextStatus, setNextStatus] = useState("active");
+  const [nextStatus, setNextStatus] =
+    useState<AdminOfferModerationStatus>("pending");
+  const [moderationReason, setModerationReason] = useState("");
   const [loading, setLoading] = useState(true);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -103,7 +110,11 @@ export default function AdminProductDetailPage() {
       try {
         const data = await fetchOfferDetail(offerId);
         setOffer(data);
-        setNextStatus(data.offerStatus || "active");
+        setNextStatus(
+          (data.moderationStatus as AdminOfferModerationStatus | undefined) ||
+            "pending",
+        );
+        setModerationReason(data.moderationReason || "");
       } catch (err: unknown) {
         const message =
           err instanceof Error
@@ -126,8 +137,43 @@ export default function AdminProductDetailPage() {
     return Array.from(new Set(images));
   }, [offer]);
 
-  const handleStatusUpdate = () => {
-    toast.info("Chưa có API cập nhật trạng thái sản phẩm để kết nối.");
+  const handleStatusUpdate = async () => {
+    if (!offerId || updatingStatus) return;
+
+    const reason = moderationReason.trim();
+    if ((nextStatus === "rejected" || nextStatus === "banned") && !reason) {
+      toast.error("Vui lòng nhập lý do khi từ chối hoặc cấm sản phẩm");
+      return;
+    }
+
+    setUpdatingStatus(true);
+
+    try {
+      const updatedOffer = await updateAdminOfferModerationStatus(offerId, {
+        moderationStatus: nextStatus,
+        moderationReason: reason,
+      });
+
+      setOffer((currentOffer) =>
+        currentOffer
+          ? {
+              ...currentOffer,
+              ...updatedOffer,
+              moderationStatus: updatedOffer.moderationStatus ?? nextStatus,
+              moderationReason: reason,
+            }
+          : currentOffer,
+      );
+      toast.success("Cập nhật trạng thái kiểm duyệt thành công");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Không thể cập nhật trạng thái kiểm duyệt",
+      );
+    } finally {
+      setUpdatingStatus(false);
+    }
   };
 
   return (
@@ -168,10 +214,14 @@ export default function AdminProductDetailPage() {
                 <div className="admin-product-title">
                   <div className="admin-product-badges">
                     <span className={`admin-status ${getStatusType(offer.offerStatus)}`}>
-                      {getStatusLabel(offer.offerStatus)}
+                      {displayValue(offer.offerStatus)}
                     </span>
-                    <span className="admin-status pending">
-                      {displayValue(offer.verificationLevel)}
+                    <span
+                      className={`admin-status ${getStatusType(
+                        offer.moderationStatus,
+                      )}`}
+                    >
+                      {getStatusLabel(offer.moderationStatus)}
                     </span>
                   </div>
                   <h2>{offer.title}</h2>
@@ -292,10 +342,15 @@ export default function AdminProductDetailPage() {
               </div>
               <div className="admin-status-form">
                 <label>
-                  <span>Trạng thái bán</span>
+                  <span>Trạng thái kiểm duyệt</span>
                   <select
                     value={nextStatus}
-                    onChange={(event) => setNextStatus(event.target.value)}
+                    disabled={updatingStatus}
+                    onChange={(event) =>
+                      setNextStatus(
+                        event.target.value as AdminOfferModerationStatus,
+                      )
+                    }
                   >
                     {statusOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -304,8 +359,24 @@ export default function AdminProductDetailPage() {
                     ))}
                   </select>
                 </label>
-                <button type="button" onClick={handleStatusUpdate}>
-                  Cập nhật trạng thái
+                <label>
+                  <span>Lý do kiểm duyệt</span>
+                  <textarea
+                    rows={4}
+                    value={moderationReason}
+                    disabled={updatingStatus}
+                    onChange={(event) =>
+                      setModerationReason(event.target.value)
+                    }
+                    placeholder="Nhập lý do nếu cần..."
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={updatingStatus}
+                  onClick={handleStatusUpdate}
+                >
+                  {updatingStatus ? "Đang cập nhật..." : "Cập nhật trạng thái"}
                 </button>
               </div>
             </div>

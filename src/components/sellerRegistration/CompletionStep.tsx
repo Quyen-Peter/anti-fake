@@ -54,7 +54,7 @@ export default function CompletionStep({ status, onRetry }: CompletionStepProps)
           className="seller-register-primary-btn"
           onClick={onRetry}
         >
-          Đăng ký lại thông tin
+          Quay lại nộp lại hồ sơ
         </button>
       )}
     </section>

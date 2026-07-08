@@ -140,7 +140,7 @@ export default function SellerDashboard() {
       <SellerStats shopId={shopId} />
 
       <div className="seller-dashboard-middle">
-        <SellerRevenueChart />
+        <SellerRevenueChart shopId={shopId} />
         <SellerTopProducts shopId={shopId} />
       </div>
 

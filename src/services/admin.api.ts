@@ -175,6 +175,17 @@ export type AdminOffer = {
   createdAt?: string;
 };
 
+export type AdminOfferModerationStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "banned";
+
+export type UpdateAdminOfferModerationPayload = {
+  moderationStatus: AdminOfferModerationStatus;
+  moderationReason?: string;
+};
+
 export type FetchAdminOffersParams = {
   offerStatus?: string;
   moderationStatus?: string;
@@ -392,4 +403,29 @@ export const fetchAdminOffers = async (
     totalPages: Number(payload?.totalPages ?? 1),
     items: Array.isArray(payload?.items) ? payload.items : [],
   };
+};
+
+export const updateAdminOfferModerationStatus = async (
+  offerId: string,
+  payload: UpdateAdminOfferModerationPayload,
+): Promise<AdminOffer> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/offers/admin/${offerId}/moderation-status`,
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the cap nhat trang thai san pham");
+  }
+
+  return data?.data ?? data;
 };

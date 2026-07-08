@@ -55,6 +55,22 @@ export type ShopSummaryMetricsResponse = {
   offers?: ShopSummaryMetric;
 };
 
+export type ShopDailyMetric = {
+  date: string;
+  label: string;
+  revenue: number;
+  orders: number;
+};
+
+export type ShopDailyMetricsResponse = {
+  range?: {
+    days?: number;
+    from?: string;
+    to?: string;
+  };
+  series: ShopDailyMetric[];
+};
+
 export type ShopBestSellingProduct = {
   id: string;
   title: string;
@@ -88,6 +104,24 @@ export type ShopDocumentRequirementsResponse = {
     description?: string;
   };
   requirements: ShopDocumentRequirement[];
+};
+
+export type ShopSubmittedDocumentFile = {
+  fileUrl: string;
+  side?: string;
+  mimeType?: string;
+  assetType?: string;
+};
+
+export type ShopSubmittedDocument = {
+  id?: string;
+  code?: string;
+  docType?: string;
+  name?: string;
+  status?: string;
+  reviewNote?: string | null;
+  fileUrl?: string;
+  files?: ShopSubmittedDocumentFile[];
 };
 
 export type SubmitShopDocumentsPayload = {
@@ -285,6 +319,58 @@ export const submitShopDocuments = async (
   return data;
 };
 
+export const fetchShopSubmittedDocuments = async (
+  shopId: string,
+): Promise<ShopSubmittedDocument[]> => {
+  const response = await authFetch(`${BASE_URL}/api/shops/${shopId}/documents`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay ho so phap ly cua shop");
+  }
+
+  const payload = data?.data ?? data?.items ?? data;
+  if (!Array.isArray(payload)) return [];
+
+  return payload.map((item: Record<string, unknown>) => ({
+    id: typeof item.id === "string" ? item.id : undefined,
+    code: typeof item.code === "string" ? item.code : undefined,
+    docType: typeof item.docType === "string" ? item.docType : undefined,
+    name: typeof item.name === "string" ? item.name : undefined,
+    status: typeof item.status === "string" ? item.status : undefined,
+    reviewNote: typeof item.reviewNote === "string" ? item.reviewNote : null,
+    fileUrl: typeof item.fileUrl === "string" ? item.fileUrl : undefined,
+    files: Array.isArray(item.files)
+      ? item.files
+          .map((file): ShopSubmittedDocumentFile | null => {
+            if (!file || typeof file !== "object") return null;
+            const fileRecord = file as Record<string, unknown>;
+            const fileUrl = fileRecord.fileUrl;
+            if (typeof fileUrl !== "string") return null;
+            return {
+              fileUrl,
+              side: typeof fileRecord.side === "string" ? fileRecord.side : undefined,
+              mimeType:
+                typeof fileRecord.mimeType === "string"
+                  ? fileRecord.mimeType
+                  : undefined,
+              assetType:
+                typeof fileRecord.assetType === "string"
+                  ? fileRecord.assetType
+                  : undefined,
+            };
+          })
+          .filter((file): file is ShopSubmittedDocumentFile => Boolean(file))
+      : undefined,
+  }));
+};
+
 export const fetchShopCategories = async (shopId: string) => {
   const response = await fetch(`${BASE_URL}/api/shops/${shopId}/categories`, {
     method: "GET",
@@ -379,6 +465,49 @@ export const getShopSummaryMetrics = async (
   }
 
   return data;
+};
+
+export const getShopDailyMetrics = async (
+  shopId: string,
+  params: {
+    days?: number;
+    fromDate?: string;
+    toDate?: string;
+  } = {},
+): Promise<ShopDailyMetricsResponse> => {
+  const query = new URLSearchParams();
+  if (params.days) query.set("days", String(params.days));
+  if (params.fromDate) query.set("fromDate", params.fromDate);
+  if (params.toDate) query.set("toDate", params.toDate);
+
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/daily-metrics?${query.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay doanh thu theo ngay");
+  }
+
+  const payload = data?.data ?? data;
+  const series = Array.isArray(payload?.series) ? payload.series : [];
+
+  return {
+    range: payload?.range,
+    series: series.map((item: Record<string, unknown>) => ({
+      date: String(item.date ?? ""),
+      label: String(item.label ?? item.date ?? ""),
+      revenue: Number(item.revenue ?? 0),
+      orders: Number(item.orders ?? 0),
+    })),
+  };
 };
 
 export const fetchShopBestSellingProducts = async (

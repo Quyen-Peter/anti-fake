@@ -46,6 +46,8 @@ export type OfferDetail = {
   soldQuantity?: number;
   verificationLevel?: string;
   offerStatus?: string;
+  moderationStatus?: string;
+  moderationReason?: string | null;
   categoryId?: string;
   brandId?: string;
   gtin?: number | string;

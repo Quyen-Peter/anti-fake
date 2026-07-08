@@ -104,13 +104,21 @@
   font-weight: 800;
 }
 
-.admin-status-form select {
+.admin-status-form select,
+.admin-status-form textarea {
   height: 38px;
   border: 1px solid #efd0d0;
   border-radius: 8px;
   padding: 0 12px;
   background: #fffdfd;
   color: #2a1111;
+}
+
+.admin-status-form textarea {
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+  font: inherit;
 }
 
 .admin-status-form button {
@@ -123,3 +131,9 @@
   cursor: pointer;
 }
 
+.admin-status-form button:disabled,
+.admin-status-form select:disabled,
+.admin-status-form textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}

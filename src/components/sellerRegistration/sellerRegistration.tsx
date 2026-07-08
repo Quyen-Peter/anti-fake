@@ -147,6 +147,7 @@ export default function SellerRegistration() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingRequirements, setLoadingRequirements] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const isRejectedRegistration = registrationStatus === "rejected";
 
   const completedSteps = useMemo(
     () =>
@@ -371,12 +372,22 @@ export default function SellerRegistration() {
 
   const handleRetryRegistration = () => {
     revokeUploadedFiles(files);
-    setForm(initialRegistrationForm);
     setFiles(initialUploadedFiles);
-    setShopId("");
     setDocumentRequirements([]);
     setDocumentShopTypeName("");
     setRegistrationStatus("success");
+
+    if (shopId) {
+      setStep(2);
+      navigate("/register", {
+        replace: true,
+        state: { initialStep: 2, shopId },
+      });
+      return;
+    }
+
+    setForm(initialRegistrationForm);
+    setShopId("");
     setStep(1);
     navigate("/register", { replace: true, state: null });
   };
@@ -387,38 +398,47 @@ export default function SellerRegistration() {
         loadingRequirements ||
         submitting) && <LoadingOverlay />}
 
-      <StepProgress step={step} completedSteps={completedSteps} />
-
-      {step === 1 && (
-        <StoreInfoStep
-          form={form}
-          setForm={setForm}
-          categories={categories}
-          loadingCategories={loadingCategories}
-          submitting={submitting}
-          onSubmit={handleSubmitStoreInfo}
-        />
-      )}
-
-      {step === 2 && (
-        <VerificationStep
-          form={form}
-          files={files}
-          setForm={setForm}
-          onBack={() => setStep(1)}
-          onFileChange={handleFileChange}
-          onRequirementFileChange={handleRequirementFileChange}
-          documentRequirements={documentRequirements}
-          documentShopTypeName={documentShopTypeName}
-          onSubmit={handleSubmitDocuments}
-        />
-      )}
-
-      {step === 3 && (
+      {isRejectedRegistration ? (
         <CompletionStep
           status={registrationStatus}
           onRetry={handleRetryRegistration}
         />
+      ) : (
+        <>
+          <StepProgress step={step} completedSteps={completedSteps} />
+
+          {step === 1 && (
+            <StoreInfoStep
+              form={form}
+              setForm={setForm}
+              categories={categories}
+              loadingCategories={loadingCategories}
+              submitting={submitting}
+              onSubmit={handleSubmitStoreInfo}
+            />
+          )}
+
+          {step === 2 && (
+            <VerificationStep
+              form={form}
+              files={files}
+              setForm={setForm}
+              onBack={() => setStep(1)}
+              onFileChange={handleFileChange}
+              onRequirementFileChange={handleRequirementFileChange}
+              documentRequirements={documentRequirements}
+              documentShopTypeName={documentShopTypeName}
+              onSubmit={handleSubmitDocuments}
+            />
+          )}
+
+          {step === 3 && (
+            <CompletionStep
+              status={registrationStatus}
+              onRetry={handleRetryRegistration}
+            />
+          )}
+        </>
       )}
     </main>
   );

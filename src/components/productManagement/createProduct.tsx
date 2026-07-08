@@ -1,6 +1,7 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import "../../css/components/productManagement/createProduct.css";
+import { fetchBrands, type Brand } from "../../services/brand.api";
 import { createOffer, type CreateOfferPayload } from "../../services/product.api";
 import {
   fetchShopCategories,
@@ -80,8 +81,18 @@ export default function CreateProduct({
 }: CreateProductProps) {
   const [form, setForm] = useState<ProductForm>(initialForm);
   const [categories, setCategories] = useState<ShopCategory[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandSearch, setBrandSearch] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingBrands, setLoadingBrands] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const filteredBrands = useMemo(() => {
+    const keyword = brandSearch.trim().toLowerCase();
+    if (!keyword) return brands;
+
+    return brands.filter((brand) => brand.name.toLowerCase().includes(keyword));
+  }, [brandSearch, brands]);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,6 +120,29 @@ export default function CreateProduct({
     };
 
     loadShopCategories();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadBrands = async () => {
+      try {
+        const data = await fetchBrands();
+        if (!cancelled) setBrands(data);
+      } catch (error: unknown) {
+        toast.error(
+          getErrorMessage(error, "Khong the lay danh sach thuong hieu"),
+        );
+      } finally {
+        if (!cancelled) setLoadingBrands(false);
+      }
+    };
+
+    loadBrands();
 
     return () => {
       cancelled = true;
@@ -179,7 +213,7 @@ export default function CreateProduct({
 
   const validatePayload = (payload: CreateOfferPayload) => {
     if (!payload.title || !payload.categoryId || !payload.brandId) {
-      return "Vui lòng nhập tên sản phẩm, danh mục và mã thương hiệu";
+      return "Vui lòng nhập tên sản phẩm, danh mục và thương hiệu";
     }
 
     if (!payload.description) {
@@ -327,12 +361,41 @@ export default function CreateProduct({
             </div>
 
             <div className="form-group">
-              <label className="required">Mã thương hiệu</label>
-              <input
-                value={form.brandId}
-                onChange={(event) => updateField("brandId", event.target.value)}
-                placeholder="brand-id"
-              />
+              <label className="required">Thương hiệu</label>
+              <div className="brand-picker">
+                <input
+                  value={brandSearch}
+                  disabled={loadingBrands}
+                  onChange={(event) => setBrandSearch(event.target.value)}
+                  placeholder="Tìm thương hiệu..."
+                />
+                <select
+                  value={form.brandId}
+                  disabled={loadingBrands}
+                  onChange={(event) =>
+                    updateField("brandId", event.target.value)
+                  }
+                >
+                  <option value="">
+                    {loadingBrands
+                      ? "Đang tải thương hiệu..."
+                      : "Chọn thương hiệu"}
+                  </option>
+                  {filteredBrands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {!loadingBrands && brands.length === 0 && (
+                <small>Chưa có thương hiệu nào.</small>
+              )}
+              {!loadingBrands &&
+                brands.length > 0 &&
+                filteredBrands.length === 0 && (
+                  <small>Không tìm thấy thương hiệu phù hợp.</small>
+                )}
             </div>
           </div>
 

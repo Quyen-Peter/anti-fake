@@ -105,6 +105,7 @@ export default function SellerHeader() {
     {
       label: "Thông tin doanh nghiệp",
       icon: Building2,
+      onClick: () => navigate("/seller/business-info"),
     },
     {
       label: "Thông tin thuế",

@@ -26,7 +26,9 @@ export type ShopOffer = {
   soldQuantity?: number;
   verificationLevel?: string;
   offerStatus?: string;
+  moderationStatus?: string;
   categoryId?: string;
+  categoryName?: string;
   brandId?: string;
   thumbnailUrl?: string;
   createdAt?: string;
@@ -37,6 +39,21 @@ export type ShopOffersResponse = {
   page: number;
   pageSize: number;
   items: ShopOffer[];
+};
+
+export type ShopOfferModerationStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "banned";
+
+export type ShopOfferStatus = "active" | "inactive" | "draft";
+
+export type FetchShopOffersParams = {
+  offerStatus?: ShopOfferStatus;
+  moderationStatus?: ShopOfferModerationStatus;
+  page?: number;
+  pageSize?: number;
 };
 
 export type ShopSummaryMetric = {
@@ -408,16 +425,29 @@ export const fetchShopCategories = async (shopId: string) => {
 
 export const fetchShopOffers = async (
   shopId: string,
-  page = 1,
-  pageSize = 20,
+  paramsOrPage: FetchShopOffersParams | number = 1,
+  pageSizeArg = 20,
 ): Promise<ShopOffersResponse> => {
-  const params = new URLSearchParams({
+  const requestParams =
+    typeof paramsOrPage === "number"
+      ? { page: paramsOrPage, pageSize: pageSizeArg }
+      : paramsOrPage;
+  const page = requestParams.page ?? 1;
+  const pageSize = requestParams.pageSize ?? 20;
+
+  const query = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
   });
+  if (requestParams.offerStatus) {
+    query.set("offerStatus", requestParams.offerStatus);
+  }
+  if (requestParams.moderationStatus) {
+    query.set("moderationStatus", requestParams.moderationStatus);
+  }
 
   const response = await authFetch(
-    `${BASE_URL}/api/shops/${shopId}/offers?${params.toString()}`,
+    `${BASE_URL}/api/shops/${shopId}/offers?${query.toString()}`,
     {
       method: "GET",
       headers: {
@@ -432,11 +462,18 @@ export const fetchShopOffers = async (
     throw new Error(data.message || "Khong the lay danh sach san pham");
   }
 
+  const payload = data?.data ?? data;
+  const items = Array.isArray(payload?.items)
+    ? payload.items
+    : Array.isArray(payload)
+      ? payload
+      : [];
+
   return {
-    total: Number(data.total ?? 0),
-    page: Number(data.page ?? page),
-    pageSize: Number(data.pageSize ?? pageSize),
-    items: Array.isArray(data.items) ? data.items : [],
+    total: Number(payload?.totalItems ?? payload?.total ?? items.length),
+    page: Number(payload?.page ?? page),
+    pageSize: Number(payload?.pageSize ?? pageSize),
+    items,
   };
 };
 

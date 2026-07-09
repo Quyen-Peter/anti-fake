@@ -168,6 +168,8 @@
   gap: 8px;
 
   cursor: pointer;
+  color: #1f2937;
+  text-decoration: none;
   transition: all 0.2s ease;
 }
 

@@ -14,7 +14,7 @@ const emptySummary: ShopOrderStatusSummary = {
   totalOrders: 0,
   pendingOrders: 0,
   shippingOrders: 0,
-  completedOrders: 0,
+  deliveredOrders: 0,
 };
 
 const formatNumber = (value: number) =>
@@ -75,8 +75,8 @@ export default function OrderStats({ shopId }: OrderStatsProps) {
       className: "shipping",
     },
     {
-      label: "Đã hoàn thành",
-      value: summary.completedOrders,
+      label: "Đã giao",
+      value: summary.deliveredOrders,
       icon: <CheckCircle2 size={20} />,
       className: "completed",
     },

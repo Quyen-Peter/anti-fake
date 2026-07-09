@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../../css/components/order/orderCard.css";
 import type { Order } from "../../type/order";
+import { formatVnd } from "../../ultil/currency";
 
 type Props = {
   order: Order;
@@ -38,8 +39,6 @@ const getPaymentMethodLabel = (paymentMethod: string) =>
 
 export default function OrderCard({ order }: Props) {
   const navigate = useNavigate();
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
   const firstProduct = order.firstProduct ?? {
     name: "Sản phẩm",
     variant: "",
@@ -77,7 +76,7 @@ export default function OrderCard({ order }: Props) {
         </div>
 
         <div className="order-product-price">
-          <strong>{formatPrice(firstProduct.price)}đ</strong>
+          <strong>{formatVnd(firstProduct.price)}</strong>
           <small>Giá sản phẩm</small>
         </div>
       </div>
@@ -86,7 +85,7 @@ export default function OrderCard({ order }: Props) {
         <div className="order-payment-info">
           <div>
             <span>Tổng thanh toán</span>
-            <b>{formatPrice(order.totalAmount)}đ</b>
+            <b>{formatVnd(order.totalAmount)}</b>
           </div>
 
           <div>

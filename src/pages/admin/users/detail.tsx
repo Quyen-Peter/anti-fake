@@ -21,6 +21,7 @@ import {
   type AdminUserDetail,
 } from "../../../services/admin.api";
 import { createUserChatThread } from "../../../services/chat.api";
+import { formatVnd } from "../../../ultil/currency";
 
 const formatDate = (value?: string) => {
   if (!value) return "--";
@@ -34,14 +35,8 @@ const formatNumber = (value?: number) => {
   return new Intl.NumberFormat("vi-VN").format(value);
 };
 
-const formatMoney = (value?: number) => {
-  if (typeof value !== "number") return "--";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const formatMoney = (value?: number) =>
+  typeof value === "number" ? formatVnd(value) : "--";
 
 const displayValue = (value?: number | string | boolean | null) => {
   if (value === undefined || value === null || value === "") return "--";

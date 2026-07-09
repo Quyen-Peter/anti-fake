@@ -1,10 +1,10 @@
-import { ClipboardList, Eye, MessageSquare } from "lucide-react";
+import { ClipboardList, Eye, Loader2, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import "../../css/components/orderManagement/orderTable.css";
-import EmptyState from "../common/emptyState";
 import { createUserChatThread } from "../../services/chat.api";
+import EmptyState from "../common/emptyState";
 
 interface Order {
   id: string;
@@ -19,6 +19,39 @@ interface Order {
 interface Props {
   orders: Order[];
 }
+
+const statusMap: Record<string, { text: string; className: string }> = {
+  pending: {
+    text: "Chờ xác nhận",
+    className: "seller-order-status-pending",
+  },
+  processing: {
+    text: "Đang xử lý",
+    className: "seller-order-status-processing",
+  },
+  shipping: {
+    text: "Đang giao",
+    className: "seller-order-status-shipping",
+  },
+  delivered: {
+    text: "Đã giao",
+    className: "seller-order-status-delivered",
+  },
+  cancelled: {
+    text: "Đã hủy",
+    className: "seller-order-status-cancelled",
+  },
+};
+
+const getStatus = (status: string) => {
+  const value = String(status ?? "").toLowerCase();
+  return (
+    statusMap[value] ?? {
+      text: status || "Không rõ",
+      className: "seller-order-status-pending",
+    }
+  );
+};
 
 export default function OrderTable({ orders }: Props) {
   const navigate = useNavigate();
@@ -44,41 +77,6 @@ export default function OrderTable({ orders }: Props) {
       toast.error(message);
     } finally {
       setStartingChatUserId("");
-    }
-  };
-
-  const getStatus = (status: string) => {
-    switch (status) {
-      case "pending":
-      case "processing":
-        return {
-          text: "Chờ xử lý",
-          className: "seller-order-status-processing",
-        };
-
-      case "shipping":
-        return {
-          text: "Đang giao",
-          className: "seller-order-status-shipping",
-        };
-
-      case "completed":
-        return {
-          text: "Hoàn thành",
-          className: "seller-order-status-completed",
-        };
-
-      case "cancelled":
-        return {
-          text: "Đã hủy",
-          className: "seller-order-status-cancelled",
-        };
-
-      default:
-        return {
-          text: status,
-          className: "",
-        };
     }
   };
 
@@ -110,6 +108,7 @@ export default function OrderTable({ orders }: Props) {
         {orders.map((order) => {
           const status = getStatus(order.status);
           const orderId = encodeURIComponent(order.id.replace("#", ""));
+          const isStartingChat = startingChatUserId === order.customerId;
 
           return (
             <tr key={order.id}>
@@ -121,7 +120,7 @@ export default function OrderTable({ orders }: Props) {
 
                   <div>
                     <h4>{order.customer}</h4>
-                    <span>{order.email}</span>
+                    <span>{order.email || "Chưa có email"}</span>
                   </div>
                 </div>
               </td>
@@ -138,25 +137,28 @@ export default function OrderTable({ orders }: Props) {
                 <div className="seller-order-table-actions">
                   <button
                     type="button"
-                    aria-label="Xem chi tiet don hang"
+                    className="seller-order-action-icon"
+                    aria-label="Xem chi tiết đơn hàng"
                     onClick={() => navigate(`/seller/orders/${orderId}`)}
                   >
                     <Eye size={16} />
                   </button>
                   <button
                     type="button"
-                    aria-label="Nhắn tin với khách hàng"
-                    disabled={
-                      !order.customerId ||
-                      startingChatUserId === order.customerId
-                    }
+                    className="seller-order-chat-button"
+                    disabled={!order.customerId || isStartingChat}
                     onClick={() => {
                       if (order.customerId) {
                         startChatWithCustomer(order.customerId);
                       }
                     }}
                   >
-                    <MessageSquare size={16} />
+                    {isStartingChat ? (
+                      <Loader2 size={15} className="seller-order-chat-spin" />
+                    ) : (
+                      <MessageSquare size={15} />
+                    )}
+                    <span>{isStartingChat ? "Đang mở..." : "Nhắn tin"}</span>
                   </button>
                 </div>
               </td>

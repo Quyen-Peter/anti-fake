@@ -11,6 +11,7 @@ import { usePayOS, type PayOSConfig } from "@payos/payos-checkout";
 
 import "../../css/components/payment/paymentModel.css";
 import { useEffect, useMemo } from "react";
+import { formatVnd } from "../../ultil/currency";
 
 type PaymentModelProps = {
   amount?: number;
@@ -24,9 +25,6 @@ type CheckoutState = {
   orderCode: string | number;
   checkoutUrl: string;
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("vi-VN").format(value);
 
 const firstValue = <T,>(...values: Array<T | undefined | null>) =>
   values.find((value) => value !== undefined && value !== null);
@@ -137,7 +135,7 @@ export default function PaymentModel({
             )}
 
             <strong className="payment-amount">
-              {formatCurrency(displayAmount)} VNĐ
+              {formatVnd(displayAmount)}
             </strong>
             <p className="payment-auto-note">Tự động cập nhật sau khi quét</p>
 

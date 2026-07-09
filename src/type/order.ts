@@ -21,7 +21,7 @@ export type OrderStatus =
   | "CONFIRMED"
   | "PROCESSING"
   | "SHIPPING"
-  | "COMPLETED"
+  | "DELIVERED"
   | "CANCELLED";
 
 export type PaymentMethod =

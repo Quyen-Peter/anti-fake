@@ -136,11 +136,11 @@ export default function Header() {
         <Link to="/wishlist" className="icon-btn wishlist-btn">
           <Heart size={22} />
 
-          <span className="badge">4</span>
+          {/* <span className="badge">4</span> */}
         </Link>
         <Link to="/chat" className="icon-btn">
           <MessageSquareText size={22} />
-          <span className="badge">3</span>
+          {/* <span className="badge">3</span> */}
         </Link>
 
         <Link to="/cart" className="icon-btn cart-btn">
@@ -150,7 +150,7 @@ export default function Header() {
 
         <Link to="/notification" className="icon-btn">
           <Bell size={22} />
-          <span className="badge">1</span>
+          {/* <span className="badge">1</span> */}
         </Link>
 
         <div className="divider" />

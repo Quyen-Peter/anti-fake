@@ -9,44 +9,28 @@ interface Props {
   setSearch: (value: string) => void;
 }
 
+const tabs = [
+  { label: "Tất cả", value: "all" },
+  { label: "Chờ xác nhận", value: "pending" },
+  { label: "Đang xử lý", value: "processing" },
+  { label: "Đang giao", value: "shipping" },
+  { label: "Đã giao", value: "delivered" },
+  { label: "Đã hủy", value: "cancelled" },
+];
+
 export default function OrderFilters({
   activeStatus,
   setActiveStatus,
   search,
   setSearch,
 }: Props) {
-  const tabs = [
-    {
-      label: "Tất cả",
-      value: "all",
-    },
-    {
-      label: "Chờ xử lý",
-      value: "pending",
-    },
-    {
-      label: "Đang giao",
-      value: "shipping",
-    },
-    {
-      label: "Hoàn thành",
-      value: "completed",
-    },
-    {
-      label: "Đã hủy",
-      value: "cancelled",
-    },
-  ];
-
   return (
     <div className="seller-order-filter">
       <div className="seller-order-tabs">
         {tabs.map((tab) => (
           <button
             key={tab.value}
-            className={
-              activeStatus === tab.value ? "active" : ""
-            }
+            className={activeStatus === tab.value ? "active" : ""}
             onClick={() => setActiveStatus(tab.value)}
           >
             {tab.label}
@@ -60,7 +44,7 @@ export default function OrderFilters({
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(event) => setSearch(event.target.value)}
           placeholder="Tìm theo mã đơn hàng hoặc tên khách hàng..."
         />
       </div>

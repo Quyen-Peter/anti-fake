@@ -1,13 +1,12 @@
 import type { Product } from "../../type/product";
 import "../../css/components/product/productSale.css";
+import { formatVnd } from "../../ultil/currency";
 
 type Props = {
   product: Product;
 };
 
 export default function ProductSell({ product }: Props) {
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
   return (
     <div key={product.id} className="flash-card">
       <div className="discount-tag">-{product.discount}%</div>
@@ -16,9 +15,9 @@ export default function ProductSell({ product }: Props) {
 
       <h4>{product.name}</h4>
 
-      <div className="price">{formatPrice(product.price)}đ</div>
+      <div className="price">{formatVnd(product.price)}</div>
 
-      <div className="old-price">{formatPrice(product.oldPrice)}đ</div>
+      <div className="old-price">{formatVnd(product.oldPrice)}</div>
 
       <div className="sold-bar">
         <div

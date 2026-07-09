@@ -20,6 +20,128 @@
   min-height: 420px;
 }
 
+.cart-loading-card {
+  border: 1px solid #ececec;
+  border-radius: 16px;
+  padding: 18px;
+  background: #fff;
+}
+
+.cart-loading-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #555;
+  font-weight: 700;
+}
+
+.cart-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #f1d4d8;
+  border-top-color: #c8102e;
+  border-radius: 50%;
+  animation: cart-spin 0.8s linear infinite;
+}
+
+.cart-loading-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 120px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid #f3f3f3;
+}
+
+.cart-loading-row > span,
+.cart-loading-row div span,
+.cart-summary-loading span {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #ffffff 37%, #f3f4f6 63%);
+  background-size: 400% 100%;
+  animation: cart-shimmer 1.2s ease-in-out infinite;
+}
+
+.cart-loading-row > span:first-child {
+  width: 86px;
+  height: 86px;
+}
+
+.cart-loading-row > span:last-child {
+  height: 34px;
+}
+
+.cart-loading-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-loading-row div span:first-child {
+  width: 75%;
+  height: 18px;
+}
+
+.cart-loading-row div span:last-child {
+  width: 45%;
+  height: 18px;
+}
+
+.cart-summary-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cart-summary-loading span {
+  height: 20px;
+}
+
+.cart-summary-loading span:last-child {
+  height: 44px;
+}
+
+.cart-item-busy {
+  position: relative;
+}
+
+.cart-item-busy .cart-item {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.cart-item-busy::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  border: 3px solid #f1d4d8;
+  border-top-color: #c8102e;
+  border-radius: 50%;
+  animation: cart-spin 0.8s linear infinite;
+}
+
+@keyframes cart-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cart-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
 /* ================= HEADER ================= */
 
 .cart-header {

@@ -1,6 +1,7 @@
 import "../../css/components/product/productCard.css";
 import { BadgeCheck, Package } from "lucide-react";
 import type { ProductView } from "../../type/product";
+import { formatVnd } from "../../ultil/currency";
 import { formatSale } from "../../ultil/format";
 import { Link } from "react-router-dom";
 
@@ -9,9 +10,6 @@ type Props = {
 };
 
 export default function ProductCard({ product }: Props) {
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
-
   return (
     <Link to={`/product/${product.id}`} className="product-card-link">
       <div className="product-card">
@@ -22,9 +20,9 @@ export default function ProductCard({ product }: Props) {
             className="product-image"
           />
 
-          <span className="product-status">
+          {/* <span className="product-status">
             {product.salesMode === "WHOLESALE" ? "Bán sỉ" : "Bán lẻ"}
-          </span>
+          </span> */}
         </div>
 
         <div className="product-content">
@@ -32,7 +30,9 @@ export default function ProductCard({ product }: Props) {
 
           <h3 className="product-title">{product.title}</h3>
 
-          <div className="product-price">{formatPrice(product.price)} {product.currency}</div>
+          <div className="product-price">
+            {formatVnd(product.price, product.currency)}
+          </div>
 
           <div className="product-meta">
             <span>

@@ -3,6 +3,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import "../../css/components/productManagement/productCard.css";
 
@@ -107,15 +108,23 @@ export default function ProductCard({ product }: Props) {
       </div>
 
       <div className="seller-product-card-actions">
-        <button className="seller-product-action-btn">
+        <Link
+          className="seller-product-action-btn"
+          to={`/seller/products/${product.id}`}
+          aria-label={`Xem chi tiết ${product.name}`}
+        >
           <Eye size={18} />
           <span>Xem</span>
-        </button>
+        </Link>
 
-        <button className="seller-product-action-btn">
+        <Link
+          className="seller-product-action-btn"
+          to={`/seller/products/${product.id}?edit=1`}
+          aria-label={`Sửa ${product.name}`}
+        >
           <Pencil size={18} />
           <span>Sửa</span>
-        </button>
+        </Link>
 
         <button className="seller-product-delete-btn">
           <Trash2 size={18} />

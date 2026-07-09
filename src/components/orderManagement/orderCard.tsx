@@ -1,4 +1,4 @@
-import { Clock3, Eye, MessageSquare } from "lucide-react";
+import { Clock3, Eye, Loader2, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,46 +17,23 @@ interface Props {
   };
 }
 
+const statusMap: Record<string, { text: string; className: string }> = {
+  pending: { text: "Chờ xác nhận", className: "pending" },
+  processing: { text: "Đang xử lý", className: "processing" },
+  shipping: { text: "Đang giao", className: "shipping" },
+  delivered: { text: "Đã giao", className: "delivered" },
+  cancelled: { text: "Đã hủy", className: "cancelled" },
+};
+
 export default function OrderCard({ order }: Props) {
   const navigate = useNavigate();
   const [startingChat, setStartingChat] = useState(false);
 
-  const getStatus = () => {
-    switch (order.status) {
-      case "pending":
-      case "processing":
-        return {
-          text: "Đang xử lý",
-          className: "pending",
-        };
-
-      case "paid":
-        return {
-          text: "Đang giao",
-          className: "shipping",
-        };
-
-      case "completed":
-        return {
-          text: "Hoàn thành",
-          className: "completed",
-        };
-
-      case "cancelled":
-        return {
-          text: "Đã hủy",
-          className: "cancelled",
-        };
-
-      default:
-        return {
-          text: order.status,
-          className: "",
-        };
-    }
-  };
-
-  const status = getStatus();
+  const status =
+    statusMap[String(order.status ?? "").toLowerCase()] ?? {
+      text: order.status || "Không rõ",
+      className: "pending",
+    };
   const orderId = encodeURIComponent(order.id.replace("#", ""));
 
   const startChatWithCustomer = async () => {
@@ -104,18 +81,23 @@ export default function OrderCard({ order }: Props) {
         <div className="seller-mobile-order-actions">
           <button
             type="button"
-            aria-label="Xem chi tiet don hang"
+            aria-label="Xem chi tiết đơn hàng"
             onClick={() => navigate(`/seller/orders/${orderId}`)}
           >
             <Eye size={18} />
           </button>
           <button
             type="button"
+            className="seller-mobile-chat-button"
             aria-label="Nhắn tin với khách hàng"
             disabled={!order.customerId || startingChat}
             onClick={startChatWithCustomer}
           >
-            <MessageSquare size={18} />
+            {startingChat ? (
+              <Loader2 size={18} className="seller-order-chat-spin" />
+            ) : (
+              <MessageSquare size={18} />
+            )}
           </button>
         </div>
       </div>

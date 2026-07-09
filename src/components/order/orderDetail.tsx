@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   AlertCircle,
   ArrowLeft,
+  CheckCircle2,
+  CreditCard,
   MapPin,
   PackageOpen,
   Phone,
   ShieldCheck,
   Star,
+  Store,
+  Truck,
   User,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,13 +23,14 @@ import { createOfferReview } from "../../services/review.api";
 import ConfirmModal from "../common/confirmModal";
 import LoadingOverlay from "../loadingOverlay";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+import { formatVnd } from "../../ultil/currency";
 
 const statusLabels: Record<string, string> = {
   pending: "Chờ xác nhận",
   processing: "Đang xử lý",
   shipping: "Đang giao",
-  completed: "Hoàn thành",
   delivered: "Đã giao",
+  completed: "Hoàn thành",
   cancelled: "Đã hủy",
   canceled: "Đã hủy",
 };
@@ -35,12 +40,20 @@ const paymentStatusLabels: Record<string, string> = {
   paid: "Đã thanh toán",
   failed: "Thanh toán thất bại",
   cancelled: "Đã hủy",
+  refunded: "Đã hoàn tiền",
 };
 
 const paymentMethodLabels: Record<string, string> = {
   COD: "Thanh toán khi nhận hàng",
   PAYOS: "Thanh toán PayOS",
 };
+
+const progressSteps = [
+  { value: "pending", label: "Đặt hàng" },
+  { value: "processing", label: "Xử lý" },
+  { value: "shipping", label: "Vận chuyển" },
+  { value: "delivered", label: "Đã giao" },
+];
 
 const formatDate = (value?: string) => {
   if (!value) return "Đang cập nhật";
@@ -87,7 +100,6 @@ export default function OrderDetailPage() {
         const data = await fetchOrderDetail(id);
         setOrder(data);
       } catch (error) {
-        console.error(error);
         setOrder(null);
         setError(
           error instanceof Error ? error.message : "Không thể tải chi tiết đơn hàng",
@@ -100,12 +112,22 @@ export default function OrderDetailPage() {
     loadOrder();
   }, [id]);
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
-
   const orderStatus = order?.status.toLowerCase() ?? "";
-  const isCompleted = orderStatus === "completed" || orderStatus === "delivered";
-  const isPending = orderStatus === "pending";
+  const normalizedStatus = orderStatus === "completed" ? "delivered" : orderStatus;
+  const isCompleted = normalizedStatus === "delivered";
+  const isPending = normalizedStatus === "pending";
+  const currentStepIndex = progressSteps.findIndex(
+    (step) => step.value === normalizedStatus,
+  );
+
+  const itemCount = useMemo(
+    () =>
+      order?.shops.reduce(
+        (sum, shop) => sum + shop.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
+        0,
+      ) ?? 0,
+    [order],
+  );
 
   const openReviewBox = (itemId: string) => {
     setActiveReviewItemId((current) => (current === itemId ? "" : itemId));
@@ -166,7 +188,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <div className="order-detail-page">
-        <LoadingOverlay />
+        <LoadingOverlay message="Đang tải chi tiết đơn hàng..." />
       </div>
     );
   }
@@ -207,85 +229,90 @@ export default function OrderDetailPage() {
 
   return (
     <div className="order-detail-page">
-      <div className="od-section od-header">
+      <section className="od-section od-hero">
         <button className="od-back-btn" onClick={() => navigate("/profile/orders")}>
-          <ArrowLeft size={26} />
+          <ArrowLeft size={20} />
+          <span>Đơn mua</span>
         </button>
-        <div>
-          <h1 className="od-order-code">Chi tiết đơn hàng: {order.orderCode}</h1>
-          <p className="od-created">Ngày đặt hàng: {formatDate(order.createdAt)}</p>
+
+        <div className="od-hero-main">
+          <div>
+            <p className="od-kicker">Chi tiết đơn hàng</p>
+            <h1>{order.orderCode || order.id}</h1>
+            <span>Đặt lúc {formatDate(order.createdAt)}</span>
+          </div>
+          <div className={`od-status-pill ${normalizedStatus}`}>
+            {label(statusLabels, order.status)}
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="od-section">
-        <h2>Tiến độ đơn hàng</h2>
-        <div className="od-progress">
-          {["pending","processing", "shipping", "completed"].map(
-            (status, index) => {
-              const current = order.status.toLowerCase();
-              const currentIndex = [
-                "pending",
-                "processing",
-                "shipping",
-                "completed",
-              ].indexOf(current);
-              const isActive = currentIndex >= index;
-
+      {normalizedStatus !== "cancelled" && (
+        <section className="od-section">
+          <h2>Tiến độ đơn hàng</h2>
+          <div className="od-progress">
+            {progressSteps.map((step, index) => {
+              const isActive = currentStepIndex >= index;
               return (
-                <div className="od-step-wrap" key={status}>
+                <div className="od-step-wrap" key={step.value}>
                   {index > 0 && <div className={`od-line ${isActive ? "active" : ""}`} />}
                   <div className={`od-step ${isActive ? "active" : ""}`}>
                     <div className="od-step-icon">
-                      <ShieldCheck size={16} />
+                      {isActive ? <CheckCircle2 size={16} /> : <ShieldCheck size={16} />}
                     </div>
-                    <span>{statusLabels[status]}</span>
+                    <span>{step.label}</span>
                   </div>
                 </div>
               );
-            },
-          )}
-        </div>
-      </div>
+            })}
+          </div>
+        </section>
+      )}
 
-      <div className="od-section">
-        <h2>Địa chỉ nhận hàng</h2>
-        <div className="od-info-item">
-          <User size={18} />
-          <span>{order.receiverName}</span>
-        </div>
-        <div className="od-info-item">
-          <Phone size={18} />
-          <span>{order.receiverPhone}</span>
-        </div>
-        <div className="od-info-item">
-          <MapPin size={18} />
-          <span>{order.shippingAddress}</span>
-        </div>
-      </div>
+      <section className="od-info-grid">
+        <article className="od-section od-info-card">
+          <h2>Người nhận</h2>
+          <div className="od-info-item">
+            <User size={18} />
+            <span>{order.receiverName || "Đang cập nhật"}</span>
+          </div>
+          <div className="od-info-item">
+            <Phone size={18} />
+            <span>{order.receiverPhone || "Đang cập nhật"}</span>
+          </div>
+          <div className="od-info-item">
+            <MapPin size={18} />
+            <span>{order.shippingAddress || "Đang cập nhật"}</span>
+          </div>
+        </article>
 
-      <div className="od-section">
-        <h2>Thông tin vận chuyển</h2>
-        <div className="od-row">
-          <span>Đơn vị vận chuyển</span>
-          <b>{order.carrier ?? "Đang cập nhật"}</b>
-        </div>
-        <div className="od-row">
-          <span>Mã vận đơn</span>
-          <b>{order.trackingCode ?? "Đang cập nhật"}</b>
-        </div>
-        <div className="od-row">
-          <span>Loại vận chuyển</span>
-          <b>{order.shippingMethod ?? "Đang cập nhật"}</b>
-        </div>
-        <div className="od-row">
-          <span>Dự kiến giao</span>
-          <b>{order.estimatedDelivery ?? "Đang cập nhật"}</b>
-        </div>
-      </div>
+        <article className="od-section od-info-card">
+          <h2>Vận chuyển</h2>
+          <div className="od-info-item">
+            <Truck size={18} />
+            <span>{order.carrier ?? "Đang cập nhật"}</span>
+          </div>
+          <div className="od-row compact">
+            <span>Mã vận đơn</span>
+            <b>{order.trackingCode ?? "Đang cập nhật"}</b>
+          </div>
+          <div className="od-row compact">
+            <span>Dự kiến giao</span>
+            <b>{order.estimatedDelivery ?? "Đang cập nhật"}</b>
+          </div>
+        </article>
+      </section>
 
       {order.shops.map((shop) => (
-        <div key={shop.id ?? shop.shopId} className="od-section">
-          <div className="od-shop-title">{shop.name ?? shop.shopName}</div>
+        <section key={shop.id ?? shop.shopId} className="od-section od-shop-card">
+          <div className="od-shop-title">
+            <Store size={18} />
+            <span>{shop.name ?? shop.shopName}</span>
+            {shop.fulfillmentStatus && (
+              <small>{label(statusLabels, shop.fulfillmentStatus)}</small>
+            )}
+          </div>
+
           {shop.items.map((item) => (
             <div key={item.id} className="od-item-block">
               <div className="od-item">
@@ -296,7 +323,8 @@ export default function OrderDetailPage() {
                   <span>Số lượng: {item.quantity}</span>
                 </div>
                 <div className="od-item-side">
-                  <div className="od-item-price">{formatPrice(item.totalPrice)}đ</div>
+                  <span>{formatVnd(item.unitPrice)}</span>
+                  <div className="od-item-price">{formatVnd(item.totalPrice)}</div>
                   {isCompleted && !reviewedItemIds.includes(item.id) && (
                     <button
                       type="button"
@@ -357,50 +385,53 @@ export default function OrderDetailPage() {
               )}
             </div>
           ))}
-        </div>
+        </section>
       ))}
 
-      <div className="od-section">
-        <h2>Tổng kết đơn hàng</h2>
+      <section className="od-section od-payment-card">
+        <div className="od-payment-title">
+          <CreditCard size={20} />
+          <h2>Thanh toán</h2>
+        </div>
         <div className="od-row">
-          <span>Tạm tính</span>
-          <b>{formatPrice(order.subtotal)}đ</b>
+          <span>Tạm tính ({itemCount} sản phẩm)</span>
+          <b>{formatVnd(order.subtotal)}</b>
         </div>
         <div className="od-row">
           <span>Giảm giá</span>
-          <b>-{formatPrice(order.discount)}đ</b>
+          <b>-{formatVnd(order.discount)}</b>
         </div>
         <div className="od-row">
           <span>Phí vận chuyển</span>
-          <b>{formatPrice(order.shippingFee)}đ</b>
+          <b>{formatVnd(order.shippingFee)}</b>
         </div>
         <div className="od-row od-total">
           <span>Tổng thanh toán</span>
-          <b>{formatPrice(order.totalAmount)}đ</b>
+          <b>{formatVnd(order.totalAmount)}</b>
         </div>
         <div className="od-row">
-          <span>Phương thức thanh toán</span>
+          <span>Phương thức</span>
           <b>{label(paymentMethodLabels, order.paymentMethod)}</b>
         </div>
         <div className="od-row">
           <span>Trạng thái thanh toán</span>
           <b>{label(paymentStatusLabels, order.paymentStatus)}</b>
         </div>
-      </div>
+      </section>
 
       {order.histories.length > 0 && (
-        <div className="od-section">
+        <section className="od-section">
           <h2>Lịch sử đơn hàng</h2>
           {order.histories.map((history, index) => (
             <div key={`${history.status}-${index}`} className="od-history">
               <div className="od-dot" />
               <div>
-                <b>{history.description}</b>
+                <b>{history.description || label(statusLabels, history.status)}</b>
                 <p>{formatDate(history.createdAt)}</p>
               </div>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
       <div className="od-actions">

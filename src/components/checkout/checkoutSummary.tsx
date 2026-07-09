@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { checkoutCart } from "../../services/cart.api";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+import { formatVnd } from "../../ultil/currency";
 
 interface Props {
   cartItemIds: string[];
@@ -102,22 +103,22 @@ export default function CheckoutSummary({
 
       <div className="summary-row">
         <span>Tổng tiền hàng</span>
-        <span>{subtotal.toLocaleString()}đ</span>
+        <span>{formatVnd(subtotal)}</span>
       </div>
 
       <div className="summary-row">
         <span>Phí vận chuyển</span>
-        <span>{shippingFee.toLocaleString()}đ</span>
+        <span>{formatVnd(shippingFee)}</span>
       </div>
 
       <div className="summary-row discount">
         <span>Giảm giá</span>
-        <span>-{discount.toLocaleString()}đ</span>
+        <span>-{formatVnd(discount)}</span>
       </div>
 
       <div className="summary-total-checkout">
         <span>Tổng cộng</span>
-        <strong>{total.toLocaleString()}đ</strong>
+        <strong>{formatVnd(total)}</strong>
       </div>
 
       <button

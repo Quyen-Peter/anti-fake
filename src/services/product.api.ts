@@ -31,6 +31,18 @@ export type CreateOfferPayload = {
   heightCm: number;
 };
 
+export type UpdateOfferPayload = {
+  title: string;
+  description: string;
+  price: number;
+  availableQuantity: number;
+  parcelWeightGrams: number;
+  parcelLengthCm: number;
+  parcelWidthCm: number;
+  parcelHeightCm: number;
+  offerStatus: "active" | "inactive" | "draft";
+};
+
 export type OfferDetail = {
   id: string;
   title: string;
@@ -115,6 +127,28 @@ export const fetchOfferDetail = async (id: string): Promise<OfferDetail> => {
   }
 
   const data = await response.json();
+  return data?.data ?? data;
+};
+
+export const updateOffer = async (
+  offerId: string,
+  payload: UpdateOfferPayload,
+): Promise<OfferDetail> => {
+  const response = await authFetch(`${BASE_URL}/api/offers/${offerId}`, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the cap nhat san pham");
+  }
+
   return data?.data ?? data;
 };
 

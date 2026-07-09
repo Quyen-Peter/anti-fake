@@ -53,22 +53,79 @@
 }
 
 
+.seller-order-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .seller-order-table-actions button {
   border: none;
-  background: transparent;
   cursor: pointer;
+}
+
+.seller-order-action-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #4b5563;
+}
+
+.seller-order-action-icon:hover {
+  background: #eeeeee;
+}
+
+.seller-order-chat-button {
+  height: 36px;
+  min-width: 104px;
+  border-radius: 999px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #b00020;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.seller-order-chat-button:disabled {
+  cursor: not-allowed;
+  background: #f0d6d6;
+  color: #9b7373;
+}
+
+.seller-order-chat-spin {
+  animation: seller-order-spin 0.8s linear infinite;
+}
+
+@keyframes seller-order-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* STATUS */
 
 .seller-order-status-processing,
+.seller-order-status-pending,
 .seller-order-status-shipping,
-.seller-order-status-completed,
+.seller-order-status-delivered,
 .seller-order-status-cancelled {
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
+}
+
+.seller-order-status-pending {
+  background: #fff7ed;
+  color: #c2410c;
 }
 
 .seller-order-status-processing {
@@ -81,7 +138,7 @@
   color: #08979c;
 }
 
-.seller-order-status-completed {
+.seller-order-status-delivered {
   background: #dcfce7;
   color: #15803d;
 }

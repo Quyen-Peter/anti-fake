@@ -1,4 +1,5 @@
 import { Trash2 } from "lucide-react";
+import { formatVnd } from "../../ultil/currency";
 
 type Props = {
   item: any;
@@ -14,11 +15,6 @@ export default function CartItem({
   onDelete,
 }: Props) {
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
-
-  
-
   return (
     <div className="cart-item">
       <input
@@ -30,11 +26,11 @@ export default function CartItem({
       <div className="cart-item-info">
         <h3>{item.offerTitleSnapshot}</h3>
         <div className="cart-price">
-          {formatPrice(item.unitPriceSnapshot)} {item.currencySnapshot}
+          {formatVnd(item.unitPriceSnapshot, item.currencySnapshot)}
         </div>
 
         {item.oldPrice ? (
-          <div className="cart-old-price">{formatPrice(item.oldPrice)}đ</div>
+          <div className="cart-old-price">{formatVnd(item.oldPrice)}</div>
         ) : (
           <div></div>
         )}

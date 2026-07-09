@@ -11,6 +11,7 @@ import {
   getShopDailyMetrics,
   type ShopDailyMetric,
 } from "../../services/shop.api";
+import { formatVnd } from "../../ultil/currency";
 
 type SellerRevenueChartProps = {
   shopId?: string;
@@ -37,13 +38,6 @@ const getCurrentWeekRange = () => {
     toDate: toDateInput(sunday),
   };
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value);
 
 export default function SellerRevenueChart({ shopId }: SellerRevenueChartProps) {
   const [data, setData] = useState<ChartPoint[]>([]);
@@ -126,7 +120,7 @@ export default function SellerRevenueChart({ shopId }: SellerRevenueChartProps) 
             <YAxis tickFormatter={(value) => `${Number(value) / 1000000}tr`} />
             <Tooltip
               formatter={(value, name) => [
-                formatCurrency(Number(value)),
+                formatVnd(Number(value)),
                 name === "revenue" ? "Doanh thu" : name,
               ]}
               labelFormatter={(_, items) => {

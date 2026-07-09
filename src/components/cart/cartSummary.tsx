@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { formatVnd } from "../../ultil/currency";
 
 type Props = {
   subtotal: number;
@@ -13,9 +14,6 @@ type Props = {
 export default function CartSummary({ subtotal, discount, total, selectedShops, }: Props) {
   const [showDetail, setShowDetail] = useState(false);
   const navigate = useNavigate();
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
-
   
     const handleCheckout = () => {
     if (selectedShops.length === 0) {
@@ -40,18 +38,18 @@ export default function CartSummary({ subtotal, discount, total, selectedShops, 
       <div className={`summary-detail ${showDetail ? "show" : ""}`}>
         <div className="summary-row">
           <span>Tạm tính</span>
-          <b>{formatPrice(subtotal)}đ</b>
+          <b>{formatVnd(subtotal)}</b>
         </div>
 
         <div className="summary-row">
           <span>Giảm giá sản phẩm</span>
-          <span className="discount">-{formatPrice(discount)}đ</span>
+          <span className="discount">-{formatVnd(discount)}</span>
         </div>
 
       </div>
       <div className="summary-total">
         <span>Tổng cộng</span>
-        <b>{formatPrice(total)}đ</b>
+        <b>{formatVnd(total)}</b>
       </div>
       <button className="checkout-btn" onClick={handleCheckout}>
         Tiến hành thanh toán

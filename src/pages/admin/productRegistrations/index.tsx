@@ -6,6 +6,7 @@ import {
   fetchAdminOffers,
   type AdminOffer,
 } from "../../../services/admin.api";
+import { formatVnd } from "../../../ultil/currency";
 
 const PAGE_SIZE = 10;
 
@@ -53,19 +54,13 @@ const formatDate = (value?: string) => {
   return date.toLocaleDateString("vi-VN");
 };
 
-const formatPrice = (value?: number, currency = "VND") => {
-  if (typeof value !== "number") return "--";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const formatPrice = (value?: number, currency = "VND") =>
+  typeof value === "number" ? formatVnd(value, currency) : "--";
 
 export default function AdminProductRegistrationsPage() {
   const [offers, setOffers] = useState<AdminOffer[]>([]);
   const [keyword, setKeyword] = useState("");
-  const [offerStatus, setOfferStatus] = useState("active");
+  const [offerStatus, setOfferStatus] = useState("");
   const [moderationStatus, setModerationStatus] = useState("pending");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

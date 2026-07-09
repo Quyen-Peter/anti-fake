@@ -1,5 +1,6 @@
 import { Store } from "lucide-react";
 import type { CheckoutShop } from "../../type/checkout";
+import { formatVnd } from "../../ultil/currency";
 
 
 interface Props {
@@ -8,9 +9,6 @@ interface Props {
 
 export default function CheckoutProducts({ shops }: Props) {
 
-
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
 
   return (
     <>
@@ -35,7 +33,7 @@ export default function CheckoutProducts({ shops }: Props) {
               </div>
 
               <div className="product-price">
-                {formatPrice(item.unitPriceSnapshot)} {item.currencySnapshot}
+                {formatVnd(item.unitPriceSnapshot, item.currencySnapshot)}
               </div>
             </div>
           ))}

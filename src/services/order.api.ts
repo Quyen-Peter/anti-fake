@@ -135,11 +135,13 @@ export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> =>
     throw new Error(data.message || "Khong the tai chi tiet don hang");
   }
 
+  const payload = data?.data ?? data;
+
   return {
-    ...data,
-    id: data.id ?? data.orderId,
-    shops: Array.isArray(data.shops)
-      ? data.shops.map((shop: RawOrderShop) => ({
+    ...payload,
+    id: payload.id ?? payload.orderId,
+    shops: Array.isArray(payload.shops)
+      ? payload.shops.map((shop: RawOrderShop) => ({
           ...shop,
           id: shop.id ?? shop.shopId,
           name: shop.name ?? shop.shopName,
@@ -152,7 +154,7 @@ export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> =>
             : [],
         }))
       : [],
-    histories: Array.isArray(data.histories) ? data.histories : [],
+    histories: Array.isArray(payload.histories) ? payload.histories : [],
   };
 };
 
@@ -172,6 +174,36 @@ export const cancelOrder = async (orderId: string) => {
   }
 
   return data;
+};
+
+export type FulfillmentStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "SHIPPING"
+  | "DELIVERED"
+  | "CANCELLED";
+
+export const updateOrderFulfillment = async (
+  orderId: string,
+  fulfillmentStatus: FulfillmentStatus,
+) => {
+  const response = await authFetch(`${BASE_URL}/api/orders/${orderId}/fulfillment`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fulfillmentStatus }),
+  });
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Khong the cap nhat trang thai don hang");
+  }
+
+  return data?.data ?? data;
 };
 
 export type SellerOrderCustomer = {
@@ -201,7 +233,7 @@ export type ShopOrderStatusSummary = {
   totalOrders: number;
   pendingOrders: number;
   shippingOrders: number;
-  completedOrders: number;
+  deliveredOrders: number;
 };
 
 type FetchSellerOrdersParams = {
@@ -303,6 +335,6 @@ export const fetchShopOrderStatusSummary = async (
     totalOrders: Number(payload.totalOrders ?? 0),
     pendingOrders: Number(payload.pendingOrders ?? 0),
     shippingOrders: Number(payload.shippingOrders ?? 0),
-    completedOrders: Number(payload.completedOrders ?? 0),
+    deliveredOrders: Number(payload.deliveredOrders ?? payload.completedOrders ?? 0),
   };
 };

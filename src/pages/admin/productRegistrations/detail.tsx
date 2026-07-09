@@ -22,6 +22,7 @@ import {
   updateAdminOfferModerationStatus,
   type AdminOfferModerationStatus,
 } from "../../../services/admin.api";
+import { formatVnd } from "../../../ultil/currency";
 
 const statusOptions: Array<{ value: AdminOfferModerationStatus; label: string }> = [
   { value: "pending", label: "Chờ duyệt" },
@@ -39,10 +40,7 @@ const getStatusType = (status?: string) => {
   return "pending";
 };
 
-const getStatusLabel = (status?: string) => {
-  const option = statusOptions.find((item) => item.value === status);
-  return option?.label ?? status ?? "Không rõ";
-};
+
 
 const formatDate = (value?: string) => {
   if (!value) return "--";
@@ -51,14 +49,8 @@ const formatDate = (value?: string) => {
   return date.toLocaleDateString("vi-VN");
 };
 
-const formatMoney = (value?: number, currency = "VND") => {
-  if (typeof value !== "number") return "--";
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const formatMoney = (value?: number, currency = "VND") =>
+  typeof value === "number" ? formatVnd(value, currency) : "--";
 
 const displayValue = (value?: number | string | null) => {
   if (value === undefined || value === null || value === "") return "--";
@@ -216,13 +208,13 @@ export default function AdminProductDetailPage() {
                     <span className={`admin-status ${getStatusType(offer.offerStatus)}`}>
                       {displayValue(offer.offerStatus)}
                     </span>
-                    <span
+                    {/* <span
                       className={`admin-status ${getStatusType(
                         offer.moderationStatus,
                       )}`}
                     >
                       {getStatusLabel(offer.moderationStatus)}
-                    </span>
+                    </span> */}
                   </div>
                   <h2>{offer.title}</h2>
                   <small>{offer.id}</small>

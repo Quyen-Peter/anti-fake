@@ -1,4 +1,5 @@
 import { Eye, PackageOpen, Pencil, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import "../../css/components/productManagement/productTable.css";
 import EmptyState from "../common/emptyState";
@@ -118,13 +119,21 @@ export default function ProductTable({ products }: Props) {
 
                 <td>
                   <div className="seller-product-actions">
-                    <button className="seller-product-action-btn view">
+                    <Link
+                      className="seller-product-action-btn view"
+                      to={`/seller/products/${product.id}`}
+                      aria-label={`Xem chi tiết ${product.name}`}
+                    >
                       <Eye size={18} />
-                    </button>
+                    </Link>
 
-                    <button className="seller-product-action-btn edit">
+                    <Link
+                      className="seller-product-action-btn edit"
+                      to={`/seller/products/${product.id}?edit=1`}
+                      aria-label={`Sửa ${product.name}`}
+                    >
                       <Pencil size={18} />
-                    </button>
+                    </Link>
 
                     <button className="seller-product-action-btn delete">
                       <Trash2 size={18} />

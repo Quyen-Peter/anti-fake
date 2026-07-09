@@ -10,6 +10,7 @@ import {
   type SellerOrder,
 } from "../../services/order.api";
 import { getMyShop } from "../../services/shop.api";
+import { formatVnd } from "../../ultil/currency";
 
 type ViewOrder = {
   id: string;
@@ -28,14 +29,6 @@ const normalizeMyShop = (data: any) => {
   if (Array.isArray(payload)) return payload[0] ?? null;
   return payload && typeof payload === "object" ? payload : null;
 };
-
-const formatCurrency = (value?: number) =>
-  typeof value === "number"
-    ? new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }).format(value)
-    : "";
 
 const formatDate = (value?: string) => {
   if (!value) return "";
@@ -58,7 +51,7 @@ const mapOrder = (order: SellerOrder): ViewOrder => ({
   customer: order.customer?.name || "Khach hang",
   email: order.customer?.email || "",
   date: formatDate(order.createdAt || order.orderDate || order.createdDate),
-  total: formatCurrency(order.orderAmount),
+  total: formatVnd(order.orderAmount),
   status: order.orderStatus,
 });
 

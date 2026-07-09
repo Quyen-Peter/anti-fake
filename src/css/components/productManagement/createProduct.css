@@ -668,7 +668,7 @@ textarea {
 }
 
 .price-box::before {
-  content: "₫";
+  content: "VND";
 
   position: absolute;
 

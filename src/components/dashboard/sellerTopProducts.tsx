@@ -3,17 +3,11 @@ import {
   fetchShopBestSellingProducts,
   type ShopBestSellingProduct,
 } from "../../services/shop.api";
+import { formatVnd } from "../../ultil/currency";
 
 type SellerTopProductsProps = {
   shopId?: string;
 };
-
-const formatCurrency = (value?: number, currency = "VND") =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value ?? 0);
 
 export default function SellerTopProducts({ shopId }: SellerTopProductsProps) {
   const [products, setProducts] = useState<ShopBestSellingProduct[]>([]);
@@ -72,7 +66,7 @@ export default function SellerTopProducts({ shopId }: SellerTopProductsProps) {
               <span>Đã bán {product.soldQuantity ?? 0}</span>
             </div>
 
-            <b>{formatCurrency(product.price, product.currency)}</b>
+            <b>{formatVnd(product.price, product.currency)}</b>
           </div>
         ))}
     </div>

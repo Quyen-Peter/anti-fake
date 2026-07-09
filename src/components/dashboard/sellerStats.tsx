@@ -8,6 +8,7 @@ import {
   getShopSummaryMetrics,
   type ShopSummaryMetricsResponse,
 } from "../../services/shop.api";
+import { formatVnd } from "../../ultil/currency";
 
 type SellerStatsProps = {
   shopId?: string;
@@ -31,13 +32,6 @@ const getTodayRange = () => {
     to: to.toISOString(),
   };
 };
-
-const formatCurrency = (value?: number) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value ?? 0);
 
 const formatNumber = (value?: number) =>
   new Intl.NumberFormat("vi-VN").format(value ?? 0);
@@ -78,7 +72,7 @@ export default function SellerStats({ shopId }: SellerStatsProps) {
     () => [
       {
         title: "Doanh thu",
-        value: loading ? "..." : formatCurrency(metrics?.revenue?.value),
+        value: loading ? "..." : formatVnd(metrics?.revenue?.value ?? 0),
         icon: DollarSign,
         change: formatChange(metrics?.revenue?.growthPercent),
       },

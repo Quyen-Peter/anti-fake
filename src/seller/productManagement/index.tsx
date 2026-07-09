@@ -5,12 +5,14 @@ import "../../css/pages/productManagement.css";
 import ProductCard from "../../components/productManagement/productCard";
 import CreateProduct from "../../components/productManagement/createProduct";
 import {
+  type FetchShopOffersParams,
   fetchShopCategories,
   fetchShopOffers,
   getMyShop,
   type ShopCategory,
   type ShopOffer,
 } from "../../services/shop.api";
+import { formatVnd } from "../../ultil/currency";
 
 type Product = {
   id: string;
@@ -24,7 +26,32 @@ type Product = {
   image: string;
 };
 
-const PAGE_SIZE = 20;
+type ProductTab =
+  | "all"
+  | "active"
+  | "low"
+  | "review"
+  | "failed"
+  | "disabled";
+
+const PAGE_SIZE = 100;
+const LOW_STOCK_THRESHOLD = 10;
+
+const getOfferQueryByTab = (tab: ProductTab): FetchShopOffersParams => {
+  switch (tab) {
+    case "active":
+    case "low":
+      return { offerStatus: "active", moderationStatus: "approved" };
+    case "review":
+      return { offerStatus: "active", moderationStatus: "pending" };
+    case "failed":
+      return { offerStatus: "active", moderationStatus: "rejected" };
+    case "disabled":
+      return { offerStatus: "inactive", moderationStatus: "approved" };
+    default:
+      return {};
+  }
+};
 
 const normalizeMyShop = (data: unknown) => {
   if (!data || typeof data !== "object") return null;
@@ -41,23 +68,23 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 const formatCurrency = (value?: number, currency = "VND") =>
-  typeof value === "number"
-    ? new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency,
-      }).format(value)
-    : "";
+  typeof value === "number" ? formatVnd(value, currency) : "";
 
 const normalizeStatus = (offer: ShopOffer) => {
-  const status = offer.offerStatus?.toLowerCase() || "active";
+  const offerStatus = offer.offerStatus?.toLowerCase() || "active";
+  const moderationStatus = offer.moderationStatus?.toLowerCase();
   const stock = offer.availableQuantity ?? 0;
 
-  if (status === "pending") return "review";
-  if (status === "rejected") return "failed";
-  if (status === "inactive") return "disabled";
-  if (status === "active" && stock > 0 && stock <= 5) return "low";
+  if (moderationStatus === "pending") return "review";
+  if (moderationStatus === "rejected" || moderationStatus === "banned") {
+    return "failed";
+  }
+  if (offerStatus === "inactive") return "disabled";
+  if (offerStatus === "active" && stock > 0 && stock <= LOW_STOCK_THRESHOLD) {
+    return "low";
+  }
 
-  return status;
+  return offerStatus;
 };
 
 const mapOfferToProduct = (
@@ -73,7 +100,7 @@ const mapOfferToProduct = (
     id: offer.id,
     name: offer.title,
     sku: offer.id,
-    category: category?.name || "Chua phan loai",
+    category: offer.categoryName || category?.name || "Chua phan loai",
     categoryId,
     price: formatCurrency(offer.price, offer.currency || "VND"),
     stock: offer.availableQuantity ?? 0,
@@ -110,7 +137,7 @@ function ProductLoading() {
 }
 
 export default function ProductManagement() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState<ProductTab>("all");
   const [searchText, setSearchText] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [openCreateProduct, setOpenCreateProduct] = useState(false);
@@ -154,7 +181,11 @@ export default function ProductManagement() {
       try {
         const [categoryData, offerData] = await Promise.all([
           fetchShopCategories(shopId),
-          fetchShopOffers(shopId, 1, PAGE_SIZE),
+          fetchShopOffers(shopId, {
+            ...getOfferQueryByTab(activeTab),
+            page: 1,
+            pageSize: PAGE_SIZE,
+          }),
         ]);
 
         setCategories(categoryData);
@@ -173,12 +204,12 @@ export default function ProductManagement() {
     };
 
     loadProducts();
-  }, [shopId, createVersion]);
+  }, [shopId, activeTab, createVersion]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const statusMatch =
-        activeTab === "all" ? true : product.status === activeTab;
+      const stockMatch =
+        activeTab === "low" ? product.stock <= LOW_STOCK_THRESHOLD : true;
 
       const keyword = searchText.trim().toLowerCase();
 
@@ -192,12 +223,9 @@ export default function ProductManagement() {
           ? true
           : String(product.categoryId) === String(categoryFilter);
 
-      return statusMatch && searchMatch && categoryMatch;
+      return stockMatch && searchMatch && categoryMatch;
     });
   }, [products, activeTab, searchText, categoryFilter]);
-
-  const countByStatus = (status: string) =>
-    products.filter((product) => product.status === status).length;
 
   return (
     <div className="seller-product-page">
@@ -224,7 +252,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("all")}
           >
-            Tất cả ({products.length})
+            Tất cả
           </button>
 
           <button
@@ -233,7 +261,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("active")}
           >
-            Trên kệ ({countByStatus("active")})
+            Trên kệ 
           </button>
 
           <button
@@ -242,7 +270,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("low")}
           >
-            Còn ít ({countByStatus("low")})
+            Còn ít 
           </button>
 
           <button
@@ -251,7 +279,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("review")}
           >
-            Đang xét duyệt ({countByStatus("review")})
+            Đang xét duyệt 
           </button>
 
           <button
@@ -260,7 +288,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("failed")}
           >
-            Không thành công ({countByStatus("failed")})
+            Không thành công 
           </button>
 
           <button
@@ -269,7 +297,7 @@ export default function ProductManagement() {
             }`}
             onClick={() => setActiveTab("disabled")}
           >
-            Đã vô hiệu hóa ({countByStatus("disabled")})
+            Đã vô hiệu hóa 
           </button>
         </div>
         <div className="seller-product-search-select">

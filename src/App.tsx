@@ -30,6 +30,7 @@ import SellerLayout from "./layouts/sellerLayout";
 import AdminLayout from "./layouts/adminLayout";
 import SellerDashboard from "./seller/dashboard";
 import ProductManagement from "./seller/productManagement";
+import SellerProductDetail from "./seller/productManagement/detail";
 import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
 import SellerShopInfo from "./seller/shopInfo";
@@ -165,6 +166,7 @@ function App() {
             <Route path="/seller" element={<SellerLayout />}>
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<ProductManagement />} />
+              <Route path="products/:offerId" element={<SellerProductDetail />} />
               <Route path="orders" element={<OrderManagement />} />
               <Route path="orders/:orderId" element={<SellerOrderDetail />} />
               <Route path="wallet" element={<SellerWallet />} />

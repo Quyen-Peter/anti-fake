@@ -6,34 +6,35 @@ import {
   RotateCcw,
 } from "lucide-react";
 import "../../css/components/wallet/transactionTable.css";
+import { formatVnd } from "../../ultil/currency";
 
 const transactions = [
   {
     id: "#AF-77291",
     date: "15:30 - 24/10/2023",
     type: "withdraw",
-    amount: "-10.000.000₫",
+    amount: -10000000,
     status: "success",
   },
   {
     id: "#AF-77285",
     date: "09:12 - 24/10/2023",
     type: "order",
-    amount: "+2.450.000₫",
+    amount: 2450000,
     status: "success",
   },
   {
     id: "#AF-77280",
     date: "18:45 - 23/10/2023",
     type: "withdraw",
-    amount: "-5.000.000₫",
+    amount: -5000000,
     status: "processing",
   },
   {
     id: "#AF-77272",
     date: "10:00 - 23/10/2023",
     type: "refund",
-    amount: "-1.200.000₫",
+    amount: -1200000,
     status: "failed",
   },
 ];
@@ -103,7 +104,10 @@ export default function TransactionTable() {
               <td>{item.id}</td>
               <td>{item.date}</td>
               <td>{renderType(item.type)}</td>
-              <td>{item.amount}</td>
+              <td>
+                {item.amount > 0 ? "+" : ""}
+                {formatVnd(item.amount)}
+              </td>
 
               <td>
                 <span className={`status ${item.status}`}>

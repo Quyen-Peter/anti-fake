@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, ShoppingCart, Store } from "lucide-react";
+import { toast } from "sonner";
 
 import CartItem from "../../components/cart/cartItem";
 import CartSummary from "../../components/cart/cartSummary";
@@ -13,12 +14,52 @@ import {
   fetchCart,
   updateCartItemQuantity,
 } from "../../services/cart.api";
-import { toast } from "sonner";
 import { useCartStore } from "../../store/cartStore";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 
+function CartLoading() {
+  return (
+    <div className="cart-page">
+      <div className="cart-left">
+        <div className="cart-header">
+          <h1>Giỏ hàng của bạn</h1>
+          <span>Đang tải...</span>
+        </div>
+
+        <div className="cart-loading-card" role="status" aria-live="polite">
+          <div className="cart-loading-head">
+            <span className="cart-loading-spinner" />
+            <span>Đang tải giỏ hàng...</span>
+          </div>
+
+          {Array.from({ length: 3 }, (_, index) => (
+            <div className="cart-loading-row" key={index}>
+              <span />
+              <div>
+                <span />
+                <span />
+              </div>
+              <span />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="cart-right">
+        <div className="cart-summary cart-summary-loading">
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CartPage() {
   const [cartShops, setCartShops] = useState<any[]>([]);
+  const [loadingCart, setLoadingCart] = useState(true);
+  const [cartActionLoading, setCartActionLoading] = useState("");
   const refreshCart = useCartStore((state) => state.refreshCart);
   const showLoading = useGlobalLoadingStore((state) => state.showLoading);
   const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
@@ -26,6 +67,7 @@ export default function CartPage() {
   useEffect(() => {
     const loadCart = async () => {
       try {
+        setLoadingCart(true);
         const data = await fetchCart();
 
         setCartShops(
@@ -40,16 +82,20 @@ export default function CartPage() {
         refreshCart();
       } catch (error) {
         console.error(error);
+        toast.error("Không thể tải giỏ hàng");
+      } finally {
+        setLoadingCart(false);
       }
     };
 
     loadCart();
-  }, []);
+  }, [refreshCart]);
 
   const handleQuantityChange = async (itemId: string, quantity: number) => {
-    try {
-      if (quantity < 1) return;
+    if (quantity < 1 || cartActionLoading) return;
 
+    try {
+      setCartActionLoading(itemId);
       showLoading("Đang cập nhật giỏ hàng...");
       await updateCartItemQuantity(itemId, quantity);
 
@@ -57,25 +103,24 @@ export default function CartPage() {
         prev.map((shop) => ({
           ...shop,
           items: shop.items.map((item: any) =>
-            item.id === itemId
-              ? {
-                  ...item,
-                  quantity,
-                }
-              : item,
+            item.id === itemId ? { ...item, quantity } : item,
           ),
         })),
       );
     } catch (error) {
       console.error(error);
+      toast.error("Cập nhật giỏ hàng thất bại");
     } finally {
+      setCartActionLoading("");
       hideLoading();
     }
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    try {
+    if (cartActionLoading) return;
 
+    try {
+      setCartActionLoading(itemId);
       showLoading("Đang xóa sản phẩm...");
       await deleteCartItem(itemId);
 
@@ -92,19 +137,20 @@ export default function CartPage() {
       console.error(error);
       toast.error("Xóa thất bại!");
     } finally {
+      setCartActionLoading("");
       hideLoading();
     }
   };
 
   const isShopSelected = (shopId: string) => {
-    const shop = cartShops.find((s) => s.shopId === shopId);
-
+    const shop = cartShops.find((item) => item.shopId === shopId);
     if (!shop) return false;
-
     return shop.items.some((item: any) => item.selected);
   };
 
   const toggleShopSelect = (shopId: string) => {
+    if (cartActionLoading) return;
+
     setCartShops((prev) =>
       prev.map((shop) => {
         if (shop.shopId !== shopId) return shop;
@@ -123,16 +169,13 @@ export default function CartPage() {
   };
 
   const toggleSelect = (id: string) => {
+    if (cartActionLoading) return;
+
     setCartShops((prev) =>
       prev.map((shop) => ({
         ...shop,
         items: shop.items.map((item: any) =>
-          item.id === id
-            ? {
-                ...item,
-                selected: !item.selected,
-              }
-            : item,
+          item.id === id ? { ...item, selected: !item.selected } : item,
         ),
       })),
     );
@@ -152,13 +195,8 @@ export default function CartPage() {
   );
 
   const discount = 0;
-
   const total = subtotal - discount;
-
-  const totalItems = cartShops.reduce(
-    (sum, shop) => sum + shop.items.length,
-    0,
-  );
+  const totalItems = cartShops.reduce((sum, shop) => sum + shop.items.length, 0);
 
   const selectedShops = cartShops
     .map((shop) => ({
@@ -166,6 +204,8 @@ export default function CartPage() {
       items: shop.items.filter((item: any) => item.selected),
     }))
     .filter((shop) => shop.items.length > 0);
+
+  if (loadingCart) return <CartLoading />;
 
   if (totalItems === 0) {
     return (
@@ -200,6 +240,7 @@ export default function CartPage() {
               <input
                 type="checkbox"
                 checked={isShopSelected(shop.shopId)}
+                disabled={Boolean(cartActionLoading)}
                 onChange={() => toggleShopSelect(shop.shopId)}
               />
 
@@ -209,13 +250,17 @@ export default function CartPage() {
             </div>
 
             {shop.items.map((item: any) => (
-              <CartItem
+              <div
                 key={item.id}
-                item={item}
-                toggleSelect={toggleSelect}
-                onQuantityChange={handleQuantityChange}
-                onDelete={handleDeleteItem}
-              />
+                className={cartActionLoading === item.id ? "cart-item-busy" : ""}
+              >
+                <CartItem
+                  item={item}
+                  toggleSelect={toggleSelect}
+                  onQuantityChange={handleQuantityChange}
+                  onDelete={handleDeleteItem}
+                />
+              </div>
             ))}
           </div>
         ))}

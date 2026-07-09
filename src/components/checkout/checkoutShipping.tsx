@@ -1,5 +1,6 @@
 import { Truck } from "lucide-react";
 import type { ShippingOption } from "../../type/checkout";
+import { formatVnd } from "../../ultil/currency";
 
 interface Props {
   error: string;
@@ -54,7 +55,7 @@ export default function CheckoutShipping({
                 <p>Dự kiến giao: {option.estimatedDelivery}</p>
               </div>
 
-              <span>{option.shippingFee.toLocaleString()}đ</span>
+              <span>{formatVnd(option.shippingFee)}</span>
             </label>
           ))}
         </div>

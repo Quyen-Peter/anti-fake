@@ -5,6 +5,7 @@ import { addToCart, fetchCart } from "../../services/cart.api";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/cartStore";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+import { formatVnd } from "../../ultil/currency";
 
 const getCartItemId = (value: any) =>
   value?.id ??
@@ -57,9 +58,6 @@ export default function ProductInfo({ product, shop }: any) {
   const showLoading = useGlobalLoadingStore((state) => state.showLoading);
   const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
     const refreshCart = useCartStore((state) => state.refreshCart);
-
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("vi-VN").format(price);
 
   const handleAddToCart = async () => {
     try {
@@ -136,7 +134,7 @@ export default function ProductInfo({ product, shop }: any) {
     <div className="pd-info">
       <h1>{product.title}</h1>
 
-      <div className="pd-price">{formatPrice(product.price)}đ</div>
+      <div className="pd-price">{formatVnd(product.price, product.currency)}</div>
       <div className="pd-info-row">
         <span>Đã bán:</span>
         <b className="pd-soldQuantity">{product.soldQuantity}</b>

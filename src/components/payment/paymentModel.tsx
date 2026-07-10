@@ -1,16 +1,21 @@
 import {
+  AlertTriangle,
   ArrowLeft,
   CircleHelp,
+  ExternalLink,
   Landmark,
+  Loader2,
   QrCode,
+  RefreshCw,
   ShieldCheck,
   Wallet,
 } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { usePayOS, type PayOSConfig } from "@payos/payos-checkout";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import "../../css/components/payment/paymentModel.css";
-import { useEffect, useMemo } from "react";
+import { fetchOrderDetail } from "../../services/order.api";
 import { formatVnd } from "../../ultil/currency";
 
 type PaymentModelProps = {
@@ -26,6 +31,9 @@ type CheckoutState = {
   checkoutUrl: string;
 };
 
+const successStatuses = new Set(["PAID", "SUCCESS", "SUCCEEDED"]);
+const failedStatuses = new Set(["FAILED", "CANCELLED", "CANCELED", "EXPIRED"]);
+
 const firstValue = <T,>(...values: Array<T | undefined | null>) =>
   values.find((value) => value !== undefined && value !== null);
 
@@ -36,9 +44,9 @@ const isCheckoutState = (value: unknown): value is CheckoutState => {
 
   return Boolean(
     checkout.orderId &&
-    checkout.orderCode &&
-    typeof checkout.checkoutUrl === "string" &&
-    checkout.checkoutUrl.startsWith("https://pay.payos.vn/"),
+      checkout.orderCode &&
+      typeof checkout.checkoutUrl === "string" &&
+      checkout.checkoutUrl.startsWith("https://pay.payos.vn/"),
   );
 };
 
@@ -50,8 +58,13 @@ export default function PaymentModel({
 }: PaymentModelProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const checkout = location.state?.checkout;
   const hasCheckout = isCheckoutState(checkout);
+  const navigatedRef = useRef(false);
+  const [embedError, setEmbedError] = useState("");
+  const [checkingPayment, setCheckingPayment] = useState(false);
+  const [openingPayos, setOpeningPayos] = useState(false);
 
   const displayAmount = Number(firstValue(amount, location.state?.amount, 0));
   const displayOrderCode = String(
@@ -64,6 +77,60 @@ export default function PaymentModel({
   );
   const checkoutUrl = hasCheckout ? checkout.checkoutUrl : "";
 
+  const finishPayment = (
+    result: "success" | "failed",
+    paymentStatus: string,
+    reason?: string,
+  ) => {
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+
+    navigate(result === "success" ? "/payment-success" : "/payment-failed", {
+      replace: true,
+      state: {
+        checkout: hasCheckout ? checkout : undefined,
+        paymentMethod: "PAYOS",
+        paymentStatus,
+        reason,
+      },
+    });
+  };
+
+  const checkPaymentNow = async () => {
+    if (!hasCheckout || checkingPayment) return;
+
+    setCheckingPayment(true);
+
+    try {
+      const order = await fetchOrderDetail(checkout.orderId);
+      const paymentStatus = String(order.paymentStatus ?? "").toUpperCase();
+
+      if (successStatuses.has(paymentStatus)) {
+        finishPayment("success", paymentStatus);
+        return;
+      }
+
+      if (failedStatuses.has(paymentStatus)) {
+        finishPayment("failed", paymentStatus, "Thanh toán không thành công");
+        return;
+      }
+    } catch (error) {
+      setEmbedError(
+        error instanceof Error
+          ? error.message
+          : "Không thể kiểm tra trạng thái thanh toán",
+      );
+    } finally {
+      setCheckingPayment(false);
+    }
+  };
+
+  const openPayosPage = () => {
+    if (!checkoutUrl) return;
+    setOpeningPayos(true);
+    window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => setOpeningPayos(false), 900);
+  };
 
   const payOSConfig = useMemo<PayOSConfig>(
     () => ({
@@ -71,27 +138,16 @@ export default function PaymentModel({
       ELEMENT_ID: "payos-checkout-frame",
       CHECKOUT_URL: checkoutUrl,
       embedded: true,
-
-      onSuccess: () => {
-        navigate("/payment-success", {
-          replace: true,
-          state: {
-            checkout,
-            paymentMethod: "PAYOS",
-            paymentStatus: "PAID",
-          },
-        });
-      },
-
-      onCancel: () => {
-        console.log("Đã hủy thanh toán");
-      },
-
+      onSuccess: () => finishPayment("success", "PAID"),
+      onCancel: () =>
+        finishPayment("failed", "CANCELLED", "Người dùng đã hủy thanh toán"),
       onExit: () => {
-        console.log("Đóng cửa sổ thanh toán");
+        setEmbedError(
+          "Cửa sổ thanh toán đã đóng. Nếu bạn đã thanh toán, hãy bấm kiểm tra lại trạng thái.",
+        );
       },
     }),
-    [checkoutUrl, navigate],
+    [checkoutUrl, hasCheckout],
   );
 
   const { open } = usePayOS(payOSConfig);
@@ -99,8 +155,68 @@ export default function PaymentModel({
   useEffect(() => {
     if (!checkoutUrl) return;
 
-    open();
+    try {
+      open();
+    } catch (error) {
+      setEmbedError(
+        error instanceof Error
+          ? error.message
+          : "Không thể nhúng mã QR PayOS vào trang",
+      );
+    }
   }, [checkoutUrl, open]);
+
+  useEffect(() => {
+    const status =
+      searchParams.get("status") ??
+      searchParams.get("code") ??
+      searchParams.get("paymentStatus");
+    const cancel = searchParams.get("cancel");
+
+    if (cancel === "true") {
+      finishPayment("failed", "CANCELLED", "Người dùng đã hủy thanh toán");
+      return;
+    }
+
+    if (!status) return;
+
+    const normalizedStatus = status.toUpperCase();
+    if (successStatuses.has(normalizedStatus) || normalizedStatus === "00") {
+      finishPayment("success", "PAID");
+      return;
+    }
+
+    if (failedStatuses.has(normalizedStatus)) {
+      finishPayment("failed", normalizedStatus, "Thanh toán không thành công");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!hasCheckout) return;
+
+    const intervalId = window.setInterval(() => {
+      if (!navigatedRef.current) {
+        checkPaymentNow();
+      }
+    }, 3500);
+
+    return () => window.clearInterval(intervalId);
+  }, [hasCheckout, checkout?.orderId]);
+
+  useEffect(() => {
+    if (!checkoutUrl) return;
+
+    const timeoutId = window.setTimeout(() => {
+      const frame = document.querySelector("#payos-checkout-frame iframe");
+      if (!frame && !navigatedRef.current) {
+        setEmbedError(
+          "Mã QR PayOS chưa hiển thị. Bạn có thể mở trang PayOS để tiếp tục thanh toán.",
+        );
+      }
+    }, 4500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [checkoutUrl]);
 
   return (
     <section className="payment-model-page">
@@ -125,7 +241,18 @@ export default function PaymentModel({
             </div>
 
             {checkoutUrl ? (
-              <div id="payos-checkout-frame" className="payment-embed-frame" />
+              <>
+                <div id="payos-checkout-frame" className="payment-embed-frame" />
+                {embedError ? (
+                  <div className="payment-embed-alert" role="alert">
+                    <AlertTriangle size={18} />
+                    <div>
+                      <strong>Không thể hiển thị QR ổn định</strong>
+                      <p>{embedError}</p>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : (
               <div className="payment-qr-frame">
                 <div className="payment-qr-placeholder">
@@ -134,20 +261,50 @@ export default function PaymentModel({
               </div>
             )}
 
-            <strong className="payment-amount">
-              {formatVnd(displayAmount)}
-            </strong>
-            <p className="payment-auto-note">Tự động cập nhật sau khi quét</p>
+            <strong className="payment-amount">{formatVnd(displayAmount)}</strong>
+            <p className="payment-auto-note">
+              Hệ thống tự kiểm tra kết quả sau khi bạn thanh toán
+            </p>
 
             {checkoutUrl ? (
-              <a
-                className="payment-open-link"
-                href={checkoutUrl}
-                target="_blank"
-                rel="noreferrer"
+              <div className="payment-link-actions">
+                <button
+                  type="button"
+                  className="payment-open-link"
+                  onClick={openPayosPage}
+                  disabled={openingPayos}
+                >
+                  {openingPayos ? (
+                    <Loader2 size={16} className="payment-spin" />
+                  ) : (
+                    <ExternalLink size={16} />
+                  )}
+                  Mở trang PayOS
+                </button>
+                <button
+                  type="button"
+                  className="payment-check-btn"
+                  onClick={checkPaymentNow}
+                  disabled={checkingPayment}
+                >
+                  {checkingPayment ? (
+                    <Loader2 size={16} className="payment-spin" />
+                  ) : (
+                    <RefreshCw size={16} />
+                  )}
+                  Kiểm tra thanh toán
+                </button>
+              </div>
+            ) : null}
+
+            {checkingPayment ? (
+              <div
+                className="payment-checking-note"
+                role="status"
+                aria-live="polite"
               >
-                Mở trang thanh toán
-              </a>
+                Đang kiểm tra kết quả thanh toán từ đơn hàng...
+              </div>
             ) : null}
 
             <div
@@ -181,7 +338,7 @@ export default function PaymentModel({
                 </li>
                 <li>
                   <span>3</span>
-                  Quét mã QR và xác nhận thanh toán.
+                  Quét mã QR, xác nhận thanh toán và chờ hệ thống kiểm tra.
                 </li>
               </ol>
 

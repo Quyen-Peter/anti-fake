@@ -360,7 +360,12 @@ export const fetchShopSubmittedDocuments = async (
     code: typeof item.code === "string" ? item.code : undefined,
     docType: typeof item.docType === "string" ? item.docType : undefined,
     name: typeof item.name === "string" ? item.name : undefined,
-    status: typeof item.status === "string" ? item.status : undefined,
+    status:
+      typeof item.reviewStatus === "string"
+        ? item.reviewStatus
+        : typeof item.status === "string"
+          ? item.status
+          : undefined,
     reviewNote: typeof item.reviewNote === "string" ? item.reviewNote : null,
     fileUrl: typeof item.fileUrl === "string" ? item.fileUrl : undefined,
     files: Array.isArray(item.files)

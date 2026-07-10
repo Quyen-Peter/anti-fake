@@ -512,6 +512,97 @@
   color: #7f1d1d;
 }
 
+.seller-register-review-box {
+  width: min(640px, 100%);
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid #f0c9c9;
+  border-radius: 8px;
+  background: #fff7f7;
+  text-align: left;
+}
+
+.seller-register-review-box h2 {
+  margin: 0 0 18px;
+  color: #7f1d1d;
+  font-size: 17px;
+}
+
+.seller-register-review-section + .seller-register-review-section {
+  margin-top: 20px;
+}
+
+.seller-register-review-section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.seller-register-review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.seller-register-review-list article,
+.seller-register-review-kyc {
+  padding: 12px;
+  border: 1px solid #efdada;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.seller-register-review-list article > div,
+.seller-register-review-kyc > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.seller-register-review-list span,
+.seller-register-review-kyc span {
+  color: #b00020;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seller-register-review-list p,
+.seller-register-review-kyc p,
+.seller-register-review-section > p,
+.seller-register-review-loading {
+  margin: 8px 0 0;
+  color: #6f4d4d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.seller-register-review-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.seller-register-review-gallery a {
+  display: block;
+  overflow: hidden;
+  border: 1px solid #efdada;
+  border-radius: 6px;
+  background: #f8f8f8;
+}
+
+.seller-register-review-gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 160ms ease;
+}
+
+.seller-register-review-gallery a:hover img,
+.seller-register-review-gallery a:focus-visible img {
+  transform: scale(1.03);
+}
+
 .seller-register-next-box {
   width: min(640px, 100%);
   margin: 30px 0;

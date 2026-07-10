@@ -1,13 +1,35 @@
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
+import type { ShopSubmittedDocument } from "../../services/shop.api";
+import type { UserKyc } from "../../services/user.api";
 import type { RegistrationStatus } from "./sellerRegistration";
 
 type CompletionStepProps = {
   status: RegistrationStatus;
   onRetry: () => void;
+  loadingReviewDetails?: boolean;
+  shopDocuments?: ShopSubmittedDocument[];
+  userKyc?: UserKyc | null;
 };
 
-export default function CompletionStep({ status, onRetry }: CompletionStepProps) {
+const reviewStatusLabel: Record<string, string> = {
+  pending: "Đang chờ duyệt",
+  approved: "Đã duyệt",
+  rejected: "Không đạt",
+};
+
+const formatReviewStatus = (status?: string) =>
+  reviewStatusLabel[String(status ?? "").toLowerCase()] ||
+  status ||
+  "Chưa có trạng thái";
+
+export default function CompletionStep({
+  status,
+  onRetry,
+  loadingReviewDetails = false,
+  shopDocuments = [],
+  userKyc = null,
+}: CompletionStepProps) {
   const isRejected = status === "rejected";
 
   return (
@@ -30,6 +52,114 @@ export default function CompletionStep({ status, onRetry }: CompletionStepProps)
           ? "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại thông tin cửa hàng và gửi lại hồ sơ."
           : "Cảm ơn bạn đã gửi hồ sơ đăng ký. Hệ thống AntiFake sẽ tiến hành kiểm tra và xác thực thông tin trong vòng 24 đến 48 giờ làm việc."}
       </p>
+
+      {isRejected && (
+        <div className="seller-register-review-box">
+          <h2>Chi tiết hồ sơ cần bổ sung</h2>
+
+          {loadingReviewDetails ? (
+            <p className="seller-register-review-loading">
+              Đang tải nhận xét hồ sơ...
+            </p>
+          ) : (
+            <>
+              <section className="seller-register-review-section">
+                <h3>Hồ sơ pháp lý shop</h3>
+                {shopDocuments.length > 0 ? (
+                  <div className="seller-register-review-list">
+                    {shopDocuments.map((document, index) => {
+                      const imageUrls = document.files?.length
+                        ? document.files.map((file) => file.fileUrl)
+                        : document.fileUrl
+                          ? [document.fileUrl]
+                          : [];
+                      const documentName =
+                        document.name ||
+                        document.docType ||
+                        document.code ||
+                        `Hồ sơ ${index + 1}`;
+
+                      return (
+                        <article
+                          key={document.id || `${document.docType}-${index}`}
+                        >
+                          <div>
+                            <strong>{documentName}</strong>
+                            <span>{formatReviewStatus(document.status)}</span>
+                          </div>
+                          <p>
+                            {document.reviewNote ||
+                              "Chưa có nhận xét từ người duyệt."}
+                          </p>
+                          {imageUrls.length > 0 && (
+                            <div className="seller-register-review-gallery">
+                              {imageUrls.map((fileUrl, fileIndex) => (
+                                <a
+                                  key={`${fileUrl}-${fileIndex}`}
+                                  href={fileUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  aria-label={`Mở ảnh ${documentName} ${fileIndex + 1}`}
+                                >
+                                  <img
+                                    src={fileUrl}
+                                    alt={`${documentName} ${fileIndex + 1}`}
+                                    loading="lazy"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p>Chưa có dữ liệu hồ sơ pháp lý.</p>
+                )}
+              </section>
+
+              <section className="seller-register-review-section">
+                <h3>Hồ sơ xác minh KYC</h3>
+                {userKyc ? (
+                  <article className="seller-register-review-kyc">
+                    <div>
+                      <strong>{userKyc.idType || "Giấy tờ định danh"}</strong>
+                      <span>
+                        {formatReviewStatus(userKyc.verificationStatus)}
+                      </span>
+                    </div>
+                    <p>
+                      {userKyc.reviewNote || "Chưa có nhận xét từ người duyệt."}
+                    </p>
+                    {userKyc.documents.length > 0 && (
+                      <div className="seller-register-review-gallery">
+                        {userKyc.documents.map((document, index) => (
+                          <a
+                            key={document.mediaAssetId || document.fileUrl}
+                            href={document.fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`Mở ảnh KYC ${document.side || index + 1}`}
+                          >
+                            <img
+                              src={document.fileUrl}
+                              alt={`Ảnh KYC ${document.side || index + 1}`}
+                              loading="lazy"
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                ) : (
+                  <p>Chưa có dữ liệu hồ sơ KYC.</p>
+                )}
+              </section>
+            </>
+          )}
+        </div>
+      )}
 
       {!isRejected && (
         <div className="seller-register-next-box">

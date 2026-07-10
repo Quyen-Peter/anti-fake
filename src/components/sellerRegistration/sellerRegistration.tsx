@@ -13,11 +13,17 @@ import { fetchCategories } from "../../services/category.api";
 import {
   createShop,
   fetchShopDocumentRequirements,
+  fetchShopSubmittedDocuments,
   getMyShop,
   submitShopDocuments,
   type ShopDocumentRequirement,
+  type ShopSubmittedDocument,
 } from "../../services/shop.api";
-import { submitUserKyc } from "../../services/user.api";
+import {
+  getUserKyc,
+  submitUserKyc,
+  type UserKyc,
+} from "../../services/user.api";
 import LoadingOverlay from "../loadingOverlay";
 import CompletionStep from "./CompletionStep";
 import StoreInfoStep from "./StoreInfoStep";
@@ -152,6 +158,11 @@ export default function SellerRegistration() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingRequirements, setLoadingRequirements] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingReviewDetails, setLoadingReviewDetails] = useState(false);
+  const [shopReviewDocuments, setShopReviewDocuments] = useState<
+    ShopSubmittedDocument[]
+  >([]);
+  const [userKycReview, setUserKycReview] = useState<UserKyc | null>(null);
   const isRejectedRegistration = registrationStatus === "rejected";
 
   const completedSteps = useMemo(
@@ -196,6 +207,35 @@ export default function SellerRegistration() {
 
     loadRequirements();
   }, [step, shopId]);
+
+  useEffect(() => {
+    if (!isRejectedRegistration || !shopId) return;
+
+    const loadReviewDetails = async () => {
+      setLoadingReviewDetails(true);
+
+      const [documentsResult, kycResult] = await Promise.allSettled([
+        fetchShopSubmittedDocuments(shopId),
+        getUserKyc(),
+      ]);
+
+      if (documentsResult.status === "fulfilled") {
+        setShopReviewDocuments(documentsResult.value);
+      } else {
+        toast.error("Không thể tải nhận xét hồ sơ pháp lý của shop");
+      }
+
+      if (kycResult.status === "fulfilled") {
+        setUserKycReview(kycResult.value);
+      } else {
+        toast.error("Không thể tải nhận xét hồ sơ KYC");
+      }
+
+      setLoadingReviewDetails(false);
+    };
+
+    loadReviewDetails();
+  }, [isRejectedRegistration, shopId]);
 
   const handleFileChange =
     (field: "identityFront" | "identityBack") =>
@@ -407,6 +447,9 @@ export default function SellerRegistration() {
         <CompletionStep
           status={registrationStatus}
           onRetry={handleRetryRegistration}
+          loadingReviewDetails={loadingReviewDetails}
+          shopDocuments={shopReviewDocuments}
+          userKyc={userKycReview}
         />
       ) : (
         <>

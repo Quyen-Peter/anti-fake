@@ -8,7 +8,10 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const pickCheckoutValue = (data: any, key: "orderId" | "orderCode" | "checkoutUrl") =>
+const pickCheckoutValue = (
+  data: any,
+  key: "orderId" | "orderCode" | "checkoutUrl" | "paymentLinkId",
+) =>
   data?.[key] ??
   data?.data?.[key] ??
   data?.order?.[key] ??
@@ -106,10 +109,11 @@ export const checkoutCart = async (
     orderId: pickCheckoutValue(data, "orderId") ?? data?.id ?? data?.data?.id,
     orderCode: pickCheckoutValue(data, "orderCode") ?? data?.code ?? data?.data?.code,
     checkoutUrl: pickCheckoutValue(data, "checkoutUrl") ?? data?.paymentUrl,
+    paymentLinkId: pickCheckoutValue(data, "paymentLinkId"),
   };
 
-  if (payload.paymentMethod === "PAYOS" && !checkout.checkoutUrl) {
-    throw new Error("API checkout PAYOS thieu checkoutUrl");
+  if (payload.paymentMethod === "PAYOS" && !checkout.paymentLinkId) {
+    throw new Error("API checkout PAYOS thieu paymentLinkId");
   }
 
   return checkout;

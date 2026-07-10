@@ -25,11 +25,16 @@ import VerificationStep from "./VerificationStep";
 
 export type RegistrationStep = 1 | 2 | 3;
 export type BusinessType = "MANUFACTURER" | "DISTRIBUTOR";
+export type ShopRegistrationType =
+  | "NORMAL"
+  | "HANDMADE"
+  | "MANUFACTURER"
+  | "DISTRIBUTOR";
 export type RegistrationStatus = "pending_kyc" | "rejected" | "success";
 
 export type RegistrationForm = {
   storeName: string;
-  registrationType: string;
+  registrationType: ShopRegistrationType;
   taxCode: string;
   businessType: BusinessType;
   categoryIds: string[];
@@ -67,7 +72,7 @@ type RegisteredShop = {
 
 const initialRegistrationForm: RegistrationForm = {
   storeName: "",
-  registrationType: "MANUFACTURER",
+  registrationType: "NORMAL",
   taxCode: "",
   businessType: "MANUFACTURER",
   categoryIds: [],

@@ -28,7 +28,8 @@ type PaymentModelProps = {
 type CheckoutState = {
   orderId: string;
   orderCode: string | number;
-  checkoutUrl: string;
+  checkoutUrl?: string;
+  paymentLinkId: string;
 };
 
 const successStatuses = new Set(["PAID", "SUCCESS", "SUCCEEDED"]);
@@ -45,8 +46,8 @@ const isCheckoutState = (value: unknown): value is CheckoutState => {
   return Boolean(
     checkout.orderId &&
       checkout.orderCode &&
-      typeof checkout.checkoutUrl === "string" &&
-      checkout.checkoutUrl.startsWith("https://pay.payos.vn/"),
+      typeof checkout.paymentLinkId === "string" &&
+      checkout.paymentLinkId.length > 0,
   );
 };
 
@@ -76,6 +77,7 @@ export default function PaymentModel({
     ),
   );
   const checkoutUrl = hasCheckout ? checkout.checkoutUrl : "";
+  const paymentLinkId = hasCheckout ? checkout.paymentLinkId : "";
 
   const finishPayment = (
     result: "success" | "failed",
@@ -134,26 +136,19 @@ export default function PaymentModel({
 
   const payOSConfig = useMemo<PayOSConfig>(
     () => ({
-      RETURN_URL: `${window.location.origin}/payment`,
+      RETURN_URL: "https://api.antifake.io.vn/api/orders/payos/return",
       ELEMENT_ID: "payos-checkout-frame",
-      CHECKOUT_URL: checkoutUrl,
+      CHECKOUT_URL: hasCheckout ? checkout.paymentLinkId : "",
       embedded: true,
-      onSuccess: () => finishPayment("success", "PAID"),
-      onCancel: () =>
-        finishPayment("failed", "CANCELLED", "Người dùng đã hủy thanh toán"),
-      onExit: () => {
-        setEmbedError(
-          "Cửa sổ thanh toán đã đóng. Nếu bạn đã thanh toán, hãy bấm kiểm tra lại trạng thái.",
-        );
-      },
+      onSuccess: () => navigate("/payment-success"),
     }),
-    [checkoutUrl, hasCheckout],
+    [hasCheckout, checkout, navigate],
   );
 
   const { open } = usePayOS(payOSConfig);
 
   useEffect(() => {
-    if (!checkoutUrl) return;
+    if (!paymentLinkId) return;
 
     try {
       open();
@@ -164,7 +159,7 @@ export default function PaymentModel({
           : "Không thể nhúng mã QR PayOS vào trang",
       );
     }
-  }, [checkoutUrl, open]);
+  }, [paymentLinkId, open]);
 
   useEffect(() => {
     const status =
@@ -204,7 +199,7 @@ export default function PaymentModel({
   }, [hasCheckout, checkout?.orderId]);
 
   useEffect(() => {
-    if (!checkoutUrl) return;
+    if (!paymentLinkId) return;
 
     const timeoutId = window.setTimeout(() => {
       const frame = document.querySelector("#payos-checkout-frame iframe");
@@ -216,7 +211,7 @@ export default function PaymentModel({
     }, 4500);
 
     return () => window.clearTimeout(timeoutId);
-  }, [checkoutUrl]);
+  }, [paymentLinkId]);
 
   return (
     <section className="payment-model-page">
@@ -240,7 +235,7 @@ export default function PaymentModel({
               Giao dịch an toàn
             </div>
 
-            {checkoutUrl ? (
+            {paymentLinkId ? (
               <>
                 <div id="payos-checkout-frame" className="payment-embed-frame" />
                 {embedError ? (
@@ -266,7 +261,7 @@ export default function PaymentModel({
               Hệ thống tự kiểm tra kết quả sau khi bạn thanh toán
             </p>
 
-            {checkoutUrl ? (
+            {paymentLinkId ? (
               <div className="payment-link-actions">
                 <button
                   type="button"

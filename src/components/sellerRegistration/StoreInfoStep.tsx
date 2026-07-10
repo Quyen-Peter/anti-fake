@@ -1,6 +1,10 @@
 import { ArrowRight } from "lucide-react";
 import type { FormEvent } from "react";
-import type { RegistrationForm, ShopCategory } from "./sellerRegistration";
+import type {
+  RegistrationForm,
+  ShopCategory,
+  ShopRegistrationType,
+} from "./sellerRegistration";
 
 type StoreInfoStepProps = {
   form: RegistrationForm;
@@ -59,12 +63,16 @@ export default function StoreInfoStep({
               value={form.registrationType}
               disabled={submitting}
               onChange={(event) =>
-                setForm({ ...form, registrationType: event.target.value })
+                setForm({
+                  ...form,
+                  registrationType: event.target.value as ShopRegistrationType,
+                })
               }
             >
-              <option value="MANUFACTURER">MANUFACTURER</option>
-              <option value="DISTRIBUTOR">DISTRIBUTOR</option>
-              <option value="RETAILER">RETAILER</option>
+              <option value="NORMAL">Thông thường</option>
+              <option value="HANDMADE">Thủ công</option>
+              <option value="MANUFACTURER">Nhà sản xuất</option>
+              <option value="DISTRIBUTOR">Nhà phân phối</option>
             </select>
           </label>
 
@@ -81,7 +89,7 @@ export default function StoreInfoStep({
         </div>
 
         <fieldset className="seller-register-fieldset">
-          <legend>Loại hình kinh doanh</legend>
+          <legend>Quy mô kinh doanh</legend>
           <div className="seller-register-business-grid">
             <label
               className={`seller-register-business-option ${
@@ -98,7 +106,7 @@ export default function StoreInfoStep({
                 }
               />
               <span>
-                <strong>Nhà sản xuất</strong>
+                <strong>Công ty</strong>
                 <small>Tự sản xuất và phân phối sản phẩm gốc</small>
               </span>
             </label>

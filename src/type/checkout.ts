@@ -41,4 +41,5 @@ export interface CartCheckoutResponse {
   orderId?: string;
   orderCode?: string | number;
   checkoutUrl?: string;
+  paymentLinkId?: string;
 }

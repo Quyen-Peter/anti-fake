@@ -1,4 +1,11 @@
 import { authFetch } from "../ultil/auth";
+import type {
+  BuyNowCheckoutRequest,
+  BuyNowPreview,
+  BuyNowSelection,
+  CartCheckoutResponse,
+  ShippingOption,
+} from "../type/checkout";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -128,6 +135,123 @@ export const fetchOfferDetail = async (id: string): Promise<OfferDetail> => {
 
   const data = await response.json();
   return data?.data ?? data;
+};
+
+export const fetchBuyNowPreview = async ({
+  offerId,
+  variantId,
+  quantity,
+}: BuyNowSelection): Promise<BuyNowPreview> => {
+  const query = new URLSearchParams({
+    offerId,
+    quantity: String(quantity),
+  });
+  if (variantId) query.set("variantId", variantId);
+
+  const response = await authFetch(
+    `${BASE_URL}/api/offers/buy-now?${query.toString()}`,
+    {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    },
+  );
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể tải thông tin mua ngay");
+  }
+
+  const payload = data?.data ?? data;
+  if (!payload?.offerId || !payload?.shopId) {
+    throw new Error("Dữ liệu mua ngay không hợp lệ");
+  }
+
+  const previewQuantity = Number(payload.quantity);
+  const previewPrice = Number(payload.price);
+  if (
+    !Number.isInteger(previewQuantity) ||
+    previewQuantity <= 0 ||
+    !Number.isFinite(previewPrice) ||
+    previewPrice < 0
+  ) {
+    throw new Error("Số lượng hoặc giá mua ngay không hợp lệ");
+  }
+
+  const shippingOptions: ShippingOption[] = Array.isArray(payload.shippingOptions)
+    ? payload.shippingOptions
+        .map((option: unknown): ShippingOption | null => {
+          if (!option || typeof option !== "object") return null;
+          const record = option as Record<string, unknown>;
+          if (
+            typeof record.optionCode !== "string" ||
+            typeof record.providerCode !== "string" ||
+            typeof record.providerName !== "string" ||
+            typeof record.methodName !== "string"
+          ) {
+            return null;
+          }
+
+          return {
+            optionCode: record.optionCode,
+            providerCode: record.providerCode,
+            providerName: record.providerName,
+            methodName: record.methodName,
+            shippingFee: Number(record.shippingFee ?? 0),
+            estimatedDelivery: String(record.estimatedDelivery ?? ""),
+          };
+        })
+        .filter((option: ShippingOption | null): option is ShippingOption =>
+          option !== null,
+        )
+    : [];
+
+  return {
+    shopId: String(payload.shopId),
+    shopName: String(payload.shopName ?? "Shop"),
+    offerId: String(payload.offerId),
+    modelName: String(payload.modelName ?? "Sản phẩm"),
+    variantId:
+      typeof payload.variantId === "string" ? payload.variantId : undefined,
+    sku: typeof payload.sku === "string" ? payload.sku : undefined,
+    quantity: previewQuantity,
+    price: previewPrice,
+    thumbnailUrl:
+      typeof payload.thumbnailUrl === "string" ? payload.thumbnailUrl : undefined,
+    shippingOptions,
+  };
+};
+
+export const checkoutBuyNow = async (
+  payload: BuyNowCheckoutRequest,
+): Promise<CartCheckoutResponse> => {
+  const response = await authFetch(`${BASE_URL}/api/offers/buy-now/checkout`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Không thể tạo thanh toán mua ngay");
+  }
+
+  const result = data?.data ?? data;
+  const checkout = {
+    ...result,
+    orderId: result?.orderId ?? result?.id,
+    orderCode: result?.orderCode ?? result?.code,
+    checkoutUrl: result?.checkoutUrl ?? result?.paymentUrl,
+    paymentLinkId: result?.paymentLinkId,
+  };
+
+  if (payload.paymentMethod === "PAYOS" && !checkout.paymentLinkId) {
+    throw new Error("API mua ngay PAYOS thiếu paymentLinkId");
+  }
+
+  return checkout;
 };
 
 export const updateOffer = async (

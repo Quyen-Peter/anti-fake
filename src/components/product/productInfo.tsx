@@ -1,57 +1,32 @@
 import { QrCode, ShieldCheck, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addToCart, fetchCart } from "../../services/cart.api";
+import { addToCart } from "../../services/cart.api";
+import { fetchBuyNowPreview } from "../../services/product.api";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/cartStore";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 import { formatVnd } from "../../ultil/currency";
 
-const getCartItemId = (value: any) =>
-  value?.id ??
-  value?.cartItemId ??
-  value?.cartItem?.id ??
-  value?.item?.id ??
-  value?.data?.id ??
-  value?.data?.cartItemId ??
-  value?.data?.cartItem?.id ??
-  value?.data?.item?.id;
-
-const findCartItem = (cart: any, product: any, shopId?: string | number) => {
-  const shops = Array.isArray(cart?.shops) ? cart.shops : [];
-  const targetShopId = shopId ? String(shopId) : "";
-  const productId = String(product.id);
-
-  for (const cartShop of shops) {
-    if (
-      targetShopId &&
-      String(cartShop.shopId ?? cartShop.id) !== targetShopId
-    ) {
-      continue;
-    }
-
-    const items = Array.isArray(cartShop.items) ? cartShop.items : [];
-    const item = items.find((cartItem: any) => {
-      const offerId = cartItem.offerId ?? cartItem.productId ?? cartItem.offer?.id;
-
-      if (offerId && String(offerId) === productId) return true;
-
-      return (
-        cartItem.offerTitleSnapshot === product.title &&
-        Number(cartItem.unitPriceSnapshot) === Number(product.price)
-      );
-    });
-
-    if (item) return item;
-  }
-
-  return null;
+type ProductInfoData = {
+  id: string | number;
+  title: string;
+  price: number;
+  currency?: string;
+  salesMode?: string;
+  minWholesaleQty?: number;
+  soldQuantity?: number;
+  productModelName?: string;
+  availableQuantity: number;
+  selectedVariantId?: string | number;
+  variantId?: string | number;
+  variants?: Array<{ id?: string | number }>;
 };
 
-export default function ProductInfo({ product, shop }: any) {
+export default function ProductInfo({ product }: { product: ProductInfoData }) {
   const navigate = useNavigate();
   const minQuantity =
-    product.salesMode === "WHOLESALE" ? product.minWholesaleQty : 1;
+    product.salesMode === "WHOLESALE" ? (product.minWholesaleQty ?? 1) : 1;
   const [quantity, setQuantity] = useState(minQuantity);
   const [buyLoading, setBuyLoading] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
@@ -63,7 +38,7 @@ export default function ProductInfo({ product, shop }: any) {
     try {
       setCartLoading(true);
       showLoading("Đang thêm vào giỏ hàng...");
-      const result = await addToCart(product.id, quantity);
+      const result = await addToCart(String(product.id), quantity);
 
       console.log(result);
       refreshCart();
@@ -83,36 +58,37 @@ export default function ProductInfo({ product, shop }: any) {
       setBuyLoading(true);
       showLoading("Đang chuẩn bị đơn hàng...");
 
-      const shopId = shop?.shopId ?? shop?.id ?? product.shopId;
-      const shopName = shop?.shopName ?? product.shopName ?? "Shop";
-      const cartItem = await addToCart(product.id, quantity);
-      const cart = await fetchCart();
-      const cartItemFromCart = findCartItem(cart, product, shopId);
-      const cartItemId = getCartItemId(cartItem) ?? cartItemFromCart?.id;
-
-      if (!cartItemId) {
-        throw new Error("Khong tim thay san pham trong gio hang");
-      }
-
-      if (!shopId) {
-        throw new Error("Khong tim thay thong tin shop");
-      }
+      const variantId =
+        product.selectedVariantId ??
+        product.variantId ??
+        product.variants?.[0]?.id;
+      const preview = await fetchBuyNowPreview({
+        offerId: String(product.id),
+        variantId: variantId ? String(variantId) : undefined,
+        quantity,
+      });
 
       navigate("/checkout", {
         state: {
+          source: "buy-now",
+          buyNowSelection: {
+            offerId: preview.offerId,
+            variantId: preview.variantId,
+            quantity: preview.quantity,
+          },
+          shippingOptions: preview.shippingOptions,
           shops: [
             {
-              shopId: String(shopId),
-              shopName,
+              shopId: preview.shopId,
+              shopName: preview.shopName,
               items: [
                 {
-                  id: String(cartItemId),
-                  thumbnailUrl:
-                    product.thumbnailUrl ?? product.imageUrls?.[0] ?? "",
-                  offerTitleSnapshot: product.title,
-                  unitPriceSnapshot: product.price,
-                  currencySnapshot: product.currency ?? "VND",
-                  quantity,
+                  id: preview.variantId ?? preview.offerId,
+                  thumbnailUrl: preview.thumbnailUrl ?? "",
+                  offerTitleSnapshot: preview.modelName,
+                  unitPriceSnapshot: preview.price,
+                  currencySnapshot: "VND",
+                  quantity: preview.quantity,
                 },
               ],
             },

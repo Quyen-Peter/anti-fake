@@ -2,10 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { checkoutCart } from "../../services/cart.api";
+import { checkoutBuyNow } from "../../services/product.api";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+import type { BuyNowSelection, CheckoutSource } from "../../type/checkout";
 import { formatVnd } from "../../ultil/currency";
 
 interface Props {
+  source: CheckoutSource;
+  buyNowSelection?: BuyNowSelection;
   cartItemIds: string[];
   payment: string;
   shippingOptionCode: string;
@@ -21,6 +25,8 @@ const toPaymentMethod = (payment: string) => {
 };
 
 export default function CheckoutSummary({
+  source,
+  buyNowSelection,
   cartItemIds,
   payment,
   shippingOptionCode,
@@ -36,8 +42,13 @@ export default function CheckoutSummary({
   const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
 
   const handleCheckout = async () => {
-    if (cartItemIds.length === 0) {
+    if (source === "cart" && cartItemIds.length === 0) {
       toast.error("Vui lòng chọn sản phẩm trước khi thanh toán");
+      return;
+    }
+
+    if (source === "buy-now" && !buyNowSelection) {
+      toast.error("Không tìm thấy thông tin sản phẩm mua ngay");
       return;
     }
 
@@ -51,12 +62,19 @@ export default function CheckoutSummary({
       showLoading("Đang tạo thanh toán...");
 
       const paymentMethod = toPaymentMethod(payment);
-      const checkout = await checkoutCart({
-        cartItemIds,
-        paymentMethod,
-        shippingOptionCode,
-        affiliateCode: affiliateCode.trim() || undefined,
-      });
+      const checkout =
+        source === "buy-now" && buyNowSelection
+          ? await checkoutBuyNow({
+              ...buyNowSelection,
+              paymentMethod,
+              shippingOptionCode,
+            })
+          : await checkoutCart({
+              cartItemIds,
+              paymentMethod,
+              shippingOptionCode,
+              affiliateCode: affiliateCode.trim() || undefined,
+            });
 
       if (paymentMethod === "COD") {
         navigate("/payment-success", {

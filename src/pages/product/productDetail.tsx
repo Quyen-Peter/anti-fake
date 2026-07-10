@@ -174,7 +174,7 @@ export default function ProductDetail() {
       <div className="pd-top">
         <ProductGallery images={product.imageUrls} />
 
-        <ProductInfo product={product} shop={shop} />
+        <ProductInfo product={product} />
       </div>
 
       <div className="pd-shop-box">

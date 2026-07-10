@@ -4,7 +4,12 @@ import { ShieldCheck } from "lucide-react";
 import "../../css/pages/checkout.css";
 
 import { useLocation } from "react-router-dom";
-import type { CheckoutShop, ShippingOption } from "../../type/checkout";
+import type {
+  BuyNowSelection,
+  CheckoutShop,
+  CheckoutSource,
+  ShippingOption,
+} from "../../type/checkout";
 import CheckoutAddress from "../../components/checkout/checkoutAddress";
 import CheckoutPayment from "../../components/checkout/checkoutPayment";
 import CheckoutSummary from "../../components/checkout/checkoutSummary";
@@ -21,6 +26,18 @@ export default function CheckoutPage() {
   const [shippingError, setShippingError] = useState("");
   const [shippingAddressKey, setShippingAddressKey] = useState("");
   const location = useLocation();
+  const source: CheckoutSource =
+    location.state?.source === "buy-now" ? "buy-now" : "cart";
+  const buyNowSelection = location.state?.buyNowSelection as
+    | BuyNowSelection
+    | undefined;
+  const buyNowShippingOptions: ShippingOption[] = useMemo(
+    () =>
+      Array.isArray(location.state?.shippingOptions)
+        ? location.state.shippingOptions
+        : [],
+    [location.state],
+  );
 
   const shops: CheckoutShop[] = useMemo(
     () => location.state?.shops ?? [],
@@ -39,6 +56,21 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
+    if (source === "buy-now") {
+      setShippingOptions(buyNowShippingOptions);
+      setSelectedShippingCode((current) =>
+        buyNowShippingOptions.some((option) => option.optionCode === current)
+          ? current
+          : (buyNowShippingOptions[0]?.optionCode ?? ""),
+      );
+      setShippingError(
+        buyNowShippingOptions.length > 0
+          ? ""
+          : "Không có phương thức vận chuyển phù hợp",
+      );
+      return;
+    }
+
     if (cartItemIds.length === 0 || !shippingAddressKey) {
       setShippingOptions([]);
       setSelectedShippingCode("");
@@ -75,7 +107,7 @@ export default function CheckoutPage() {
     };
 
     loadShippingOptions();
-  }, [cartItemIds, shippingAddressKey]);
+  }, [source, buyNowShippingOptions, cartItemIds, shippingAddressKey]);
 
   const subtotal = shops
     .flatMap((shop) => shop.items)
@@ -116,6 +148,8 @@ export default function CheckoutPage() {
       {/* SUMMARY */}
       <div className="checkout-right">
         <CheckoutSummary
+          source={source}
+          buyNowSelection={buyNowSelection}
           cartItemIds={cartItemIds}
           payment={payment}
           shippingOptionCode={selectedShippingCode}

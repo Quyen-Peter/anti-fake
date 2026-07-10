@@ -43,3 +43,26 @@ export interface CartCheckoutResponse {
   checkoutUrl?: string;
   paymentLinkId?: string;
 }
+
+export type CheckoutSource = "cart" | "buy-now";
+
+export interface BuyNowSelection {
+  offerId: string;
+  variantId?: string;
+  quantity: number;
+}
+
+export interface BuyNowPreview extends BuyNowSelection {
+  shopId: string;
+  shopName: string;
+  modelName: string;
+  sku?: string;
+  price: number;
+  thumbnailUrl?: string;
+  shippingOptions: ShippingOption[];
+}
+
+export interface BuyNowCheckoutRequest extends BuyNowSelection {
+  paymentMethod: string;
+  shippingOptionCode: string;
+}

@@ -43,19 +43,20 @@ export default function CheckoutShipping({
             >
               <input
                 type="radio"
+                name="shippingOption"
                 checked={selectedOptionCode === option.optionCode}
                 onChange={() => setSelectedOptionCode(option.optionCode)}
               />
 
-              <div>
-                <strong>
-                   {option.methodName}
-                </strong>
-
+              <div className="shipping-item-content">
+                <strong>{option.providerName}</strong>
+                <span className="shipping-method">{option.methodName}</span>
                 <p>Dự kiến giao: {option.estimatedDelivery}</p>
               </div>
 
-              <span>{formatVnd(option.shippingFee)}</span>
+              <span className="shipping-price">
+                {formatVnd(option.shippingFee)}
+              </span>
             </label>
           ))}
         </div>

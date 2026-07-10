@@ -2,13 +2,14 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type { CheckoutShop } from "../../type/checkout";
 import { formatVnd } from "../../ultil/currency";
 
 type Props = {
   subtotal: number;
   discount: number;
   total: number;
-  selectedShops: any[];
+  selectedShops: CheckoutShop[];
 };
 
 export default function CartSummary({ subtotal, discount, total, selectedShops, }: Props) {
@@ -23,6 +24,7 @@ export default function CartSummary({ subtotal, discount, total, selectedShops, 
 
     navigate("/checkout", {
       state: {
+        source: "cart",
         shops: selectedShops,
       },
     });

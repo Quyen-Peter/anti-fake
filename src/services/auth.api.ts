@@ -140,8 +140,18 @@ export const refreshToken = async () => {
     throw new Error(data.message || "Làm mới token thất bại");
   }
 
-  saveToken(data.accessToken);
-  saveUser(data.user);
+  const payload = data?.data ?? data;
+  const accessToken = payload?.accessToken;
 
-  return data.accessToken;
+  if (typeof accessToken !== "string" || !accessToken) {
+    throw new Error("Phản hồi làm mới token không hợp lệ");
+  }
+
+  saveToken(accessToken);
+  if (payload.user) {
+    saveUser(payload.user);
+  }
+  connectSocket(accessToken);
+
+  return accessToken;
 };

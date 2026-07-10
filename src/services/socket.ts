@@ -23,6 +23,11 @@ export const connectSocket = (accessToken?: string) => {
     return socket;
   }
 
+  const shouldReconnect = Boolean(accessToken && socket.connected);
+  if (shouldReconnect) {
+    socket.disconnect();
+  }
+
   socket.auth = {
     accessToken: token,
   };

@@ -3,9 +3,14 @@ import { refreshToken } from "../services/auth.api";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const USER_KEY = "user";
+const AUTH_FAILURE_STATUSES = new Set([401, 403]);
+
+let refreshPromise: Promise<string> | null = null;
+let sessionExpiredHandled = false;
 
 export const saveToken = (token: string) => {
   localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  sessionExpiredHandled = false;
 };
 
 export const getToken = () => {
@@ -16,7 +21,7 @@ export const removeToken = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
 };
 
-export const saveUser = (user: any) => {
+export const saveUser = (user: unknown) => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
@@ -29,17 +34,58 @@ export const removeUser = () => {
   localStorage.removeItem(USER_KEY);
 };
 
-export const authFetch = async (
-  input: RequestInfo,
-  init: RequestInit = {}
-) => {
-  let token = getToken();
+const isTokenExpired = (token: string) => {
+  try {
+    const encodedPayload = token.split(".")[1];
+    if (!encodedPayload) return false;
 
-  if (!token) {
-    throw new Error("Vui long dang nhap");
+    const normalizedPayload = encodedPayload
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(
+      Math.ceil(normalizedPayload.length / 4) * 4,
+      "=",
+    );
+    const payload = JSON.parse(atob(paddedPayload)) as { exp?: unknown };
+
+    return (
+      typeof payload.exp === "number" &&
+      payload.exp * 1000 <= Date.now() + 5_000
+    );
+  } catch {
+    return false;
+  }
+};
+
+const getRefreshedToken = () => {
+  if (!refreshPromise) {
+    refreshPromise = refreshToken().finally(() => {
+      refreshPromise = null;
+    });
   }
 
-  let response = await fetch(input, {
+  return refreshPromise;
+};
+
+const handleExpiredSession = () => {
+  removeToken();
+  removeUser();
+
+  if (sessionExpiredHandled) return;
+  sessionExpiredHandled = true;
+  toast.error("Phiên đăng nhập đã hết hạn");
+
+  if (window.location.pathname !== "/auth") {
+    window.location.assign("/auth");
+  }
+};
+
+const fetchWithToken = (
+  input: RequestInfo,
+  init: RequestInit,
+  token: string,
+) =>
+  fetch(input, {
     ...init,
     headers: {
       ...init.headers,
@@ -47,31 +93,34 @@ export const authFetch = async (
     },
   });
 
-  if (response.status !== 401) {
+export const authFetch = async (
+  input: RequestInfo,
+  init: RequestInit = {},
+) => {
+  let token = getToken();
+
+  try {
+    if (!token || isTokenExpired(token)) {
+      token = await getRefreshedToken();
+    }
+  } catch {
+    handleExpiredSession();
+    throw new Error("Phiên đăng nhập đã hết hạn");
+  }
+
+  let response = await fetchWithToken(input, init, token);
+
+  if (!AUTH_FAILURE_STATUSES.has(response.status)) {
     return response;
   }
 
   try {
-    token = await refreshToken();
-
-    response = await fetch(input, {
-      ...init,
-      headers: {
-        ...init.headers,
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    token = await getRefreshedToken();
+    response = await fetchWithToken(input, init, token);
 
     return response;
   } catch {
-    removeToken();
-    removeUser();
-    toast.error("Phien dang nhap da het han");
-
-    if (window.location.pathname !== "/auth") {
-      window.location.assign("/auth");
-    }
-
-    throw new Error("Phien dang nhap da het han");
+    handleExpiredSession();
+    throw new Error("Phiên đăng nhập đã hết hạn");
   }
 };

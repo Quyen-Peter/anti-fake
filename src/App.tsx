@@ -119,7 +119,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/notification" element={<NotificationPage />} />
+              <Route
+                path="/notification"
+                element={
+                  <ProtectedRoute>
+                    <NotificationPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/messages"
                 element={

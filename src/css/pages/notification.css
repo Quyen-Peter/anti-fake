@@ -1,0 +1,227 @@
+.notification-page {
+  min-height: calc(100vh - 72px);
+  padding: 96px 20px 48px;
+  background: #f7f7f7;
+}
+
+.notification-shell {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #eadede;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.notification-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 30px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-eyebrow {
+  color: #b00020;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notification-header h1 {
+  margin: 5px 0 6px;
+  color: #1f1f1f;
+  font-size: 28px;
+}
+
+.notification-header p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notification-total {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #fff1f3;
+  color: #b00020;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.notification-filters {
+  display: flex;
+  gap: 6px;
+  padding: 14px 30px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-filters button {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notification-filters button.active {
+  background: #b00020;
+  color: #fff;
+}
+
+.notification-list {
+  display: grid;
+}
+
+.notification-item {
+  display: flex;
+  gap: 14px;
+  padding: 18px 30px;
+  border-bottom: 1px solid #f0eeee;
+  background: #fff;
+}
+
+.notification-item.unread {
+  box-shadow: inset 3px 0 #b00020;
+  background: #fff9fa;
+}
+
+.notification-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f4f4f4;
+  color: #777;
+}
+
+.notification-item.unread .notification-icon {
+  background: #ffe9ed;
+  color: #b00020;
+}
+
+.notification-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notification-title-row h2 {
+  margin: 0;
+  color: #292929;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.notification-title-row span {
+  flex: 0 0 auto;
+  color: #b00020;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.notification-content p {
+  margin: 5px 0 7px;
+  color: #5f5f5f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.notification-content time {
+  color: #999;
+  font-size: 11px;
+}
+
+.notification-state {
+  min-height: 260px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 9px;
+  color: #777;
+  text-align: center;
+}
+
+.notification-state p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.notification-state button {
+  margin-top: 6px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 16px;
+  background: #b00020;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notification-error {
+  color: #b00020;
+}
+
+.notification-spin {
+  animation: notification-spin 800ms linear infinite;
+}
+
+.notification-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  color: #555;
+  font-size: 13px;
+}
+
+.notification-pagination button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  cursor: pointer;
+}
+
+.notification-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@keyframes notification-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 576px) {
+  .notification-page { padding: 76px 10px 28px; }
+  .notification-header { flex-direction: column; padding: 22px 18px; }
+  .notification-header h1 { font-size: 24px; }
+  .notification-filters { padding: 12px 18px; overflow-x: auto; }
+  .notification-item { padding: 16px 18px; }
+  .notification-title-row { align-items: flex-start; }
+}

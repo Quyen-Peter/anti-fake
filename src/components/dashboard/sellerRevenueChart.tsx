@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import "../../css/components/dataSkeleton.css";
 import {
   getShopDailyMetrics,
   type ShopDailyMetric,
@@ -100,7 +101,7 @@ export default function SellerRevenueChart({ shopId }: SellerRevenueChartProps) 
       </div>
 
       {loading && (
-        <div className="seller-dashboard-orders-state">Dang tai bieu do...</div>
+        <div className="seller-dashboard-orders-state"><div className="data-skeleton data-skeleton-chart" role="status" aria-label="Đang tải biểu đồ">{Array.from({ length: 8 }, (_, i) => <span key={i} />)}</div></div>
       )}
 
       {!loading && error && (

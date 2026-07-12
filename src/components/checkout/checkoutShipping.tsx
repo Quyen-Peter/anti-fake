@@ -1,6 +1,7 @@
 import { Truck } from "lucide-react";
 import type { ShippingOption } from "../../type/checkout";
 import { formatVnd } from "../../ultil/currency";
+import "../../css/components/dataSkeleton.css";
 
 interface Props {
   error: string;
@@ -25,7 +26,7 @@ export default function CheckoutShipping({
       </div>
 
       {loading ? (
-        <div className="shipping-state">Đang tải phương thức vận chuyển...</div>
+        <div className="shipping-state"><div className="data-skeleton data-skeleton-shipping" role="status" aria-label="Đang tải phương thức vận chuyển">{Array.from({ length: 3 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div></div>
       ) : error ? (
         <div className="shipping-state shipping-error">{error}</div>
       ) : options.length === 0 ? (

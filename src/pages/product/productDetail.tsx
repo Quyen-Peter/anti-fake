@@ -8,7 +8,7 @@ import { MessageCircle, Star, Store } from "lucide-react";
 import { fetchOfferDetail } from "../../services/product.api";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchShopByOffer } from "../../services/shop.api";
-import LoadingOverlay from "../../components/loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 import ProductGallery from "../../components/product/productGallery";
 import { fetchOfferReviews } from "../../services/review.api";
 import { getShopChatThread } from "../../services/chat.api";
@@ -164,7 +164,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div>
-        <LoadingOverlay />
+        <div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải chi tiết sản phẩm"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div>
       </div>
     );
   }

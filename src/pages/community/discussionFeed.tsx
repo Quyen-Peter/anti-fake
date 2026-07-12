@@ -3,7 +3,7 @@ import CommunityPost from "../../components/community/communityPost";
 import CreatePostBox from "../../components/community/createPostBox";
 import type { SocialPost } from "../../type/community";
 import { getSocialPosts } from "../../services/community.api";
-import LoadingOverlay from "../../components/loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 
 export default function DiscussionFeed() {
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -24,7 +24,7 @@ export default function DiscussionFeed() {
     fetchPosts();
   }, []);
 
-  if (loading) return <div><LoadingOverlay/></div>;
+  if (loading) return <div className="data-skeleton data-skeleton-comments" role="status" aria-label="Đang tải bài viết">{Array.from({ length: 4 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>;
 
   return (
     <>

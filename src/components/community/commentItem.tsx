@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getReplies } from "../../services/community.api";
 import type { Comment } from "../../type/community";
 import { formatCommunityTime } from "../../ultil/format";
+import "../../css/components/dataSkeleton.css";
 
 type Props = {
   comment: Comment;
@@ -111,7 +112,7 @@ export default function CommentItem({
 
         {!isReply && repliesVisible && (
           <div className="reply-list">
-            {loading && <p>Đang tải...</p>}
+            {loading && <div className="data-skeleton data-skeleton-comments data-skeleton-compact" role="status" aria-label="Đang tải phản hồi">{Array.from({ length: 2 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>}
 
             {visibleReplies.map((reply) => (
               <CommentItem

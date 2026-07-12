@@ -5,7 +5,7 @@ import SearchSidebar from "../../components/layout/searchSidebar";
 import "../../css/pages/search.css";
 import SearchHeader from "../../components/layout/searchHeader";
 import { searchOffers } from "../../services/product.api";
-import LoadingOverlay from "../../components/loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 import ProductCard from "../../components/product/productCard";
 import { fetchCategories } from "../../services/category.api";
 import type { SearchCategory } from "../../components/layout/searchSidebar";
@@ -103,7 +103,7 @@ export default function SearchPage() {
           />
         </div>
         <div className="s-product-grid">
-          {loading && <LoadingOverlay />}
+          {loading && <div className="data-skeleton data-skeleton-cards search-product-skeleton" role="status" aria-label="Đang tải kết quả tìm kiếm">{Array.from({ length: 10 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>}
 
           {!loading && sortedProducts.length === 0 && (
             <EmptyState

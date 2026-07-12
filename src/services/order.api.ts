@@ -49,6 +49,30 @@ const firstShop = (order: any) => {
   return order.shop ?? {};
 };
 
+const resolveFulfillmentStatus = (value: unknown): string => {
+  const order = value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+  const shops = order.shops ?? order.orderShops;
+  const shopStatus = Array.isArray(shops)
+    ? shops.find(
+        (shop) =>
+          shop &&
+          typeof shop === "object" &&
+          "fulfillmentStatus" in shop &&
+          shop.fulfillmentStatus,
+      )?.fulfillmentStatus
+    : undefined;
+
+  return String(
+    order.fulfillmentStatus ??
+      shopStatus ??
+      order.orderStatus ??
+      order.status ??
+      "PENDING",
+  ).toUpperCase();
+};
+
 const countOrderItems = (order: any) => {
   if (order.firstProduct) return Number(order.otherProducts ?? 0) + 1;
 
@@ -93,7 +117,7 @@ const toUserOrder = (order: any): Order => {
   return {
     id: String(order.id ?? order.orderId ?? ""),
     orderCode: String(order.orderCode ?? order.code ?? order.orderId ?? ""),
-    status: String(order.status ?? order.orderStatus ?? "PENDING"),
+    status: resolveFulfillmentStatus(order),
     shopName: String(shop.shopName ?? shop.name ?? order.shopName ?? "Shop"),
     totalAmount: Number(
       order.totalAmount ?? order.orderAmount ?? order.paymentAmount ?? 0,
@@ -118,7 +142,20 @@ export const fetchMyOrders = async (): Promise<Order[]> => {
     throw new Error(data.message || "Khong the tai danh sach don hang");
   }
 
-  return normalizeItems(data).map(toUserOrder);
+  const orders: Order[] = normalizeItems(data).map(toUserOrder);
+
+  return Promise.all(
+    orders.map(async (order) => {
+      if (order.status !== "PENDING" || !order.id) return order;
+
+      try {
+        const detail = await fetchOrderDetail(order.id);
+        return { ...order, status: detail.status };
+      } catch {
+        return order;
+      }
+    }),
+  );
 };
 
 export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> => {
@@ -140,6 +177,7 @@ export const fetchOrderDetail = async (orderId: string): Promise<OrderDetail> =>
   return {
     ...payload,
     id: payload.id ?? payload.orderId,
+    status: resolveFulfillmentStatus(payload),
     shops: Array.isArray(payload.shops)
       ? payload.shops.map((shop: RawOrderShop) => ({
           ...shop,
@@ -257,7 +295,7 @@ const toSellerOrder = (order: any): SellerOrder => ({
       email: order.customerEmail ?? order.buyerEmail ?? order.userEmail,
     } satisfies SellerOrderCustomer),
   orderAmount: Number(order.orderAmount ?? order.totalAmount ?? 0),
-  orderStatus: String(order.orderStatus ?? order.status ?? "pending"),
+  orderStatus: resolveFulfillmentStatus(order),
   createdAt: order.createdAt,
   createdDate: order.createdDate,
   orderDate: order.orderDate,

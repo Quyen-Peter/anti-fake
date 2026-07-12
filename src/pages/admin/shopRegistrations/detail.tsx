@@ -15,6 +15,7 @@ import {
   UserRound,
   XCircle,
 } from "lucide-react";
+import "../../../css/components/dataSkeleton.css";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -189,7 +190,7 @@ export default function AdminShopVerificationDetailPage() {
   if (loading) {
     return (
       <section className="admin-page">
-        <div className="admin-detail-state">Đang tải hồ sơ pháp lý...</div>
+        <div className="admin-detail-state"><div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải hồ sơ pháp lý"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div></div>
       </section>
     );
   }

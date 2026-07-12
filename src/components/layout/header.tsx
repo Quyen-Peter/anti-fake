@@ -2,12 +2,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../css/components/layout/header.css";
 import {
   Bell,
-  Handshake,
-  Heart,
   Home,
   MessageSquareText,
   ScanLine,
   Search,
+  Shapes,
   ShoppingCart,
   User,
   UserCircle2,
@@ -34,7 +33,7 @@ export default function Header() {
     }
   };
 
-  const cartCount = useCartStore((state) => state.cartCount);
+  // const cartCount = useCartStore((state) => state.cartCount);
   const refreshCart = useCartStore((state) => state.refreshCart);
 
   useEffect(() => {
@@ -55,8 +54,8 @@ export default function Header() {
       path: "/community",
     },
     {
-      label: "Affiliate",
-      path: "/affiliate",
+      label: "Danh mục",
+      path: "/categories",
     },
     {
       label: "Xác thực QR",
@@ -81,9 +80,9 @@ export default function Header() {
       icon: ScanLine,
     },
     {
-      label: "Affiliate",
-      path: "/affiliate",
-      icon: Handshake,
+      label: "Danh mục",
+      path: "/categories",
+      icon: Shapes,
     },
 
     {
@@ -133,11 +132,11 @@ export default function Header() {
 
       {/* action */}
       <div className="header-actions">
-        <Link to="/wishlist" className="icon-btn wishlist-btn">
+        {/* <Link to="/wishlist" className="icon-btn wishlist-btn">
           <Heart size={22} />
 
-          {/* <span className="badge">4</span> */}
-        </Link>
+          <span className="badge">4</span>
+        </Link> */}
         <Link to="/chat" className="icon-btn">
           <MessageSquareText size={22} />
           {/* <span className="badge">3</span> */}
@@ -145,7 +144,7 @@ export default function Header() {
 
         <Link to="/cart" className="icon-btn cart-btn">
           <ShoppingCart size={22} />
-          <span className="badge">{cartCount}</span>
+          {/* <span className="badge">{cartCount}</span> */}
         </Link>
 
         <Link to="/notification" className="icon-btn">

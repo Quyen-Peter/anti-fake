@@ -23,15 +23,10 @@ function CartLoading() {
       <div className="cart-left">
         <div className="cart-header">
           <h1>Giỏ hàng của bạn</h1>
-          <span>Đang tải...</span>
+          <span className="cart-loading-title" aria-hidden="true" />
         </div>
 
         <div className="cart-loading-card" role="status" aria-live="polite">
-          <div className="cart-loading-head">
-            <span className="cart-loading-spinner" />
-            <span>Đang tải giỏ hàng...</span>
-          </div>
-
           {Array.from({ length: 3 }, (_, index) => (
             <div className="cart-loading-row" key={index}>
               <span />

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import OrderCard from "../../components/order/orderCard";
 import { fetchMyOrders } from "../../services/order.api";
 import type { Order } from "../../type/order";
-import LoadingOverlay from "../../components/loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 import "../../css/pages/ordersPage.css";
 
 export default function OrdersPage() {
@@ -42,7 +42,7 @@ export default function OrdersPage() {
   if (loading) {
     return (
       <div className="profile-orders-page">
-        <LoadingOverlay />
+        <div className="data-skeleton" role="status" aria-label="Đang tải đơn hàng">{Array.from({ length: 4 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>
       </div>
     );
   }

@@ -30,6 +30,29 @@
   margin-top: 9px;
 }
 
+.home-shop-skeleton,
+.home-category-skeleton,
+.home-product-skeleton {
+  width: 100%;
+}
+
+.home-category-skeleton {
+  padding: 0;
+  border: 0;
+}
+
+.home-category-skeleton .data-skeleton-row {
+  min-height: 34px;
+  padding: 6px 0;
+}
+
+.home-product-skeleton {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding: 0;
+  border: 0;
+}
+
 .live-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -115,6 +138,9 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 13px;
   }
+  .home-product-skeleton {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .home-product {
     padding-left: 10px;
     padding-right: 10px;
@@ -141,6 +167,9 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
+  }
+  .home-product-skeleton {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 /* iPad lớn */

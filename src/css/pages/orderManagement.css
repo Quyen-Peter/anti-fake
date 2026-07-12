@@ -48,15 +48,6 @@
   margin-bottom: 18px;
 }
 
-.seller-order-loading-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d8eadf;
-  border-top-color: #17934a;
-  border-radius: 50%;
-  animation: seller-order-spin 0.75s linear infinite;
-}
-
 .seller-order-loading-list {
   display: grid;
   gap: 12px;
@@ -79,12 +70,6 @@
 
 .seller-order-loading-row span:nth-child(2) {
   height: 18px;
-}
-
-@keyframes seller-order-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @keyframes seller-order-shimmer {

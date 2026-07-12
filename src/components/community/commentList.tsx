@@ -3,6 +3,7 @@ import "../../css/components/community/commentList.css";
 import { getComments } from "../../services/community.api";
 import CommentItem from "./commentItem";
 import type { Comment, CommentResponse } from "../../type/community";
+import "../../css/components/dataSkeleton.css";
 
 type Props = {
   postId: string;
@@ -34,7 +35,7 @@ export default function CommentList({
   }, [postId]);
 
   if (loading) {
-    return <div>Đang tải bình luận...</div>;
+    return <div className="data-skeleton data-skeleton-comments data-skeleton-compact" role="status" aria-label="Đang tải bình luận">{Array.from({ length: 3 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>;
   }
 
   if (comments?.items.length === 0 && pendingComments.length === 0) {

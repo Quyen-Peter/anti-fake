@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { ShopSubmittedDocument } from "../../services/shop.api";
 import type { UserKyc } from "../../services/user.api";
 import type { RegistrationStatus } from "./sellerRegistration";
+import "../../css/components/dataSkeleton.css";
 
 type CompletionStepProps = {
   status: RegistrationStatus;
@@ -58,9 +59,9 @@ export default function CompletionStep({
           <h2>Chi tiết hồ sơ cần bổ sung</h2>
 
           {loadingReviewDetails ? (
-            <p className="seller-register-review-loading">
-              Đang tải nhận xét hồ sơ...
-            </p>
+            <div className="seller-register-review-loading">
+              <div className="data-skeleton data-skeleton-detail data-skeleton-compact" role="status" aria-label="Đang tải nhận xét hồ sơ"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 3 }, (_, i) => <span key={i} />)}</div></div>
+            </div>
           ) : (
             <>
               <section className="seller-register-review-section">

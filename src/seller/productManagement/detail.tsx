@@ -131,11 +131,6 @@ function ProductDetailLoading() {
       aria-live="polite"
       aria-label="Dang tai chi tiet san pham"
     >
-      <div className="seller-product-detail-loading-head">
-        <span className="seller-product-loading-spinner" />
-        <span>Dang tai day du du lieu san pham...</span>
-      </div>
-
       <div className="seller-product-detail-loading-hero" aria-hidden="true">
         <span />
         <div>

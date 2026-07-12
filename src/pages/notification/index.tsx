@@ -1,14 +1,16 @@
 import {
   Bell,
+  Check,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Inbox,
-  RefreshCw,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   fetchNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
   type NotificationFilter,
   type NotificationPage as NotificationPageData,
 } from "../../services/notification.api";
@@ -47,6 +49,9 @@ export default function NotificationPage() {
   const [data, setData] = useState<NotificationPageData>(initialPage);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [markingId, setMarkingId] = useState<string | null>(null);
+  const [markingAll, setMarkingAll] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,6 +95,53 @@ export default function NotificationPage() {
     setRequestVersion((current) => current + 1);
   };
 
+  const applyReadState = (ids?: Set<string>) => {
+    const readAt = new Date().toISOString();
+    setData((current) => {
+      const markedCount = current.items.filter(
+        (item) => !item.readAt && (!ids || ids.has(item.id)),
+      ).length;
+      const items = current.items.map((item) =>
+        !item.readAt && (!ids || ids.has(item.id)) ? { ...item, readAt } : item,
+      );
+
+      return filter === "unread"
+        ? {
+            ...current,
+            items: items.filter((item) => !item.readAt),
+            totalItems: ids ? Math.max(0, current.totalItems - markedCount) : 0,
+            totalPages: ids ? current.totalPages : 1,
+          }
+        : { ...current, items };
+    });
+  };
+
+  const markOneAsRead = async (notificationId: string) => {
+    setMarkingId(notificationId);
+    setActionError("");
+    try {
+      await markNotificationAsRead(notificationId);
+      applyReadState(new Set([notificationId]));
+    } catch (requestError) {
+      setActionError(requestError instanceof Error ? requestError.message : "Không thể cập nhật thông báo");
+    } finally {
+      setMarkingId(null);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    setMarkingAll(true);
+    setActionError("");
+    try {
+      await markAllNotificationsAsRead();
+      applyReadState();
+    } catch (requestError) {
+      setActionError(requestError instanceof Error ? requestError.message : "Không thể cập nhật thông báo");
+    } finally {
+      setMarkingAll(false);
+    }
+  };
+
   return (
     <main className="notification-page">
       <section className="notification-shell">
@@ -105,8 +157,9 @@ export default function NotificationPage() {
           </div>
         </header>
 
-        <div className="notification-filters" role="tablist" aria-label="Lọc thông báo">
-          {filters.map((item) => (
+        <div className="notification-toolbar">
+          <div className="notification-filters" role="tablist" aria-label="Lọc thông báo">
+            {filters.map((item) => (
             <button
               key={item.value}
               type="button"
@@ -117,13 +170,33 @@ export default function NotificationPage() {
             >
               {item.label}
             </button>
-          ))}
+            ))}
+          </div>
+          <button
+            type="button"
+            className="notification-read-all"
+            disabled={filter === "readed" || data.totalItems === 0 || markingAll || markingId !== null}
+            onClick={markAllAsRead}
+          >
+            <Check size={16} />
+            {markingAll ? "Đang cập nhật..." : "Đánh dấu tất cả đã đọc"}
+          </button>
         </div>
 
+        {actionError && <p className="notification-action-error" role="alert">{actionError}</p>}
+
         {loading ? (
-          <div className="notification-state" aria-busy="true">
-            <RefreshCw className="notification-spin" size={24} />
-            <strong>Đang tải thông báo...</strong>
+          <div className="notification-skeleton" aria-busy="true" aria-label="Đang tải thông báo">
+            {Array.from({ length: 5 }, (_, index) => (
+              <div className="notification-skeleton-item" key={index}>
+                <span className="notification-skeleton-icon" />
+                <span className="notification-skeleton-content">
+                  <span className="notification-skeleton-line title" />
+                  <span className="notification-skeleton-line message" />
+                  <span className="notification-skeleton-line time" />
+                </span>
+              </div>
+            ))}
           </div>
         ) : error ? (
           <div className="notification-state notification-error" role="alert">
@@ -153,7 +226,18 @@ export default function NotificationPage() {
                   <div className="notification-content">
                     <div className="notification-title-row">
                       <h2>{notification.title}</h2>
-                      {unread && <span>Chưa đọc</span>}
+                      {unread && <span className="notification-title-actions">
+                        <button
+                          type="button"
+                          className="notification-read-button"
+                          disabled={markingId === notification.id || markingAll}
+                          onClick={() => markOneAsRead(notification.id)}
+                        >
+                          <Check size={14} />
+                          {markingId === notification.id ? "Đang cập nhật..." : "Đánh dấu đã đọc"}
+                        </button>
+                        <span className="notification-unread-dot" role="img" aria-label="Chưa đọc" />
+                      </span>}
                     </div>
                     {notification.message && <p>{notification.message}</p>}
                     <time dateTime={notification.createdAt}>

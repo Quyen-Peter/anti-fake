@@ -63,11 +63,6 @@ function OrderLoading() {
       aria-live="polite"
       aria-label="Dang tai don hang"
     >
-      <div className="seller-order-loading-head">
-        <span className="seller-order-loading-spinner" />
-        <span>Dang tai don hang...</span>
-      </div>
-
       <div className="seller-order-loading-list" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
           <div className="seller-order-loading-row" key={index}>

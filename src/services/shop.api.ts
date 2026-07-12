@@ -13,6 +13,7 @@ export type CreateShopPayload = {
 export type ShopCategory = {
   id: string | number;
   name: string;
+  imageUrl?: string | null;
 };
 
 export type ShopOffer = {
@@ -414,6 +415,7 @@ export const fetchShopCategories = async (shopId: string) => {
     .map((item: Record<string, unknown>): ShopCategory | null => {
       const id = item.id ?? item.categoryId;
       const name = item.name ?? item.categoryName;
+      const imageUrl = item.imageUrl;
 
       if (
         (typeof id !== "string" && typeof id !== "number") ||
@@ -422,7 +424,11 @@ export const fetchShopCategories = async (shopId: string) => {
         return null;
       }
 
-      return { id, name };
+      return {
+        id,
+        name,
+        imageUrl: typeof imageUrl === "string" ? imageUrl : null,
+      };
     })
     .filter((item): item is ShopCategory => Boolean(item));
 };

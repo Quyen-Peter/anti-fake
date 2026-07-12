@@ -2,6 +2,7 @@ import { Eye, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import "../../../css/components/dataSkeleton.css";
 import {
   fetchAdminOffers,
   type AdminOffer,
@@ -177,7 +178,9 @@ export default function AdminProductRegistrationsPage() {
               {loading && (
                 <tr>
                   <td colSpan={8} className="admin-table-state">
-                    Đang tải danh sách sản phẩm...
+                    <div className="data-skeleton data-skeleton-table data-skeleton-compact" role="status" aria-label="Đang tải danh sách sản phẩm">
+                      {Array.from({ length: 5 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span><span className="data-skeleton-cell" /><span className="data-skeleton-cell" /><span className="data-skeleton-action" /></div>)}
+                    </div>
                   </td>
                 </tr>
               )}

@@ -9,8 +9,8 @@ export default function LoadingOverlay({
 }: LoadingOverlayProps) {
   return (
     <div className="loading-overlay" role="status" aria-live="polite">
-      <div className="loading-box">
-        <div className="loading-spinner"></div>
+      <div className="loading-box" aria-label={message}>
+        <span className="loading-progress" />
         <p>{message}</p>
       </div>
     </div>

@@ -109,3 +109,23 @@ export const fetchNotifications = async ({
     ),
   };
 };
+
+const postNotificationAction = async (path: string): Promise<void> => {
+  const response = await authFetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.message || "Không thể cập nhật trạng thái thông báo");
+  }
+};
+
+export const markNotificationAsRead = (notificationId: string) =>
+  postNotificationAction(
+    `/api/user/notifications/${encodeURIComponent(notificationId)}/read`,
+  );
+
+export const markAllNotificationsAsRead = () =>
+  postNotificationAction("/api/user/notifications/read-all");

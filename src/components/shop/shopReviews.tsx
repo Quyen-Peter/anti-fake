@@ -3,6 +3,7 @@ import { PackageOpen, Search } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ProductCard from "../product/productCard";
 import EmptyState from "../common/emptyState";
+import "../../css/components/dataSkeleton.css";
 import {
   fetchShopBestSellingProducts,
   type ShopBestSellingProduct,
@@ -56,7 +57,7 @@ export default function ShopReviews() {
 
       {loading && (
         <div className="shop-best-selling-state">
-          Đang tải sản phẩm bán chạy...
+          <div className="data-skeleton data-skeleton-cards data-skeleton-compact" role="status" aria-label="Đang tải sản phẩm bán chạy">{Array.from({ length: 4 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>
         </div>
       )}
 

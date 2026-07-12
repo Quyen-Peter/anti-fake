@@ -4,7 +4,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import SearchHeader from "../layout/searchHeader";
 import SearchSidebar, { type SearchCategory } from "../layout/searchSidebar";
 import ProductCard from "../product/productCard";
-import LoadingOverlay from "../loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 import EmptyState from "../common/emptyState";
 import { searchOffers } from "../../services/product.api";
 import { fetchShopCategories } from "../../services/shop.api";
@@ -108,7 +108,7 @@ export default function ShopProducts() {
           />
         </div>
         <div className="shop-products-grid">
-          {loading && <LoadingOverlay />}
+          {loading && <div className="data-skeleton data-skeleton-cards shop-product-skeleton" role="status" aria-label="Đang tải sản phẩm của shop">{Array.from({ length: 10 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div>}
 
           {!loading && sortedProducts.length === 0 && (
             <EmptyState

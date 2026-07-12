@@ -8,6 +8,7 @@ import {
 } from "../services/shop.api";
 import { getUserKyc, type UserKyc } from "../services/user.api";
 import "../css/pages/sellerShopInfo.css";
+import "../css/components/dataSkeleton.css";
 
 type SellerShop = {
   id?: string;
@@ -132,7 +133,7 @@ export default function SellerBusinessInfo() {
           </div>
 
           {loading && (
-            <div className="seller-shop-document-state">Đang tải hồ sơ...</div>
+            <div className="seller-shop-document-state"><div className="data-skeleton data-skeleton-detail data-skeleton-compact" role="status" aria-label="Đang tải hồ sơ"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 3 }, (_, i) => <span key={i} />)}</div></div></div>
           )}
 
           {!loading && shopDocuments.length === 0 && (
@@ -216,7 +217,7 @@ export default function SellerBusinessInfo() {
           </div>
 
           {loading && (
-            <div className="seller-shop-document-state">Đang tải KYC...</div>
+            <div className="seller-shop-document-state"><div className="data-skeleton data-skeleton-detail data-skeleton-compact" role="status" aria-label="Đang tải KYC"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 3 }, (_, i) => <span key={i} />)}</div></div></div>
           )}
 
           {!loading && !userKyc && (

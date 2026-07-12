@@ -117,11 +117,6 @@ function ProductLoading() {
       aria-live="polite"
       aria-label="Dang tai san pham"
     >
-      <div className="seller-product-loading-head">
-        <span className="seller-product-loading-spinner" />
-        <span>Dang tai san pham...</span>
-      </div>
-
       <div className="seller-product-loading-list" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
           <div className="seller-product-loading-row" key={index}>

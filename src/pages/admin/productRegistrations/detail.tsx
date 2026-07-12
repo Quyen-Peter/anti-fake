@@ -10,6 +10,7 @@ import {
   Ruler,
   Tags,
 } from "lucide-react";
+import "../../../css/components/dataSkeleton.css";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -183,7 +184,7 @@ export default function AdminProductDetailPage() {
       </div>
 
       {loading && (
-        <div className="admin-detail-state">Đang tải chi tiết sản phẩm...</div>
+        <div className="admin-detail-state"><div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải chi tiết sản phẩm"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div></div>
       )}
 
       {!loading && error && (

@@ -176,15 +176,6 @@
   margin-bottom: 18px;
 }
 
-.seller-product-loading-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #f0d6dc;
-  border-top-color: #b00020;
-  border-radius: 50%;
-  animation: seller-product-spin 0.75s linear infinite;
-}
-
 .seller-product-loading-list {
   display: grid;
   gap: 12px;
@@ -207,12 +198,6 @@
 
 .seller-product-loading-row span:first-child {
   height: 18px;
-}
-
-@keyframes seller-product-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @keyframes seller-product-shimmer {

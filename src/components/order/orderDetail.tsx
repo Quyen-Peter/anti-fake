@@ -21,7 +21,7 @@ import type { OrderDetail, OrderItem } from "../../type/order";
 import { cancelOrder, fetchOrderDetail } from "../../services/order.api";
 import { createOfferReview } from "../../services/review.api";
 import ConfirmModal from "../common/confirmModal";
-import LoadingOverlay from "../loadingOverlay";
+import "../../css/components/dataSkeleton.css";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 import { formatVnd } from "../../ultil/currency";
 
@@ -188,7 +188,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <div className="order-detail-page">
-        <LoadingOverlay message="Đang tải chi tiết đơn hàng..." />
+        <div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải chi tiết đơn hàng"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div>
       </div>
     );
   }

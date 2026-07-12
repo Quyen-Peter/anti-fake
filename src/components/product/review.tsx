@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../../css/components/product/review.css";
 import { MessageSquareText, Star } from "lucide-react";
 import EmptyState from "../common/emptyState";
+import "../../css/components/dataSkeleton.css";
 
 type ReviewItem = {
   id: string;
@@ -29,7 +30,7 @@ export default function Review({ reviews, loading }: Props) {
   );
 
   if (loading) {
-    return <div className="pd-review-loading">Đang tải đánh giá...</div>;
+    return <div className="pd-review-loading"><div className="data-skeleton data-skeleton-comments data-skeleton-compact" role="status" aria-label="Đang tải đánh giá">{Array.from({ length: 3 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div></div>;
   }
 
   return (

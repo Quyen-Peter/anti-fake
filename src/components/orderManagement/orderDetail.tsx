@@ -11,6 +11,7 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
+import "../../css/components/dataSkeleton.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -81,9 +82,8 @@ const initials = (name?: string) =>
 
 function OrderDetailLoading() {
   return (
-    <div className="seller-order-detail-loading" role="status" aria-live="polite">
-      <span className="seller-order-detail-spinner" />
-      <span>Đang tải chi tiết đơn hàng...</span>
+    <div className="seller-order-detail-loading">
+      <div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải chi tiết đơn hàng"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div>
     </div>
   );
 }

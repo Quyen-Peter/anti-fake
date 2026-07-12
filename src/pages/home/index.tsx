@@ -11,6 +11,7 @@ import Footer from "../../components/layout/footer";
 import { useEffect, useState } from "react";
 import { fetchOffers } from "../../services/product.api";
 import { fetchShops } from "../../services/shop.api";
+import "../../css/components/dataSkeleton.css";
 
 export default function HomePage() {
   const mockLiveShops = [
@@ -72,6 +73,8 @@ export default function HomePage() {
 
   const [products, setProducts] = useState<ProductView[]>([]);
   const [shop, setShop] = useState<shopCard[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [shopsLoading, setShopsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
@@ -91,6 +94,8 @@ export default function HomePage() {
         });
       } catch (error) {
         console.error("Load products error:", error);
+      } finally {
+        setProductsLoading(false);
       }
     };
 
@@ -104,6 +109,8 @@ export default function HomePage() {
         setShop(data.items || []);
       } catch (error) {
         console.error(error);
+      } finally {
+        setShopsLoading(false);
       }
     };
 
@@ -123,9 +130,18 @@ export default function HomePage() {
         <div className="home-shop-card">
           <h2>Cửa hàng uy tín</h2>
           <div className="shop-list">
-            {shop.map((shop) => (
-              <ShopCard key={shop.shopId} shop={shop} />
-            ))}
+            {shopsLoading ? (
+              <div className="data-skeleton data-skeleton-compact home-shop-skeleton" aria-busy="true" aria-label="Đang tải cửa hàng">
+                {Array.from({ length: 5 }, (_, index) => (
+                  <div className="data-skeleton-row" key={index}>
+                    <span className="data-skeleton-thumbnail" />
+                    <span className="data-skeleton-lines"><span /><span /><span /></span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              shop.map((shop) => <ShopCard key={shop.shopId} shop={shop} />)
+            )}
           </div>
         </div>
         <div className="live-section">
@@ -141,9 +157,20 @@ export default function HomePage() {
 
       <div className="home-product">
         <div className="product-grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {productsLoading && products.length === 0 ? (
+            <div className="data-skeleton data-skeleton-cards home-product-skeleton" aria-busy="true" aria-label="Đang tải sản phẩm">
+              {Array.from({ length: 12 }, (_, index) => (
+                <div className="data-skeleton-row" key={index}>
+                  <span className="data-skeleton-thumbnail" />
+                  <span className="data-skeleton-lines"><span /><span /><span /></span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
         </div>
         <div className="load-more-wrapper">
           <button

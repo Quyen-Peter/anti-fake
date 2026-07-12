@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquareText,
+  Shapes,
   ShieldCheck,
   TicketPercent,
   Users,
@@ -39,6 +40,11 @@ const adminMenus = [
     label: "Quản lý mã giảm giá",
     path: "/admin/vouchers",
     icon: TicketPercent,
+  },
+  {
+    label: "Quản lý danh mục",
+    path: "/admin/categories",
+    icon: Shapes,
   },
   {
     label: "Yêu cầu rút tiền của shop",

@@ -1,15 +1,11 @@
 /* ===== Layout ===== */
 
 .community-page {
-  max-width: 1400px;
+  width: min(100%, 980px);
+  margin: 0 auto;
   padding-top: 80px;
   padding-left: 20px;
   padding-right: 20px;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 24px;
-
-  align-items: start;
 }
 
 .community-content {
@@ -483,47 +479,13 @@
 
 @media (max-width: 768px) {
   .community-page {
-    grid-template-columns: 1fr;
     padding: 0 12px;
-    padding-top: 90px;
-  }
-
-  .community-sidebar {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    z-index: 999;
-    width: 100%;
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    border-radius: 0px;
-  }
-
-  .community-sidebar h3 {
-    display: none;
-  }
-
-  .sidebar-menu {
-    flex: 1;
-    justify-content: center;
-    margin-bottom: 0;
+    padding-top: 72px;
   }
 }
 
 /* Mobile */
 @media (max-width: 576px) {
-  .community-content {
-    margin-top: 30px;
-  }
-
-  .sidebar-menu {
-    padding: 8px 14px;
-    font-size: 13px;
-  }
   .community-post p {
     padding-left: 10px;
   }
@@ -562,36 +524,8 @@
 /* Tablet */
 @media (min-width: 577px) and (max-width: 768px) {
   .community-page {
-    grid-template-columns: 1fr;
     padding: 0 40px;
-  }
-
-  .community-sidebar {
-    position: fixed;
-    top: 55px;
-    left: 0;
-    right: 0;
-    z-index: 999;
-    width: 100%;
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-  }
-
-  .community-sidebar h3 {
-    display: none;
-  }
-
-  .sidebar-menu {
-    flex: 1;
-    justify-content: center;
-    margin-bottom: 0;
-  }
-
-  .community-content {
-    margin-top: 110px;
+    padding-top: 72px;
   }
 }
 

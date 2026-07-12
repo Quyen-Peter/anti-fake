@@ -10,6 +10,7 @@ import {
 import CreateAddress from "../../components/address/createAddress";
 import { toast } from "sonner";
 import ConfirmModal from "../../components/common/confirmModal";
+import "../../css/components/dataSkeleton.css";
 import UpdateAddress from "../../components/address/updateAddress";
 import EmptyState from "../../components/common/emptyState";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
@@ -105,7 +106,7 @@ export default function ProfileAddress() {
       <div className="profile-address-divider" />
 
       {loading ? (
-        <div className="profile-address-loading">Đang tải địa chỉ...</div>
+        <div className="profile-address-loading"><div className="data-skeleton data-skeleton-address" role="status" aria-label="Đang tải địa chỉ">{Array.from({ length: 3 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span></div>)}</div></div>
       ) : addresses.length === 0 ? (
         <EmptyState
           icon={<MapPin size={30} />}

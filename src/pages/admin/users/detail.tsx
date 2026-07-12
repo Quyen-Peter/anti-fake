@@ -12,6 +12,7 @@ import {
   Store,
   User,
 } from "lucide-react";
+import "../../../css/components/dataSkeleton.css";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -160,7 +161,7 @@ export default function AdminUserDetailPage() {
 
       {loading && (
         <div className="admin-detail-state">
-          Đang tải chi tiết người dùng...
+          <div className="data-skeleton data-skeleton-detail" role="status" aria-label="Đang tải chi tiết người dùng"><div className="data-skeleton-detail-hero"><span /><div><span /><span /><span /></div></div><div className="data-skeleton-detail-grid">{Array.from({ length: 6 }, (_, i) => <span key={i} />)}</div></div>
         </div>
       )}
 

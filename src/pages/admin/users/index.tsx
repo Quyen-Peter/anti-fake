@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import "../../../css/components/dataSkeleton.css";
 import { toast } from "sonner";
 import ConfirmModal from "../../../components/common/confirmModal";
 import {
@@ -295,7 +296,9 @@ export default function AdminUsersPage() {
               {loading && (
                 <tr>
                   <td colSpan={6} className="admin-table-state">
-                    Đang tải danh sách người dùng...
+                    <div className="data-skeleton data-skeleton-table data-skeleton-compact" role="status" aria-label="Đang tải danh sách người dùng">
+                      {Array.from({ length: 5 }, (_, i) => <div className="data-skeleton-row" key={i}><span className="data-skeleton-thumbnail" /><span className="data-skeleton-lines"><span /><span /><span /></span><span className="data-skeleton-cell" /><span className="data-skeleton-cell" /><span className="data-skeleton-action" /></div>)}
+                    </div>
                   </td>
                 </tr>
               )}

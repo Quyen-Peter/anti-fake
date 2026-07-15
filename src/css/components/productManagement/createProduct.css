@@ -78,6 +78,94 @@
   font-size: 22px;
 }
 
+.create-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.create-section-title h3 {
+  margin-bottom: 0;
+}
+
+.option-group-list {
+  display: grid;
+  gap: 18px;
+}
+
+.option-group-card {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 18px;
+  background: #fcfcfc;
+}
+
+.option-group-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.option-value-list {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.option-value-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.option-extra-hidden {
+  display: none !important;
+}
+
+.option-group-card .form-group {
+  margin-bottom: 0;
+}
+
+.option-remove-btn {
+  padding-inline: 16px;
+}
+
+.option-image-picker {
+  min-height: 48px;
+  border: 1px dashed #d7d7d7;
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.option-image-picker:hover {
+  border-color: #e53935;
+  background: #fff6f6;
+}
+
+.option-image-picker img {
+  width: 100%;
+  height: 72px;
+  object-fit: cover;
+}
+
+.option-image-picker span {
+  color: #777;
+  font-weight: 600;
+}
+
+.option-image-picker input {
+  display: none;
+}
+
 /* ===========================
    GRID
 =========================== */
@@ -849,6 +937,10 @@ textarea::-webkit-scrollbar-thumb:hover {
     grid-template-columns: repeat(2,1fr);
   }
 
+  .option-value-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 768px) {
@@ -888,6 +980,16 @@ textarea::-webkit-scrollbar-thumb:hover {
   .create-footer {
     flex-direction: column;
     gap: 14px;
+  }
+
+  .create-section-title,
+  .option-group-head,
+  .option-value-row {
+    grid-template-columns: 1fr;
+  }
+
+  .create-section-title {
+    align-items: stretch;
   }
 
   .create-footer>div {

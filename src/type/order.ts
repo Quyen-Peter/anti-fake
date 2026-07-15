@@ -27,6 +27,7 @@ export type OrderStatus =
 export type PaymentMethod =
   | "COD"
   | "PAYOS"
+  | "WALLET"
   | "VNPay"
   | "Momo"
   | "ZaloPay"
@@ -46,6 +47,21 @@ export interface OrderItem {
   productName: string;
   thumbnailUrl: string;
   variantName?: string;
+  variant?: {
+    id: string;
+    sku: string | null;
+    price: number;
+    availableQuantity: number;
+    isActive: boolean;
+  } | null;
+  selectedOptions?: Array<{
+    optionGroupId: string;
+    optionValueId: string;
+    optionGroupDisplayName: string;
+    optionValueText: string;
+    mediaAssetId: string | null;
+    mediaUrl: string | null;
+  }>;
   quantity: number;
   unitPrice: number;
   totalPrice: number;

@@ -1,8 +1,9 @@
 import { Trash2 } from "lucide-react";
 import { formatVnd } from "../../ultil/currency";
+import type { CartItem as CartItemType } from "../../type/checkout";
 
 type Props = {
-  item: any;
+  item: CartItemType & { selected: boolean };
   toggleSelect: (id: string) => void;
   onQuantityChange: (id: string, quantity: number) => void;
   onDelete: (id: string) => void;
@@ -25,6 +26,9 @@ export default function CartItem({
       <img src={item.thumbnailUrl} alt="" />
       <div className="cart-item-info">
         <h3>{item.offerTitleSnapshot}</h3>
+        {item.variantSku ? (
+          <div className="cart-variant">Phân loại: {item.variantSku}</div>
+        ) : null}
         <div className="cart-price">
           {formatVnd(item.unitPriceSnapshot, item.currencySnapshot)}
         </div>

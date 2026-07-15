@@ -1,71 +1,77 @@
 import {
-  Download,
-  Calendar,
   ArrowUpCircle,
-  ShoppingBag,
+  Calendar,
+  Download,
   RotateCcw,
+  ShoppingBag,
 } from "lucide-react";
+import type { WalletTransaction } from "../../services/wallet.api";
 import "../../css/components/wallet/transactionTable.css";
 import { formatVnd } from "../../ultil/currency";
 
-const transactions = [
-  {
-    id: "#AF-77291",
-    date: "15:30 - 24/10/2023",
-    type: "withdraw",
-    amount: -10000000,
-    status: "success",
-  },
-  {
-    id: "#AF-77285",
-    date: "09:12 - 24/10/2023",
-    type: "order",
-    amount: 2450000,
-    status: "success",
-  },
-  {
-    id: "#AF-77280",
-    date: "18:45 - 23/10/2023",
-    type: "withdraw",
-    amount: -5000000,
-    status: "processing",
-  },
-  {
-    id: "#AF-77272",
-    date: "10:00 - 23/10/2023",
-    type: "refund",
-    amount: -1200000,
-    status: "failed",
-  },
-];
+type Props = {
+  transactions?: WalletTransaction[];
+  loading?: boolean;
+};
 
-export default function TransactionTable() {
+const transactionLabels: Record<string, string> = {
+  PAYMENT: "Thanh toán đơn hàng",
+  REFUND: "Hoàn tiền đơn hàng",
+  AFFILIATE_COMMISSION: "Hoa hồng Affiliate",
+  DISPUTE_HOLD: "Tiền bị tạm khóa do tranh chấp",
+  DISPUTE_RELEASE: "Tiền tranh chấp đã được mở khóa",
+  DISPUTE_REFUND: "Hoàn tiền tranh chấp",
+  SETTLEMENT: "Đối soát thành công",
+  WITHDRAWAL_REQUEST: "Đã tạo yêu cầu rút tiền",
+  WITHDRAWAL: "Rút tiền",
+};
+
+const statusLabels: Record<string, string> = {
+  PENDING: "Đang xử lý",
+  COMPLETED: "Hoàn thành",
+  SUCCESS: "Hoàn thành",
+  FAILED: "Thất bại",
+  REJECTED: "Đã từ chối",
+};
+
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("vi-VN", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+};
+
+export default function TransactionTable({
+  transactions = [],
+  loading = false,
+}: Props) {
   const renderType = (type: string) => {
-    switch (type) {
-      case "withdraw":
-        return (
-          <>
-            <ArrowUpCircle size={14} />
-            Rút tiền
-          </>
-        );
-
-      case "order":
-        return (
-          <>
-            <ShoppingBag size={14} />
-            Doanh thu đơn hàng
-          </>
-        );
-
-      default:
-        return (
-          <>
-            <RotateCcw size={14} />
-            Hoàn tiền
-          </>
-        );
+    if (type === "WITHDRAWAL" || type === "WITHDRAWAL_REQUEST") {
+      return (
+        <>
+          <ArrowUpCircle size={14} />
+          {transactionLabels[type]}
+        </>
+      );
     }
+
+    if (type === "PAYMENT" || type === "SETTLEMENT") {
+      return (
+        <>
+          <ShoppingBag size={14} />
+          {transactionLabels[type]}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <RotateCcw size={14} />
+        {transactionLabels[type] ?? type}
+      </>
+    );
   };
 
   return (
@@ -74,14 +80,14 @@ export default function TransactionTable() {
         <h3>Lịch sử giao dịch</h3>
 
         <div className="wallet-filters">
-          <button>Tất cả loại</button>
+          <button type="button">Tất cả loại</button>
 
-          <button>
+          <button type="button">
             <Calendar size={14} />
             Chọn ngày
           </button>
 
-          <button>
+          <button type="button">
             <Download size={14} />
           </button>
         </div>
@@ -99,35 +105,39 @@ export default function TransactionTable() {
         </thead>
 
         <tbody>
-          {transactions.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.date}</td>
-              <td>{renderType(item.type)}</td>
-              <td>
-                {item.amount > 0 ? "+" : ""}
-                {formatVnd(item.amount)}
-              </td>
-
-              <td>
-                <span className={`status ${item.status}`}>
-                  {item.status === "success" && "Hoàn thành"}
-                  {item.status === "processing" && "Đang xử lý"}
-                  {item.status === "failed" && "Thất bại"}
-                </span>
-              </td>
+          {loading ? (
+            <tr>
+              <td colSpan={5}>Đang tải giao dịch...</td>
             </tr>
-          ))}
+          ) : null}
+
+          {!loading && transactions.length === 0 ? (
+            <tr>
+              <td colSpan={5}>Chưa có giao dịch ví.</td>
+            </tr>
+          ) : null}
+
+          {!loading
+            ? transactions.map((item) => (
+                <tr key={item.transactionCode}>
+                  <td>{item.transactionCode}</td>
+                  <td>{formatDate(item.createdAt)}</td>
+                  <td>{renderType(item.transactionType)}</td>
+                  <td>
+                    {item.direction === "CREDIT" ? "+" : "-"}
+                    {formatVnd(item.amount)}
+                  </td>
+
+                  <td>
+                    <span className={`status ${item.status.toLowerCase()}`}>
+                      {statusLabels[item.status] ?? item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            : null}
         </tbody>
       </table>
-
-      <div className="wallet-pagination">
-        <button>‹</button>
-        <button className="active">1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>›</button>
-      </div>
     </div>
   );
 }

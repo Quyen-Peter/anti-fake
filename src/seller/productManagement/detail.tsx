@@ -17,9 +17,12 @@ import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "re
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
+  fetchOfferVariants,
   fetchOfferDetail,
+  updateOfferVariant,
   updateOffer,
   type OfferDetail,
+  type OfferVariant,
   type UpdateOfferPayload,
 } from "../../services/product.api";
 import { formatVnd } from "../../ultil/currency";
@@ -68,6 +71,21 @@ const displayValue = (value?: number | string | null) => {
 
 const displayUnit = (value: number | string | null | undefined, unit: string) =>
   value === undefined || value === null || value === "" ? "--" : `${value} ${unit}`;
+
+const getVariantDisplayName = (offer: OfferDetail, variant: OfferVariant) => {
+  if (variant.optionValues?.length) {
+    return variant.optionValues.map((value) => value.text).join(" - ");
+  }
+
+  const valueIds = variant.optionValueIds ?? [];
+  const values = (offer.optionGroups ?? []).flatMap((group) =>
+    group.values
+      .filter((value) => valueIds.includes(value.id))
+      .map((value) => value.text),
+  );
+
+  return values.join(" - ") || "--";
+};
 
 type UpdateOfferForm = Omit<
   UpdateOfferPayload,
@@ -150,12 +168,322 @@ function ProductDetailLoading() {
   );
 }
 
+function OfferOptionsAndVariants({ offer }: { offer: OfferDetail }) {
+  const optionGroups = offer.optionGroups ?? [];
+  const variants = offer.variants ?? [];
+
+  if (optionGroups.length === 0 && variants.length === 0) return null;
+
+  return (
+    <section className="seller-product-detail-section">
+      <div className="seller-product-detail-section-head">
+        <Layers size={18} />
+        <h2>Phân loại sản phẩm</h2>
+      </div>
+
+      {optionGroups.length > 0 && (
+        <div className="seller-product-option-groups">
+          {optionGroups.map((group) => (
+            <div className="seller-product-option-group" key={group.id}>
+              <strong>{group.displayName}</strong>
+              <div>
+                {group.values.map((value) => (
+                  <span key={value.id}>
+                    {value.mediaAsset?.secureUrl && (
+                      <img src={value.mediaAsset.secureUrl} alt={value.text} />
+                    )}
+                    {value.text}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {variants.length > 0 && (
+        <div className="seller-product-variant-table">
+          {variants.map((variant) => (
+            <div className="seller-product-variant-row" key={variant.id}>
+              <span>{getVariantDisplayName(offer, variant)}</span>
+              <span>
+                {formatMoney(
+                  variant.priceOverride ?? variant.price ?? offer.price,
+                  offer.currency,
+                )}
+              </span>
+              <span>Tồn kho: {variant.availableQuantity}</span>
+              <span>{variant.isActive ? "Đang bán" : "Ngừng bán"}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+type VariantForm = {
+  priceOverride: string;
+  availableQuantity: string;
+};
+
+const toVariantForm = (variant: OfferVariant): VariantForm => ({
+  priceOverride: toFormNumber(variant.priceOverride ?? variant.price),
+  availableQuantity: toFormNumber(variant.availableQuantity),
+});
+
+const getVariantComboName = (offer: OfferDetail, variant: OfferVariant) => {
+  if (variant.optionValues?.length) {
+    return variant.optionValues.map((value) => value.text).join(" - ");
+  }
+
+  return (offer.optionGroups ?? [])
+    .flatMap((group) =>
+      group.values
+        .filter((value) => (variant.optionValueIds ?? []).includes(value.id))
+        .map((value) => value.text),
+    )
+    .join(" - ");
+};
+
+function VariantUpdatePanel({
+  offer,
+  onVariantUpdated,
+}: {
+  offer: OfferDetail;
+  onVariantUpdated: (variant: OfferVariant) => void;
+}) {
+  const [variants, setVariants] = useState<OfferVariant[]>([]);
+  const [forms, setForms] = useState<Record<string, VariantForm>>({});
+  const [loading, setLoading] = useState(false);
+  const [savingId, setSavingId] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const [showOnlyActive, setShowOnlyActive] = useState(true);
+
+  const loadVariants = async (isActive?: boolean) => {
+    if (!offer.id) return;
+
+    setLoading(true);
+    setLoadError("");
+    try {
+      const data = await fetchOfferVariants(offer.id, isActive);
+      setVariants(data);
+      setForms(
+        data.reduce<Record<string, VariantForm>>((result, variant) => {
+          result[variant.id] = toVariantForm(variant);
+          return result;
+        }, {}),
+      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Không thể tải variants";
+      setLoadError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadVariants(showOnlyActive ? true : undefined);
+  }, [offer.id, showOnlyActive]);
+
+  const updateVariantField = <K extends keyof VariantForm>(
+    variantId: string,
+    field: K,
+    value: VariantForm[K],
+  ) => {
+    setForms((current) => ({
+      ...current,
+      [variantId]: {
+        ...current[variantId],
+        [field]: value,
+      },
+    }));
+  };
+
+  const saveVariant = async (variantId: string) => {
+    const form = forms[variantId];
+    if (!form || savingId) return;
+
+    const availableQuantity = Number(form.availableQuantity || 0);
+    const priceOverride =
+      form.priceOverride.trim() === "" ? null : Number(form.priceOverride);
+
+    if (Number.isNaN(availableQuantity) || availableQuantity < 0) {
+      toast.error("Tồn kho variant không hợp lệ");
+      return;
+    }
+
+    if (priceOverride !== null && (Number.isNaN(priceOverride) || priceOverride < 0)) {
+      toast.error("Giá variant không hợp lệ");
+      return;
+    }
+
+    setSavingId(variantId);
+    try {
+      const updatedVariant = await updateOfferVariant(offer.id, variantId, {
+        priceOverride,
+        availableQuantity,
+      });
+
+      setVariants((current) =>
+        current.map((variant) =>
+          variant.id === variantId ? { ...variant, ...updatedVariant } : variant,
+        ),
+      );
+      onVariantUpdated(updatedVariant);
+      toast.success("Cập nhật variant thành công");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể cập nhật variant");
+    } finally {
+      setSavingId("");
+    }
+  };
+
+  return (
+    <section className="seller-product-detail-section">
+      <div className="seller-product-detail-section-head seller-product-variant-edit-head">
+        <Layers size={18} />
+        <h2>Cập nhật variant</h2>
+        <label>
+          <input
+            type="checkbox"
+            checked={showOnlyActive}
+            onChange={(event) => setShowOnlyActive(event.target.checked)}
+          />
+          Chỉ variant đang bán
+        </label>
+      </div>
+
+      {loading && <div className="seller-product-detail-state">Đang tải variants...</div>}
+
+      {!loading && loadError && (
+        <div className="seller-product-detail-state error">
+          {loadError}
+          <button
+            type="button"
+            onClick={() => loadVariants(showOnlyActive ? true : undefined)}
+          >
+            Tải lại
+          </button>
+        </div>
+      )}
+
+      {!loading && !loadError && variants.length === 0 && (
+        <div className="seller-product-detail-empty">Chưa có variant để cập nhật.</div>
+      )}
+
+      {!loading && !loadError && variants.length > 0 && (
+        <div className="seller-product-variant-edit-list">
+          {variants.map((variant) => {
+            const form = forms[variant.id] ?? toVariantForm(variant);
+            const comboName = getVariantComboName(offer, variant);
+            return (
+              <div className="seller-product-variant-edit-row" key={variant.id}>
+                <div className="seller-product-variant-edit-media">
+                  {variant.mediaAsset?.secureUrl ? (
+                    <img
+                      src={variant.mediaAsset.secureUrl}
+                      alt={comboName || "Anh variant"}
+                    />
+                  ) : (
+                    <ImageIcon size={24} />
+                  )}
+                </div>
+                <div className="seller-product-variant-combo">
+                  <strong>{comboName || "Chưa có cặp phân loại"}</strong>
+                  {false ? (
+                    <div>
+                      {[].map((pair) => (
+                        <span key={pair}>{pair}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    <small>Chưa có cặp phân loại</small>
+                  )}
+                </div>
+
+                <label className="seller-product-variant-sku-input">
+                  <span>SKU</span>
+                  <input
+                    value=""
+                    disabled={savingId === variant.id}
+                    onChange={(event) =>
+                      event.currentTarget.blur()
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span>Giá variant</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.priceOverride}
+                    disabled={savingId === variant.id}
+                    placeholder={formatMoney(offer.price, offer.currency)}
+                    onChange={(event) =>
+                      updateVariantField(
+                        variant.id,
+                        "priceOverride",
+                        event.target.value,
+                      )
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span>Tồn kho</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.availableQuantity}
+                    disabled={savingId === variant.id}
+                    onChange={(event) =>
+                      updateVariantField(
+                        variant.id,
+                        "availableQuantity",
+                        event.target.value,
+                      )
+                    }
+                  />
+                </label>
+
+                <label className="seller-product-variant-active">
+                  <input
+                    type="checkbox"
+                    checked={variant.isActive}
+                    disabled={savingId === variant.id}
+                    onChange={(event) =>
+                      event.currentTarget.blur()
+                    }
+                  />
+                  Đang bán
+                </label>
+
+                <button
+                  type="button"
+                  disabled={savingId === variant.id}
+                  onClick={() => saveVariant(variant.id)}
+                >
+                  {savingId === variant.id ? "Đang lưu..." : "Lưu variant"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function SellerProductDetail() {
   const { offerId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [offer, setOffer] = useState<OfferDetail | null>(null);
   const [form, setForm] = useState<UpdateOfferForm>(initialUpdateForm);
   const [editing, setEditing] = useState(searchParams.get("edit") === "1");
+  const [editingVariants, setEditingVariants] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -216,6 +544,10 @@ export default function SellerProductDetail() {
     ) as string[];
     return Array.from(new Set(images));
   }, [offer]);
+
+  const canUpdateVariants =
+    String(offer?.moderationStatus ?? "").toLowerCase() === "approved" ||
+    String(offer?.offerStatus ?? "").toLowerCase() === "active";
 
   const updateField = <K extends keyof UpdateOfferForm>(
     field: K,
@@ -294,6 +626,21 @@ export default function SellerProductDetail() {
     }
   };
 
+  const handleVariantUpdated = (updatedVariant: OfferVariant) => {
+    setOffer((currentOffer) =>
+      currentOffer
+        ? {
+            ...currentOffer,
+            variants: (currentOffer.variants ?? []).map((variant) =>
+              variant.id === updatedVariant.id
+                ? { ...variant, ...updatedVariant }
+                : variant,
+            ),
+          }
+        : currentOffer,
+    );
+  };
+
   if (loading) {
     return (
       <div className="seller-product-page seller-product-detail-page">
@@ -356,8 +703,25 @@ export default function SellerProductDetail() {
                 <Pencil size={16} />
                 Cập nhật thông tin
               </button>
+              {canUpdateVariants && (
+                <button
+                  type="button"
+                  className="seller-product-detail-edit-btn"
+                  onClick={() => setEditingVariants((current) => !current)}
+                >
+                  <Layers size={16} />
+                  {editingVariants ? "Ẩn cập nhật variant" : "Cập nhật variant"}
+                </button>
+              )}
             </div>
           </section>
+
+          {editingVariants && (
+            <VariantUpdatePanel
+              offer={offer}
+              onVariantUpdated={handleVariantUpdated}
+            />
+          )}
 
           {editing && (
             <section className="seller-product-detail-section">
@@ -535,6 +899,8 @@ export default function SellerProductDetail() {
               />
             </div>
           </section>
+
+          <OfferOptionsAndVariants offer={offer} />
 
           <section className="seller-product-detail-section">
             <div className="seller-product-detail-section-head">

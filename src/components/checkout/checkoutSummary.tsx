@@ -21,6 +21,7 @@ interface Props {
 
 const toPaymentMethod = (payment: string) => {
   if (payment === "cod") return "COD";
+  if (payment === "wallet") return "WALLET";
   return "PAYOS";
 };
 
@@ -76,13 +77,13 @@ export default function CheckoutSummary({
               affiliateCode: affiliateCode.trim() || undefined,
             });
 
-      if (paymentMethod === "COD") {
+      if (paymentMethod === "COD" || paymentMethod === "WALLET") {
         navigate("/payment-success", {
           replace: true,
           state: {
             checkout,
             paymentMethod,
-            paymentStatus: "COD_PENDING",
+            paymentStatus: paymentMethod === "WALLET" ? "PAID" : "COD_PENDING",
           },
         });
         return;

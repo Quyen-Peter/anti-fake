@@ -22,6 +22,7 @@ type ProductForm = Omit<
   | "lengthCm"
   | "widthCm"
   | "heightCm"
+  | "optionGroups"
 > & {
   price: string;
   availableQuantity: string;
@@ -29,9 +30,30 @@ type ProductForm = Omit<
   lengthCm: string;
   widthCm: string;
   heightCm: string;
+  optionGroups: OptionGroupForm[];
 };
 
 const MAX_PRODUCT_IMAGES = 4;
+
+type OptionValueForm = {
+  text: string;
+  image: string;
+};
+
+type OptionGroupForm = {
+  displayName: string;
+  values: OptionValueForm[];
+};
+
+const createOptionValue = (): OptionValueForm => ({
+  text: "",
+  image: "",
+});
+
+const createOptionGroup = (): OptionGroupForm => ({
+  displayName: "",
+  values: [createOptionValue()],
+});
 
 const initialForm: ProductForm = {
   categoryId: "",
@@ -49,6 +71,7 @@ const initialForm: ProductForm = {
   lengthCm: "",
   widthCm: "",
   heightCm: "",
+  optionGroups: [],
 };
 
 const normalizeMyShop = (data: unknown) => {
@@ -63,6 +86,19 @@ const normalizeMyShop = (data: unknown) => {
 };
 
 const toPayloadNumber = (value: string) => Number(value || 0);
+
+const buildOptionGroups = (optionGroups: OptionGroupForm[]) =>
+  optionGroups
+    .map((group) => ({
+      displayName: group.displayName.trim(),
+      values: group.values
+        .map((value) => ({
+          text: value.text.trim(),
+          image: value.image.trim() || undefined,
+        }))
+        .filter((value) => value.text),
+    }))
+    .filter((group) => group.displayName && group.values.length > 0);
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
@@ -156,6 +192,96 @@ export default function CreateProduct({
     setForm((current) => ({ ...current, [field]: value }));
   };
 
+  const addOptionGroup = () => {
+    updateField("optionGroups", [...form.optionGroups, createOptionGroup()]);
+  };
+
+  const removeOptionGroup = (groupIndex: number) => {
+    updateField(
+      "optionGroups",
+      form.optionGroups.filter((_, index) => index !== groupIndex),
+    );
+  };
+
+  const updateOptionGroupName = (groupIndex: number, displayName: string) => {
+    updateField(
+      "optionGroups",
+      form.optionGroups.map((group, index) =>
+        index === groupIndex ? { ...group, displayName } : group,
+      ),
+    );
+  };
+
+  const addOptionValue = (groupIndex: number) => {
+    updateField(
+      "optionGroups",
+      form.optionGroups.map((group, index) =>
+        index === groupIndex
+          ? { ...group, values: [...group.values, createOptionValue()] }
+          : group,
+      ),
+    );
+  };
+
+  const removeOptionValue = (groupIndex: number, valueIndex: number) => {
+    updateField(
+      "optionGroups",
+      form.optionGroups.map((group, index) =>
+        index === groupIndex
+          ? {
+              ...group,
+              values: group.values.filter(
+                (_, currentIndex) => currentIndex !== valueIndex,
+              ),
+            }
+          : group,
+      ),
+    );
+  };
+
+  const updateOptionValue = <K extends keyof OptionValueForm>(
+    groupIndex: number,
+    valueIndex: number,
+    field: K,
+    value: OptionValueForm[K],
+  ) => {
+    updateField(
+      "optionGroups",
+      form.optionGroups.map((group, index) =>
+        index === groupIndex
+          ? {
+              ...group,
+              values: group.values.map((optionValue, currentIndex) =>
+                currentIndex === valueIndex
+                  ? { ...optionValue, [field]: value }
+                  : optionValue,
+              ),
+            }
+          : group,
+      ),
+    );
+  };
+
+  const handleOptionImageChange = async (
+    event: ChangeEvent<HTMLInputElement>,
+    groupIndex: number,
+    valueIndex: number,
+  ) => {
+    const file = Array.from(event.target.files ?? []).find((item) =>
+      item.type.startsWith("image/"),
+    );
+    event.target.value = "";
+
+    if (!file) return;
+
+    try {
+      const image = await fileToDataUrl(file);
+      updateOptionValue(groupIndex, valueIndex, "image", image);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Khong the doc anh tuy chon"));
+    }
+  };
+
   const buildPayload = (): CreateOfferPayload => ({
     ...form,
     title: form.title.trim(),
@@ -170,6 +296,7 @@ export default function CreateProduct({
     lengthCm: toPayloadNumber(form.lengthCm),
     widthCm: toPayloadNumber(form.widthCm),
     heightCm: toPayloadNumber(form.heightCm),
+    optionGroups: buildOptionGroups(form.optionGroups),
   });
 
   const handleProductImagesChange = async (
@@ -247,6 +374,16 @@ export default function CreateProduct({
       payload.heightCm <= 0
     ) {
       return "Vui lòng nhập đầy đủ cân nặng và kích thước hợp lệ";
+    }
+
+    if (
+      form.optionGroups.some(
+        (group) =>
+          group.displayName.trim() &&
+          group.values.every((value) => !value.text.trim()),
+      )
+    ) {
+      return "Mỗi nhóm tùy chọn cần có ít nhất một giá trị";
     }
 
     return "";
@@ -489,6 +626,140 @@ export default function CreateProduct({
               />
               <span>Đã qua sử dụng</span>
             </label>
+          </div>
+        </section>
+
+        <section className="create-section">
+          <div className="create-section-title">
+            <h3>Tùy chọn sản phẩm</h3>
+            <button className="btn-outline" type="button" onClick={addOptionGroup}>
+              Thêm nhóm tùy chọn
+            </button>
+          </div>
+
+          {form.optionGroups.length === 0 && (
+            <p className="create-product-help">
+              Thêm các nhóm như màu sắc, kích thước nếu sản phẩm có biến thể.
+            </p>
+          )}
+
+          <div className="option-group-list">
+            {form.optionGroups.map((group, groupIndex) => (
+              <div className="option-group-card" key={groupIndex}>
+                <div className="option-group-head">
+                  <div className="form-group">
+                    <label>Tên nhóm tùy chọn</label>
+                    <input
+                      value={group.displayName}
+                      onChange={(event) =>
+                        updateOptionGroupName(groupIndex, event.target.value)
+                      }
+                      placeholder="Màu sắc"
+                    />
+                  </div>
+                  <button
+                    className="btn-outline"
+                    type="button"
+                    onClick={() => removeOptionGroup(groupIndex)}
+                  >
+                    Xóa nhóm
+                  </button>
+                </div>
+
+                <div className="option-value-list">
+                  {group.values.map((value, valueIndex) => (
+                    <div className="option-value-row" key={valueIndex}>
+                      <div className="form-group option-extra-hidden">
+                        <label>Giá trị</label>
+                        <input
+                          value={value.text}
+                          onChange={(event) =>
+                            updateOptionValue(
+                              groupIndex,
+                              valueIndex,
+                              "text",
+                              event.target.value,
+                            )
+                          }
+                          placeholder="Đỏ"
+                        />
+                      </div>
+
+                      <div className="form-group option-extra-hidden">
+                        <label>Media asset ID</label>
+                        <input
+                          value=""
+                          onChange={(event) =>
+                            updateOptionValue(
+                              groupIndex,
+                              valueIndex,
+                              "text",
+                              event.target.value,
+                            )
+                          }
+                          placeholder="media-asset-id"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Ảnh tùy chọn</label>
+                        <label className="option-image-picker">
+                          {value.image ? (
+                            <img src={value.image} alt={value.text || "Ảnh tùy chọn"} />
+                          ) : (
+                            <span>Chọn ảnh</span>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) =>
+                              handleOptionImageChange(
+                                event,
+                                groupIndex,
+                                valueIndex,
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
+
+                      <div className="form-group option-extra-hidden">
+                        <label>Thứ tự</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value=""
+                          onChange={(event) =>
+                            updateOptionValue(
+                              groupIndex,
+                              valueIndex,
+                              "text",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <button
+                        className="btn-outline option-remove-btn"
+                        type="button"
+                        onClick={() => removeOptionValue(groupIndex, valueIndex)}
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  className="btn-outline"
+                  type="button"
+                  onClick={() => addOptionValue(groupIndex)}
+                >
+                  Thêm giá trị
+                </button>
+              </div>
+            ))}
           </div>
         </section>
 

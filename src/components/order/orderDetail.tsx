@@ -39,13 +39,14 @@ const paymentStatusLabels: Record<string, string> = {
   pending: "Chờ thanh toán",
   paid: "Đã thanh toán",
   failed: "Thanh toán thất bại",
-  cancelled: "Đã hủy",
+  cancelled: "Đã hủy thanh toán",
   refunded: "Đã hoàn tiền",
 };
 
 const paymentMethodLabels: Record<string, string> = {
   COD: "Thanh toán khi nhận hàng",
   PAYOS: "Thanh toán PayOS",
+  WALLET: "Ví AntiFake",
 };
 
 const progressSteps = [
@@ -69,6 +70,11 @@ const label = (map: Record<string, string>, value?: string) =>
   value ? map[value.toLowerCase()] ?? map[value.toUpperCase()] ?? value : "Đang cập nhật";
 
 const getOfferId = (item: OrderItem) => item.offerId || item.productId;
+const getSelectedOptionText = (item: OrderItem) =>
+  item.selectedOptions?.map((option) => option.optionValueText).filter(Boolean).join(", ") ||
+  item.variantName ||
+  item.variant?.sku ||
+  "";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -319,7 +325,9 @@ export default function OrderDetailPage() {
                 <img src={item.thumbnailUrl} alt={item.productName} />
                 <div className="od-item-info">
                   <h3>{item.productName}</h3>
-                  {item.variantName && <p>{item.variantName}</p>}
+                  {getSelectedOptionText(item) && (
+                    <p>Phân loại: {getSelectedOptionText(item)}</p>
+                  )}
                   <span>Số lượng: {item.quantity}</span>
                 </div>
                 <div className="od-item-side">

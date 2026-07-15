@@ -16,6 +16,13 @@ import {
 } from "../../services/cart.api";
 import { useCartStore } from "../../store/cartStore";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+import type { CartItem as CartItemType, CartShop } from "../../type/checkout";
+
+type SelectableCartItem = CartItemType & { selected: boolean };
+type SelectableCartShop = Omit<CartShop, "items"> & { items: SelectableCartItem[] };
+
+const getCartItemGroupKey = (item: CartItemType) =>
+  `${item.offerId}:${item.variantId ?? "default"}`;
 
 function CartLoading() {
   return (
@@ -52,7 +59,7 @@ function CartLoading() {
 }
 
 export default function CartPage() {
-  const [cartShops, setCartShops] = useState<any[]>([]);
+  const [cartShops, setCartShops] = useState<SelectableCartShop[]>([]);
   const [loadingCart, setLoadingCart] = useState(true);
   const [cartActionLoading, setCartActionLoading] = useState("");
   const refreshCart = useCartStore((state) => state.refreshCart);
@@ -66,9 +73,9 @@ export default function CartPage() {
         const data = await fetchCart();
 
         setCartShops(
-          (data.shops || []).map((shop: any) => ({
+          (data.shops || []).map((shop) => ({
             ...shop,
-            items: shop.items.map((item: any) => ({
+            items: shop.items.map((item) => ({
               ...item,
               selected: false,
             })),
@@ -97,7 +104,7 @@ export default function CartPage() {
       setCartShops((prev) =>
         prev.map((shop) => ({
           ...shop,
-          items: shop.items.map((item: any) =>
+          items: shop.items.map((item) =>
             item.id === itemId ? { ...item, quantity } : item,
           ),
         })),
@@ -123,7 +130,7 @@ export default function CartPage() {
         prev
           .map((shop) => ({
             ...shop,
-            items: shop.items.filter((item: any) => item.id !== itemId),
+            items: shop.items.filter((item) => item.id !== itemId),
           }))
           .filter((shop) => shop.items.length > 0),
       );
@@ -140,7 +147,7 @@ export default function CartPage() {
   const isShopSelected = (shopId: string) => {
     const shop = cartShops.find((item) => item.shopId === shopId);
     if (!shop) return false;
-    return shop.items.some((item: any) => item.selected);
+    return shop.items.some((item) => item.selected);
   };
 
   const toggleShopSelect = (shopId: string) => {
@@ -150,11 +157,11 @@ export default function CartPage() {
       prev.map((shop) => {
         if (shop.shopId !== shopId) return shop;
 
-        const allSelected = shop.items.every((item: any) => item.selected);
+        const allSelected = shop.items.every((item) => item.selected);
 
         return {
           ...shop,
-          items: shop.items.map((item: any) => ({
+          items: shop.items.map((item) => ({
             ...item,
             selected: !allSelected,
           })),
@@ -169,7 +176,7 @@ export default function CartPage() {
     setCartShops((prev) =>
       prev.map((shop) => ({
         ...shop,
-        items: shop.items.map((item: any) =>
+        items: shop.items.map((item) =>
           item.id === id ? { ...item, selected: !item.selected } : item,
         ),
       })),
@@ -180,9 +187,9 @@ export default function CartPage() {
     (shopSum, shop) =>
       shopSum +
       shop.items
-        .filter((item: any) => item.selected)
+        .filter((item) => item.selected)
         .reduce(
-          (itemSum: number, item: any) =>
+          (itemSum: number, item) =>
             itemSum + item.unitPriceSnapshot * item.quantity,
           0,
         ),
@@ -196,7 +203,7 @@ export default function CartPage() {
   const selectedShops = cartShops
     .map((shop) => ({
       ...shop,
-      items: shop.items.filter((item: any) => item.selected),
+      items: shop.items.filter((item) => item.selected),
     }))
     .filter((shop) => shop.items.length > 0);
 
@@ -244,9 +251,9 @@ export default function CartPage() {
               <span>{shop.shopName}</span>
             </div>
 
-            {shop.items.map((item: any) => (
+            {shop.items.map((item) => (
               <div
-                key={item.id}
+                key={`${item.id}:${getCartItemGroupKey(item)}`}
                 className={cartActionLoading === item.id ? "cart-item-busy" : ""}
               >
                 <CartItem

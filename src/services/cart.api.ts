@@ -2,6 +2,7 @@ import { authFetch } from "../ultil/auth";
 import type {
   CartCheckoutRequest,
   CartCheckoutResponse,
+  CartResponse,
   ShippingOptionsRequest,
   ShippingOptionsResponse,
 } from "../type/checkout";
@@ -19,36 +20,46 @@ const pickCheckoutValue = (
   data?.orders?.[0]?.[key] ??
   data?.data?.orders?.[0]?.[key];
 
+const getApiErrorMessage = async (response: Response, fallback: string) => {
+  const text = await response.text();
+  if (!text) return fallback;
+
+  try {
+    const data = JSON.parse(text);
+    return data?.message ?? data?.error ?? fallback;
+  } catch {
+    return text;
+  }
+};
 
 export const addToCart = async (
   offerId: string,
-  quantity: number
+  quantity: number,
+  variantId?: string,
 ) => {
-
-  const response = await authFetch(
-    `${BASE_URL}/api/cart/items`,
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        offerId,
-        quantity,
-      }),
-    }
-  );
+  const response = await authFetch(`${BASE_URL}/api/cart/items`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      offerId,
+      quantity,
+      ...(variantId ? { variantId } : {}),
+    }),
+  });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || "Không thể thêm vào giỏ hàng");
+    throw new Error(
+      await getApiErrorMessage(response, "Không thể thêm vào giỏ hàng"),
+    );
   }
 
-  return await response.json();
+  return response.json();
 };
 
-export const fetchCart = async () => {
+export const fetchCart = async (): Promise<CartResponse> => {
   const response = await authFetch(`${BASE_URL}/api/cart`, {
     method: "GET",
     headers: {
@@ -57,10 +68,13 @@ export const fetchCart = async () => {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP Error: ${response.status}`);
+    throw new Error(
+      await getApiErrorMessage(response, `HTTP Error: ${response.status}`),
+    );
   }
 
-  return response.json();
+  const data = await response.json();
+  return data?.data ?? data;
 };
 
 export const fetchShippingOptions = async (
@@ -101,42 +115,39 @@ export const checkoutCart = async (
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Khong the tao thanh toan");
+    throw new Error(data.message || "Không thể tạo thanh toán");
   }
 
   const checkout = {
     ...data,
     orderId: pickCheckoutValue(data, "orderId") ?? data?.id ?? data?.data?.id,
-    orderCode: pickCheckoutValue(data, "orderCode") ?? data?.code ?? data?.data?.code,
+    orderCode:
+      pickCheckoutValue(data, "orderCode") ?? data?.code ?? data?.data?.code,
     checkoutUrl: pickCheckoutValue(data, "checkoutUrl") ?? data?.paymentUrl,
     paymentLinkId: pickCheckoutValue(data, "paymentLinkId"),
   };
 
   if (payload.paymentMethod === "PAYOS" && !checkout.paymentLinkId) {
-    throw new Error("API checkout PAYOS thieu paymentLinkId");
+    throw new Error("API checkout PAYOS thiếu paymentLinkId");
   }
 
   return checkout;
 };
 
-
 export const updateCartItemQuantity = async (
   cartItemId: string,
   quantity: number,
 ) => {
-  const response = await authFetch(
-    `${BASE_URL}/api/cart/items/${cartItemId}`,
-    {
-      method: "PATCH",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        quantity,
-      }),
-    }
-  );
+  const response = await authFetch(`${BASE_URL}/api/cart/items/${cartItemId}`, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      quantity,
+    }),
+  });
 
   const data = await response.json();
 
@@ -147,23 +158,18 @@ export const updateCartItemQuantity = async (
   return data;
 };
 
-
-export const deleteCartItem = async (
-  cartItemId: string,
-) => {
-  const response = await authFetch(
-    `${BASE_URL}/api/cart/items/${cartItemId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "*/*",
-      },
-    }
-  );
+export const deleteCartItem = async (cartItemId: string) => {
+  const response = await authFetch(`${BASE_URL}/api/cart/items/${cartItemId}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "*/*",
+    },
+  });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || "Xóa sản phẩm thất bại");
+    throw new Error(
+      await getApiErrorMessage(response, "Xóa sản phẩm thất bại"),
+    );
   }
 
   return true;

@@ -106,6 +106,65 @@
   font-weight: 500;
 }
 
+.pd-options {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.pd-option-group {
+  display: grid;
+  gap: 8px;
+}
+
+.pd-option-group > span {
+  font-weight: 600;
+  color: #444;
+}
+
+.pd-option-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pd-option-value {
+  min-height: 42px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #333;
+}
+
+.pd-option-value img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.pd-option-value.active {
+  border-color: #e53935;
+  color: #e53935;
+  background: #fff6f6;
+}
+
+.pd-option-value:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.pd-option-warning {
+  color: #d92525;
+  font-weight: 600;
+}
+
 .pd-quantity-control {
   display: flex;
   width: fit-content;

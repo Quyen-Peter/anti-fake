@@ -36,6 +36,15 @@ export type CreateOfferPayload = {
   lengthCm: number;
   widthCm: number;
   heightCm: number;
+  optionGroups?: {
+    displayName: string;
+    values: {
+      text: string;
+      mediaAssetId?: string | null;
+      image?: string | null;
+      sortOrder?: number;
+    }[];
+  }[];
 };
 
 export type UpdateOfferPayload = {
@@ -77,7 +86,49 @@ export type OfferDetail = {
   productModelName?: string;
   thumbnailUrl?: string | null;
   imageUrls?: string[];
+  optionGroups?: Array<{
+    id: string;
+    displayName: string;
+    values: Array<{
+      id: string;
+      text: string;
+      mediaAsset: {
+        id: string;
+        secureUrl: string;
+      } | null;
+    }>;
+  }>;
+  variants?: Array<{
+    id: string;
+    sku: string | null;
+    price?: number | null;
+    priceOverride?: number | null;
+    availableQuantity: number;
+    isActive: boolean;
+    optionValueIds?: string[];
+    optionValues?: Array<{
+      id: string;
+      text: string;
+      optionGroup?: {
+        id: string;
+        displayName: string;
+      };
+    }>;
+    mediaAsset: {
+      id: string;
+      secureUrl: string;
+    } | null;
+  }>;
   createdAt?: string;
+};
+
+export type OfferVariant = NonNullable<OfferDetail["variants"]>[number];
+
+export type UpdateOfferVariantPayload = {
+  priceOverride?: number | null;
+  availableQuantity?: number;
+  image?: string | null;
+  mediaAssetId?: string | null;
 };
 
 export const createOffer = async (payload: CreateOfferPayload) => {
@@ -274,6 +325,83 @@ export const updateOffer = async (
   }
 
   return data?.data ?? data;
+};
+
+export const fetchOfferVariants = async (
+  offerId: string,
+  isActive?: boolean,
+): Promise<OfferVariant[]> => {
+  const query = new URLSearchParams();
+  if (typeof isActive === "boolean") query.set("isActive", String(isActive));
+
+  const response = await authFetch(
+    `${BASE_URL}/api/offers/${offerId}/variants${
+      query.toString() ? `?${query.toString()}` : ""
+    }`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the lay danh sach variant");
+  }
+
+  const payload = data?.data ?? data;
+  return Array.isArray(payload) ? payload : payload?.items ?? [];
+};
+
+export const updateOfferVariant = async (
+  offerId: string,
+  variantId: string,
+  payload: UpdateOfferVariantPayload,
+): Promise<OfferVariant> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/offers/${offerId}/variants/${variantId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Khong the cap nhat variant");
+  }
+
+  return data?.data ?? data;
+};
+
+export const deleteOfferVariant = async (
+  offerId: string,
+  variantId: string,
+): Promise<void> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/offers/${offerId}/variants/${variantId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Khong the xoa variant");
+  }
 };
 
 export const searchOffers = async ({

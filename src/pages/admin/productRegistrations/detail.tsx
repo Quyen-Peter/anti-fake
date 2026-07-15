@@ -63,6 +63,21 @@ const displayUnit = (value: number | string | null | undefined, unit: string) =>
   return `${value} ${unit}`;
 };
 
+const getVariantDisplayName = (offer: OfferDetail, variant: NonNullable<OfferDetail["variants"]>[number]) => {
+  if (variant.optionValues?.length) {
+    return variant.optionValues.map((value) => value.text).join(" - ");
+  }
+
+  const valueIds = variant.optionValueIds ?? [];
+  const values = (offer.optionGroups ?? []).flatMap((group) =>
+    group.values
+      .filter((value) => valueIds.includes(value.id))
+      .map((value) => value.text),
+  );
+
+  return values.join(" - ") || "--";
+};
+
 function InfoItem({
   icon,
   label,
@@ -79,6 +94,60 @@ function InfoItem({
         <small>{label}</small>
         <strong>{displayValue(value)}</strong>
       </div>
+    </div>
+  );
+}
+
+function OfferOptionsAndVariants({ offer }: { offer: OfferDetail }) {
+  const optionGroups = offer.optionGroups ?? [];
+  const variants = offer.variants ?? [];
+
+  if (optionGroups.length === 0 && variants.length === 0) return null;
+
+  return (
+    <div className="admin-detail-section">
+      <div className="admin-detail-section-head">
+        <Layers size={17} />
+        <h2>Phân loại sản phẩm</h2>
+      </div>
+
+      {optionGroups.length > 0 && (
+        <div className="admin-product-option-groups">
+          {optionGroups.map((group) => (
+            <div className="admin-product-option-group" key={group.id}>
+              <strong>{group.displayName}</strong>
+              <div>
+                {group.values.map((value) => (
+                  <span key={value.id}>
+                    {value.mediaAsset?.secureUrl && (
+                      <img src={value.mediaAsset.secureUrl} alt={value.text} />
+                    )}
+                    {value.text}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {variants.length > 0 && (
+        <div className="admin-product-variant-table">
+          {variants.map((variant) => (
+            <div className="admin-product-variant-row" key={variant.id}>
+              <span>{getVariantDisplayName(offer, variant)}</span>
+              <span>
+                {formatMoney(
+                  variant.priceOverride ?? variant.price ?? offer.price,
+                  offer.currency,
+                )}
+              </span>
+              <span>Tồn kho: {variant.availableQuantity}</span>
+              <span>{variant.isActive ? "Đang bán" : "Ngừng bán"}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -286,6 +355,8 @@ export default function AdminProductDetailPage() {
                 </div>
               )}
             </div>
+
+            <OfferOptionsAndVariants offer={offer} />
 
             <div className="admin-detail-section">
               <div className="admin-detail-section-head">

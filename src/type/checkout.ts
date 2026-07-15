@@ -1,8 +1,12 @@
 export interface CheckoutItem {
   id: string;
+  offerId?: string;
+  variantId?: string | null;
+  variantSku?: string | null;
   thumbnailUrl: string;
   offerTitleSnapshot: string;
   unitPriceSnapshot: number;
+  oldPrice?: number;
   currencySnapshot: string;
   quantity: number;
 }
@@ -11,6 +15,28 @@ export interface CheckoutShop {
   shopId: string;
   shopName: string;
   items: CheckoutItem[];
+}
+
+export interface CartItem extends CheckoutItem {
+  offerId: string;
+  variantId: string | null;
+  variantSku: string | null;
+  shopNameSnapshot?: string;
+  selected?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CartShop {
+  shopId: string;
+  shopName: string;
+  items: CartItem[];
+}
+
+export interface CartResponse {
+  id: string;
+  buyerUserId: string;
+  shops: CartShop[];
 }
 
 export interface ShippingOption {
@@ -32,7 +58,7 @@ export interface ShippingOptionsResponse {
 
 export interface CartCheckoutRequest {
   cartItemIds: string[];
-  paymentMethod: string;
+  paymentMethod: "COD" | "PAYOS" | "WALLET";
   shippingOptionCode: string;
   affiliateCode?: string;
 }
@@ -63,6 +89,6 @@ export interface BuyNowPreview extends BuyNowSelection {
 }
 
 export interface BuyNowCheckoutRequest extends BuyNowSelection {
-  paymentMethod: string;
+  paymentMethod: "COD" | "PAYOS" | "WALLET";
   shippingOptionCode: string;
 }

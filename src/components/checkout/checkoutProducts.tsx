@@ -27,6 +27,7 @@ export default function CheckoutProducts({ shops }: Props) {
 
               <div className="product-info">
                 <h4>{item.offerTitleSnapshot}</h4>
+                {item.variantSku ? <span>Phân loại: {item.variantSku}</span> : null}
 
                 <span>Số lượng: {item.quantity}</span>
 

@@ -9,6 +9,7 @@ import {
   IdCard,
   LoaderCircle,
   Mail,
+  MessageCircle,
   Phone,
   Store,
   Tags,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 import "../../../css/components/dataSkeleton.css";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
   fetchAdminShopVerificationDetail,
@@ -25,6 +26,7 @@ import {
   type AdminShopReviewStatus,
   type AdminShopVerificationDetail,
 } from "../../../services/admin.api";
+import { createShopChatThread } from "../../../services/chat.api";
 
 type StatusTone = "active" | "locked" | "pending";
 
@@ -115,12 +117,14 @@ function DocumentImage({
 
 export default function AdminShopVerificationDetailPage() {
   const { shopId } = useParams();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<AdminShopVerificationDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reviewNote, setReviewNote] = useState("");
   const [reviewingStatus, setReviewingStatus] =
     useState<AdminShopReviewStatus | null>(null);
+  const [startingChat, setStartingChat] = useState(false);
 
   const refreshDetail = useCallback(async () => {
     if (!shopId) return;
@@ -157,6 +161,25 @@ export default function AdminShopVerificationDetailPage() {
       toast.error(message);
     } finally {
       setReviewingStatus(null);
+    }
+  };
+
+  const handleStartChat = async () => {
+    if (!shopId || startingChat) return;
+
+    setStartingChat(true);
+    try {
+      const response = await createShopChatThread(shopId);
+      if (!response?.success || !response.threadId) {
+        throw new Error("Không thể mở cuộc trò chuyện");
+      }
+      navigate(`/admin/chat/${response.threadId}`);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Không thể mở cuộc trò chuyện";
+      toast.error(message);
+    } finally {
+      setStartingChat(false);
     }
   };
 
@@ -210,6 +233,9 @@ export default function AdminShopVerificationDetailPage() {
   }
 
   const shopStatus = detail.shop.status ?? detail.shop.shopStatus;
+  const isReviewCompleted = ["verified", "approved"].includes(
+    String(shopStatus ?? "").toLowerCase(),
+  );
   const ownerAvatar = detail.owner.avatarUrl ?? detail.owner.avatar;
   const address = detail.shop.physicalAddress ?? detail.shop.address;
 
@@ -337,50 +363,76 @@ export default function AdminShopVerificationDetailPage() {
           <section className="admin-detail-panel admin-review-panel">
             <div className="admin-detail-section-head">
               <BadgeCheck size={18} />
-              <h2>Duyệt hồ sơ</h2>
+              <h2>{isReviewCompleted ? "Hồ sơ đã xử lý" : "Duyệt hồ sơ"}</h2>
             </div>
-            <label className="admin-review-note">
-              <span>Ghi chú xét duyệt</span>
-              <textarea
-                rows={4}
-                value={reviewNote}
-                onChange={(event) => setReviewNote(event.target.value)}
-                placeholder="Nhập ghi chú hoặc lý do từ chối..."
-                disabled={Boolean(reviewingStatus)}
-              />
-            </label>
-            <div className="admin-review-actions">
-              <button
-                type="button"
-                className={`approve ${
-                  reviewingStatus === "approved" ? "is-loading" : ""
-                }`}
-                disabled={Boolean(reviewingStatus)}
-                onClick={() => handleReview("approved")}
-              >
-                {reviewingStatus === "approved" ? (
-                  <LoaderCircle size={16} />
-                ) : (
-                  <CheckCircle2 size={16} />
-                )}
-                {reviewingStatus === "approved" ? "Đang duyệt..." : "Duyệt"}
-              </button>
-              <button
-                type="button"
-                className={`reject ${
-                  reviewingStatus === "rejected" ? "is-loading" : ""
-                }`}
-                disabled={Boolean(reviewingStatus)}
-                onClick={() => handleReview("rejected")}
-              >
-                {reviewingStatus === "rejected" ? (
-                  <LoaderCircle size={16} />
-                ) : (
-                  <XCircle size={16} />
-                )}
-                {reviewingStatus === "rejected" ? "Đang từ chối..." : "Từ chối"}
-              </button>
-            </div>
+            {isReviewCompleted ? (
+              <div className="admin-review-complete" role="status">
+                <CheckCircle2 size={32} />
+                <strong>Đã xác minh hồ sơ</strong>
+                <p>
+                  Hồ sơ pháp lý và KYC đã được duyệt. Các thao tác duyệt hoặc
+                  từ chối đã được khóa.
+                </p>
+                <button
+                  type="button"
+                  className="admin-review-chat-btn"
+                  disabled={startingChat}
+                  onClick={handleStartChat}
+                >
+                  {startingChat ? (
+                    <LoaderCircle size={16} />
+                  ) : (
+                    <MessageCircle size={16} />
+                  )}
+                  {startingChat ? "Đang mở chat..." : "Nhắn tin với shop"}
+                </button>
+              </div>
+            ) : (
+              <>
+                <label className="admin-review-note">
+                  <span>Ghi chú xét duyệt</span>
+                  <textarea
+                    rows={4}
+                    value={reviewNote}
+                    onChange={(event) => setReviewNote(event.target.value)}
+                    placeholder="Nhập ghi chú hoặc lý do từ chối..."
+                    disabled={Boolean(reviewingStatus)}
+                  />
+                </label>
+                <div className="admin-review-actions">
+                  <button
+                    type="button"
+                    className={`approve ${
+                      reviewingStatus === "approved" ? "is-loading" : ""
+                    }`}
+                    disabled={Boolean(reviewingStatus)}
+                    onClick={() => handleReview("approved")}
+                  >
+                    {reviewingStatus === "approved" ? (
+                      <LoaderCircle size={16} />
+                    ) : (
+                      <CheckCircle2 size={16} />
+                    )}
+                    {reviewingStatus === "approved" ? "Đang duyệt..." : "Duyệt"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`reject ${
+                      reviewingStatus === "rejected" ? "is-loading" : ""
+                    }`}
+                    disabled={Boolean(reviewingStatus)}
+                    onClick={() => handleReview("rejected")}
+                  >
+                    {reviewingStatus === "rejected" ? (
+                      <LoaderCircle size={16} />
+                    ) : (
+                      <XCircle size={16} />
+                    )}
+                    {reviewingStatus === "rejected" ? "Đang từ chối..." : "Từ chối"}
+                  </button>
+                </div>
+              </>
+            )}
           </section>
 
           <section className="admin-detail-panel">

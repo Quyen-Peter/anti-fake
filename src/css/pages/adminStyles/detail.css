@@ -306,6 +306,49 @@
   gap: 14px;
 }
 
+.admin-review-complete {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 18px 12px 8px;
+  text-align: center;
+  color: #027a48;
+}
+
+.admin-review-complete strong {
+  color: #2a1111;
+  font-size: 15px;
+}
+
+.admin-review-complete p {
+  margin: 0;
+  color: #704d4d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.admin-review-chat-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid #b00020;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #fff;
+  color: #b00020;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-review-chat-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .admin-review-note {
   display: grid;
   gap: 8px;

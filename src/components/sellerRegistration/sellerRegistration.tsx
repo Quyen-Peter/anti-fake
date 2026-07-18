@@ -42,6 +42,7 @@ export type RegistrationForm = {
   storeName: string;
   registrationType: ShopRegistrationType;
   taxCode: string;
+  phone: string;
   businessType: BusinessType;
   categoryIds: string[];
   identityType: string;
@@ -80,6 +81,7 @@ const initialRegistrationForm: RegistrationForm = {
   storeName: "",
   registrationType: "NORMAL",
   taxCode: "",
+  phone: "",
   businessType: "MANUFACTURER",
   categoryIds: [],
   identityType: "CCCD",
@@ -291,6 +293,17 @@ export default function SellerRegistration() {
       return;
     }
 
+    const phone = form.phone.trim();
+    if (!phone) {
+      toast.error("Vui lòng nhập số điện thoại của shop");
+      return;
+    }
+
+    if (phone.length < 8) {
+      toast.error("Số điện thoại phải có ít nhất 8 ký tự");
+      return;
+    }
+
     if (form.categoryIds.length === 0) {
       toast.error("Vui lòng chọn ít nhất một danh mục");
       return;
@@ -304,6 +317,7 @@ export default function SellerRegistration() {
           shopName: form.storeName.trim(),
           registrationType: form.registrationType,
           taxCode: form.taxCode.trim(),
+          phone,
           businessType: form.businessType,
           categoryIds: form.categoryIds,
         });

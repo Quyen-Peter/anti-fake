@@ -7,6 +7,7 @@ export type CreateShopPayload = {
   registrationType: string;
   taxCode: string;
   businessType: string;
+  phone: string;
   categoryIds: string[];
 };
 

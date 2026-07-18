@@ -48,10 +48,33 @@ export default function StoreInfoStep({
         <label className="seller-register-field full">
           <span>Tên Cửa hàng</span>
           <input
+            id="shop-name"
+            name="shopName"
+            required
             value={form.storeName}
             disabled={submitting}
             onChange={(event) =>
               setForm({ ...form, storeName: event.target.value })
+            }
+          />
+        </label>
+
+        <label className="seller-register-field full">
+          <span>Số điện thoại shop <small>(bắt buộc)</small></span>
+          <input
+            id="shop-phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            required
+            minLength={8}
+            maxLength={30}
+            placeholder="Ví dụ: 0901234567"
+            value={form.phone}
+            disabled={submitting}
+            onChange={(event) =>
+              setForm({ ...form, phone: event.target.value })
             }
           />
         </label>

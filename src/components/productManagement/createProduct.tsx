@@ -16,16 +16,13 @@ type CreateProductProps = {
 
 type ProductForm = Omit<
   CreateOfferPayload,
-  | "price"
-  | "availableQuantity"
+  | "currency"
   | "weightGrams"
   | "lengthCm"
   | "widthCm"
   | "heightCm"
   | "optionGroups"
 > & {
-  price: string;
-  availableQuantity: string;
   weightGrams: string;
   lengthCm: string;
   widthCm: string;
@@ -61,10 +58,7 @@ const initialForm: ProductForm = {
   title: "",
   description: "",
   productImages: ["", "", "", ""],
-  price: "",
-  currency: "VND",
   itemCondition: "new",
-  availableQuantity: "",
   gtin: "",
   model: "",
   weightGrams: "",
@@ -287,11 +281,10 @@ export default function CreateProduct({
     title: form.title.trim(),
     description: form.description.trim(),
     brandId: form.brandId.trim(),
+    currency: "VND",
     gtin: form.gtin.trim(),
     model: form.model.trim(),
     productImages: form.productImages.map((image) => image.trim()).filter(Boolean),
-    price: toPayloadNumber(form.price),
-    availableQuantity: toPayloadNumber(form.availableQuantity),
     weightGrams: toPayloadNumber(form.weightGrams),
     lengthCm: toPayloadNumber(form.lengthCm),
     widthCm: toPayloadNumber(form.widthCm),
@@ -353,14 +346,6 @@ export default function CreateProduct({
 
     if (payload.productImages.length > MAX_PRODUCT_IMAGES) {
       return `Chỉ được nhập tối đa ${MAX_PRODUCT_IMAGES} ảnh`;
-    }
-
-    if (payload.price <= 0) {
-      return "Giá sản phẩm phải lớn hơn 0";
-    }
-
-    if (payload.availableQuantity < 0) {
-      return "Số lượng có sẵn không được âm";
     }
 
     if (!payload.gtin || !payload.model) {
@@ -546,42 +531,6 @@ export default function CreateProduct({
               }
               placeholder="Mô tả sản phẩm..."
             />
-          </div>
-        </section>
-
-        <section className="create-section">
-          <h3>Giá bán và kho</h3>
-          <div className="grid-3">
-            <div className="form-group">
-              <label className="required">Giá</label>
-              <input
-                type="number"
-                min={0}
-                value={form.price}
-                onChange={(event) =>
-                  updateField("price", event.target.value)
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Tiền tệ</label>
-              <select value={form.currency} disabled>
-                <option value="VND">VND</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="required">Số lượng có sẵn</label>
-              <input
-                type="number"
-                min={0}
-                value={form.availableQuantity}
-                onChange={(event) =>
-                  updateField("availableQuantity", event.target.value)
-                }
-              />
-            </div>
           </div>
         </section>
 

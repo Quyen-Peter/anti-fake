@@ -26,10 +26,8 @@ export type CreateOfferPayload = {
   title: string;
   description: string;
   productImages: string[];
-  price: number;
   currency: "VND";
   itemCondition: "new" | "used";
-  availableQuantity: number;
   gtin: string;
   model: string;
   weightGrams: number;

@@ -75,6 +75,7 @@ type RegisterRouteState = {
 type RegisteredShop = {
   id?: string;
   shopId?: string;
+  shopStatus?: string;
 };
 
 const initialRegistrationForm: RegistrationForm = {
@@ -158,6 +159,9 @@ export default function SellerRegistration() {
   >([]);
   const [documentShopTypeName, setDocumentShopTypeName] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [checkingExistingShop, setCheckingExistingShop] = useState(
+    !routeState?.initialStep && !routeState?.shopId,
+  );
   const [loadingRequirements, setLoadingRequirements] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loadingReviewDetails, setLoadingReviewDetails] = useState(false);
@@ -172,6 +176,46 @@ export default function SellerRegistration() {
       registrationSteps.filter((item) => item.id < step).map((item) => item.id),
     [step],
   );
+
+  useEffect(() => {
+    if (routeState?.initialStep || routeState?.shopId) return;
+
+    let cancelled = false;
+
+    const loadExistingShop = async () => {
+      try {
+        const existingShop = normalizeMyShop(await getMyShop());
+        if (cancelled || !existingShop) return;
+
+        const existingShopId = existingShop.id || existingShop.shopId;
+        if (!existingShopId) return;
+
+        const nextShopId = String(existingShopId);
+        const isRejected = existingShop.shopStatus === "rejected";
+        setShopId(nextShopId);
+        setRegistrationStatus(isRejected ? "rejected" : "success");
+        setStep(isRejected ? 3 : 2);
+        navigate("/register", {
+          replace: true,
+          state: {
+            initialStep: isRejected ? 3 : 2,
+            registrationStatus: isRejected ? "rejected" : "success",
+            shopId: nextShopId,
+          },
+        });
+      } catch {
+        // A missing shop is the normal path for a new registration.
+      } finally {
+        if (!cancelled) setCheckingExistingShop(false);
+      }
+    };
+
+    loadExistingShop();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, routeState?.initialStep, routeState?.shopId]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -453,7 +497,8 @@ export default function SellerRegistration() {
 
   return (
     <main className="seller-register-page">
-      {((step === 1 && loadingCategories) ||
+      {(checkingExistingShop ||
+        (step === 1 && loadingCategories) ||
         loadingRequirements ||
         submitting) && <LoadingOverlay />}
 
@@ -475,7 +520,7 @@ export default function SellerRegistration() {
               setForm={setForm}
               categories={categories}
               loadingCategories={loadingCategories}
-              submitting={submitting}
+              submitting={submitting || checkingExistingShop}
               onSubmit={handleSubmitStoreInfo}
             />
           )}

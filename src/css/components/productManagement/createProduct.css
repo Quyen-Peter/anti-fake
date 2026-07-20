@@ -143,7 +143,7 @@
   display: grid;
   grid-template-columns: minmax(150px, 0.75fr) minmax(220px, 1.25fr) auto;
   gap: 12px;
-  align-items: end;
+  align-items: start;
 }
 
 .option-extra-hidden {
@@ -152,6 +152,19 @@
 
 .option-group-card .form-group {
   margin-bottom: 0;
+}
+
+.option-value-row > .form-group {
+  align-self: start;
+}
+
+.option-value-row > .form-group > .option-image-picker {
+  margin-bottom: 0;
+}
+
+.option-value-row > .form-group > input {
+  height: 48px;
+  box-sizing: border-box;
 }
 
 .option-remove-btn {

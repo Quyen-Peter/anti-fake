@@ -280,9 +280,10 @@ function OfferOptionsAndVariants({ offer }: { offer: OfferDetail }) {
     if (savingId) return;
     setSavingId(variant.id);
     try {
-      const restoredVariant = await updateOfferVariant(offer.id, variant.id, {
+      await updateOfferVariant(offer.id, variant.id, {
         isActive: true,
       });
+      const restoredVariant = { ...variant, isActive: true };
       setDeletedVariants((current) => current.filter((item) => item.id !== variant.id));
       setVariants((current) => [...current, restoredVariant]);
       setForms((current) => ({ ...current, [variant.id]: toForm(restoredVariant) }));

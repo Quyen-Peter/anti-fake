@@ -11,6 +11,7 @@ import {
   MessageSquareText,
   ReceiptText,
   Store,
+  UserRound,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -97,6 +98,11 @@ export default function SellerHeader() {
   const shopName = shop?.shopName || "Cửa hàng của tôi";
   const shopInitial = shopName.trim().charAt(0).toUpperCase() || "S";
   const shopInfoItems = [
+    {
+      label: "Hồ sơ cá nhân",
+      icon: UserRound,
+      onClick: () => navigate("/profile"),
+    },
     {
       label: "Thông tin cửa hàng",
       icon: Store,

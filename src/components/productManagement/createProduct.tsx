@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { ImagePlus, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import "../../css/components/productManagement/createProduct.css";
 import { fetchBrands, type Brand } from "../../services/brand.api";
@@ -607,97 +608,66 @@ export default function CreateProduct({
                     />
                   </div>
                   <button
-                    className="btn-outline"
+                    className="icon-button option-group-remove-btn"
                     type="button"
                     onClick={() => removeOptionGroup(groupIndex)}
+                    aria-label="Xóa nhóm tùy chọn"
+                    title="Xóa nhóm tùy chọn"
                   >
-                    Xóa nhóm
+                    <Trash2 size={18} />
                   </button>
                 </div>
 
-                <div className="option-value-list">
-                  {group.values.map((value, valueIndex) => (
-                    <div className="option-value-row" key={valueIndex}>
-                      <div className="form-group option-extra-hidden">
-                        <label>Giá trị</label>
-                        <input
-                          value={value.text}
-                          onChange={(event) =>
-                            updateOptionValue(
-                              groupIndex,
-                              valueIndex,
-                              "text",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Đỏ"
-                        />
-                      </div>
+                <div className="option-values-panel">
+                  <div className="option-values-title">
+                    <strong>Giá trị tùy chọn</strong>
+                    <span>Nhập tên và ảnh cho từng giá trị trong nhóm này.</span>
+                  </div>
 
-                      <div className="form-group option-extra-hidden">
-                        <label>Media asset ID</label>
-                        <input
-                          value=""
-                          onChange={(event) =>
-                            updateOptionValue(
-                              groupIndex,
-                              valueIndex,
-                              "text",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="media-asset-id"
-                        />
-                      </div>
+                  <div className="option-value-list">
+                    {group.values.map((value, valueIndex) => (
+                      <div className="option-value-row" key={valueIndex}>
+                        <div className="form-group">
+                          <label>Ảnh</label>
+                          <label className="option-image-picker">
+                            {value.image ? (
+                              <img src={value.image} alt={value.text || "Ảnh tùy chọn"} />
+                            ) : (
+                              <span><ImagePlus size={17} /> Chọn ảnh</span>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(event) =>
+                                handleOptionImageChange(event, groupIndex, valueIndex)
+                              }
+                            />
+                          </label>
+                        </div>
 
-                      <div className="form-group">
-                        <label>Ảnh tùy chọn</label>
-                        <label className="option-image-picker">
-                          {value.image ? (
-                            <img src={value.image} alt={value.text || "Ảnh tùy chọn"} />
-                          ) : (
-                            <span>Chọn ảnh</span>
-                          )}
+                        <div className="form-group">
+                          <label>Tên giá trị</label>
                           <input
-                            type="file"
-                            accept="image/*"
+                            value={value.text}
                             onChange={(event) =>
-                              handleOptionImageChange(
-                                event,
-                                groupIndex,
-                                valueIndex,
-                              )
+                              updateOptionValue(groupIndex, valueIndex, "text", event.target.value)
                             }
+                            placeholder="Đỏ"
                           />
-                        </label>
-                      </div>
+                        </div>
 
-                      <div className="form-group option-extra-hidden">
-                        <label>Thứ tự</label>
-                        <input
-                          type="number"
-                          min={0}
-                          value=""
-                          onChange={(event) =>
-                            updateOptionValue(
-                              groupIndex,
-                              valueIndex,
-                              "text",
-                              event.target.value,
-                            )
-                          }
-                        />
+                        <button
+                          className="icon-button option-remove-btn"
+                          type="button"
+                          onClick={() => removeOptionValue(groupIndex, valueIndex)}
+                          aria-label={`Xóa giá trị ${value.text || valueIndex + 1}`}
+                          title="Xóa giá trị"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
-
-                      <button
-                        className="btn-outline option-remove-btn"
-                        type="button"
-                        onClick={() => removeOptionValue(groupIndex, valueIndex)}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
                 <button
@@ -705,6 +675,7 @@ export default function CreateProduct({
                   type="button"
                   onClick={() => addOptionValue(groupIndex)}
                 >
+                  <Plus size={17} />
                   Thêm giá trị
                 </button>
               </div>

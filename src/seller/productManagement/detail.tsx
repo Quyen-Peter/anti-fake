@@ -8,9 +8,11 @@ import {
   Layers,
   Package,
   Pencil,
+  Plus,
   Ruler,
   Save,
   Tags,
+  Trash2,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
@@ -19,6 +21,7 @@ import { toast } from "sonner";
 import {
   fetchOfferVariants,
   fetchOfferDetail,
+  deleteOfferVariant,
   updateOfferVariant,
   updateOffer,
   type OfferDetail,
@@ -170,7 +173,126 @@ function ProductDetailLoading() {
 
 function OfferOptionsAndVariants({ offer }: { offer: OfferDetail }) {
   const optionGroups = offer.optionGroups ?? [];
-  const variants = offer.variants ?? [];
+  const [variants, setVariants] = useState<OfferVariant[]>([]);
+  const [deletedVariants, setDeletedVariants] = useState<OfferVariant[]>([]);
+  const [forms, setForms] = useState<Record<string, VariantForm>>({});
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [savingId, setSavingId] = useState("");
+
+  const toForm = (variant: OfferVariant): VariantForm => ({
+    priceOverride: toFormNumber(variant.priceOverride ?? variant.price),
+    availableQuantity: toFormNumber(variant.availableQuantity),
+  });
+
+  const loadActiveVariants = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchOfferVariants(offer.id, true);
+      setVariants(data);
+      setForms(
+        data.reduce<Record<string, VariantForm>>((result, variant) => {
+          result[variant.id] = toForm(variant);
+          return result;
+        }, {}),
+      );
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể tải variant");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadActiveVariants();
+  }, [offer.id]);
+
+  const loadDeletedVariants = async () => {
+    setShowDeleted(true);
+    try {
+      const data = await fetchOfferVariants(offer.id, false);
+      setDeletedVariants(data.filter((variant) => !variant.isActive));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể tải variant đã xóa");
+    }
+  };
+
+  const updateVariantField = (
+    variantId: string,
+    field: keyof VariantForm,
+    value: string,
+  ) => {
+    setForms((current) => ({
+      ...current,
+      [variantId]: { ...current[variantId], [field]: value },
+    }));
+  };
+
+  const saveVariant = async (variantId: string) => {
+    const form = forms[variantId];
+    if (!form || savingId) return;
+
+    const priceOverride = form.priceOverride.trim() === "" ? null : Number(form.priceOverride);
+    const availableQuantity = Number(form.availableQuantity || 0);
+    if (
+      (priceOverride !== null && (Number.isNaN(priceOverride) || priceOverride < 0)) ||
+      Number.isNaN(availableQuantity) ||
+      availableQuantity < 0
+    ) {
+      toast.error("Giá và tồn kho variant không hợp lệ");
+      return;
+    }
+
+    setSavingId(variantId);
+    try {
+      const updatedVariant = await updateOfferVariant(offer.id, variantId, {
+        priceOverride,
+        availableQuantity,
+      });
+      setVariants((current) =>
+        current.map((variant) =>
+          variant.id === variantId ? { ...variant, ...updatedVariant } : variant,
+        ),
+      );
+      toast.success("Cập nhật variant thành công");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể cập nhật variant");
+    } finally {
+      setSavingId("");
+    }
+  };
+
+  const removeVariant = async (variantId: string) => {
+    if (savingId) return;
+    setSavingId(variantId);
+    try {
+      await deleteOfferVariant(offer.id, variantId);
+      setVariants((current) => current.filter((variant) => variant.id !== variantId));
+      toast.success("Đã xóa variant");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể xóa variant");
+    } finally {
+      setSavingId("");
+    }
+  };
+
+  const restoreVariant = async (variant: OfferVariant) => {
+    if (savingId) return;
+    setSavingId(variant.id);
+    try {
+      const restoredVariant = await updateOfferVariant(offer.id, variant.id, {
+        isActive: true,
+      });
+      setDeletedVariants((current) => current.filter((item) => item.id !== variant.id));
+      setVariants((current) => [...current, restoredVariant]);
+      setForms((current) => ({ ...current, [variant.id]: toForm(restoredVariant) }));
+      toast.success("Đã thêm lại variant");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể thêm lại variant");
+    } finally {
+      setSavingId("");
+    }
+  };
 
   if (optionGroups.length === 0 && variants.length === 0) return null;
 
@@ -201,23 +323,81 @@ function OfferOptionsAndVariants({ offer }: { offer: OfferDetail }) {
         </div>
       )}
 
-      {variants.length > 0 && (
-        <div className="seller-product-variant-table">
-          {variants.map((variant) => (
+      <div className="seller-product-variant-table">
+        {loading && <div className="seller-product-detail-state">Đang tải variant...</div>}
+        {!loading && variants.length === 0 && (
+          <div className="seller-product-detail-empty">Không còn variant đang hoạt động.</div>
+        )}
+        {!loading && variants.map((variant) => {
+          const form = forms[variant.id] ?? toForm(variant);
+          return (
             <div className="seller-product-variant-row" key={variant.id}>
-              <span>{getVariantDisplayName(offer, variant)}</span>
-              <span>
-                {formatMoney(
-                  variant.priceOverride ?? variant.price ?? offer.price,
-                  offer.currency,
-                )}
-              </span>
-              <span>Tồn kho: {variant.availableQuantity}</span>
-              <span>{variant.isActive ? "Đang bán" : "Ngừng bán"}</span>
+              <strong>{getVariantDisplayName(offer, variant)}</strong>
+              <label>
+                <span>Giá</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.priceOverride}
+                  disabled={savingId === variant.id}
+                  onChange={(event) => updateVariantField(variant.id, "priceOverride", event.target.value)}
+                />
+              </label>
+              <label>
+                <span>Tồn kho</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.availableQuantity}
+                  disabled={savingId === variant.id}
+                  onChange={(event) => updateVariantField(variant.id, "availableQuantity", event.target.value)}
+                />
+              </label>
+              <div className="seller-product-variant-actions">
+                <button type="button" onClick={() => saveVariant(variant.id)} disabled={savingId === variant.id}>
+                  <Save size={16} />
+                  Lưu
+                </button>
+                <button
+                  type="button"
+                  className="seller-product-variant-delete"
+                  title="Xóa variant"
+                  aria-label={`Xóa variant ${getVariantDisplayName(offer, variant)}`}
+                  onClick={() => removeVariant(variant.id)}
+                  disabled={savingId === variant.id}
+                >
+                  <Trash2 size={17} />
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
+
+      <div className="seller-product-variant-recovery">
+        <button type="button" className="seller-product-variant-add" onClick={loadDeletedVariants}>
+          <Plus size={17} />
+          Thêm mới
+        </button>
+        {showDeleted && (
+          <div className="seller-product-deleted-list">
+            <strong>Variant đã xóa</strong>
+            {deletedVariants.length === 0 ? (
+              <span>Không có variant đã xóa.</span>
+            ) : (
+              deletedVariants.map((variant) => (
+                <div key={variant.id}>
+                  <span>{getVariantDisplayName(offer, variant)}</span>
+                  <button type="button" onClick={() => restoreVariant(variant)} disabled={savingId === variant.id}>
+                    <Plus size={15} />
+                    Thêm lại
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -246,7 +426,7 @@ const getVariantComboName = (offer: OfferDetail, variant: OfferVariant) => {
     .join(" - ");
 };
 
-function VariantUpdatePanel({
+export function VariantUpdatePanel({
   offer,
   onVariantUpdated,
 }: {
@@ -483,7 +663,6 @@ export default function SellerProductDetail() {
   const [offer, setOffer] = useState<OfferDetail | null>(null);
   const [form, setForm] = useState<UpdateOfferForm>(initialUpdateForm);
   const [editing, setEditing] = useState(searchParams.get("edit") === "1");
-  const [editingVariants, setEditingVariants] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -544,10 +723,6 @@ export default function SellerProductDetail() {
     ) as string[];
     return Array.from(new Set(images));
   }, [offer]);
-
-  const canUpdateVariants =
-    String(offer?.moderationStatus ?? "").toLowerCase() === "approved" ||
-    String(offer?.offerStatus ?? "").toLowerCase() === "active";
 
   const updateField = <K extends keyof UpdateOfferForm>(
     field: K,
@@ -626,21 +801,6 @@ export default function SellerProductDetail() {
     }
   };
 
-  const handleVariantUpdated = (updatedVariant: OfferVariant) => {
-    setOffer((currentOffer) =>
-      currentOffer
-        ? {
-            ...currentOffer,
-            variants: (currentOffer.variants ?? []).map((variant) =>
-              variant.id === updatedVariant.id
-                ? { ...variant, ...updatedVariant }
-                : variant,
-            ),
-          }
-        : currentOffer,
-    );
-  };
-
   if (loading) {
     return (
       <div className="seller-product-page seller-product-detail-page">
@@ -703,25 +863,8 @@ export default function SellerProductDetail() {
                 <Pencil size={16} />
                 Cập nhật thông tin
               </button>
-              {canUpdateVariants && (
-                <button
-                  type="button"
-                  className="seller-product-detail-edit-btn"
-                  onClick={() => setEditingVariants((current) => !current)}
-                >
-                  <Layers size={16} />
-                  {editingVariants ? "Ẩn cập nhật variant" : "Cập nhật variant"}
-                </button>
-              )}
             </div>
           </section>
-
-          {editingVariants && (
-            <VariantUpdatePanel
-              offer={offer}
-              onVariantUpdated={handleVariantUpdated}
-            />
-          )}
 
           {editing && (
             <section className="seller-product-detail-section">

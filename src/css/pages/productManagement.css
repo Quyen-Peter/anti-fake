@@ -201,8 +201,9 @@
 
 .seller-product-variant-row {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) 140px 120px 100px;
+  grid-template-columns: minmax(260px, 1fr) 140px 120px auto;
   gap: 10px;
+  align-items: end;
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 10px;
@@ -211,6 +212,104 @@
 
 .seller-product-variant-row > span:first-child {
   font-weight: 700;
+}
+
+.seller-product-variant-row > strong {
+  align-self: center;
+  color: #333;
+}
+
+.seller-product-variant-row > label {
+  display: grid;
+  gap: 5px;
+  color: #777;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seller-product-variant-row input {
+  width: 100%;
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  padding: 0 9px;
+}
+
+.seller-product-variant-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seller-product-variant-actions button,
+.seller-product-variant-add,
+.seller-product-deleted-list button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 7px;
+  padding: 0 11px;
+  background: #b00020;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-product-variant-actions .seller-product-variant-delete {
+  width: 36px;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #e0caca;
+  color: #b00020;
+}
+
+.seller-product-variant-actions button:disabled,
+.seller-product-variant-add:disabled,
+.seller-product-deleted-list button:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+.seller-product-variant-recovery {
+  padding: 0 18px 18px;
+}
+
+.seller-product-variant-add {
+  background: #fff;
+  border: 1px solid #d8bebe;
+  color: #b00020;
+}
+
+.seller-product-deleted-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #eadede;
+  border-radius: 8px;
+  background: #fffafa;
+}
+
+.seller-product-deleted-list > span {
+  color: #777;
+  font-size: 13px;
+}
+
+.seller-product-deleted-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1e5e5;
+}
+
+.seller-product-deleted-list > div:last-child {
+  border-bottom: 0;
 }
 
 .seller-product-variant-edit-head {
@@ -341,6 +440,11 @@
   .seller-product-variant-row {
     grid-template-columns: 1fr 1fr;
   }
+
+  .seller-product-variant-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 640px) {
@@ -355,6 +459,11 @@
 
   .seller-product-variant-edit-head label {
     margin-left: 0;
+  }
+
+  .seller-product-deleted-list > div {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

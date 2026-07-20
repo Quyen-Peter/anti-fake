@@ -125,6 +125,7 @@ export type OfferVariant = NonNullable<OfferDetail["variants"]>[number];
 export type UpdateOfferVariantPayload = {
   priceOverride?: number | null;
   availableQuantity?: number;
+  isActive?: boolean;
   image?: string | null;
   mediaAssetId?: string | null;
 };

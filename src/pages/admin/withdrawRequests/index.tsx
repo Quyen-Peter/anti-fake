@@ -29,12 +29,17 @@ export default function AdminWithdrawRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState("");
   const [error, setError] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
 
   const loadWithdrawals = async () => {
     try {
       setLoading(true);
       setError("");
-      setItems(await fetchAdminWalletWithdrawals());
+      const result = await fetchAdminWalletWithdrawals(page, 20, statusFilter);
+      setItems(result.items);
+      setPagination(result.pagination);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Không thể tải yêu cầu rút tiền";
@@ -47,7 +52,9 @@ export default function AdminWithdrawRequestsPage() {
 
   useEffect(() => {
     loadWithdrawals();
-  }, []);
+  }, [statusFilter, page]);
+
+  const changeStatus = (value: string) => { setStatusFilter(value); setPage(1); };
 
   const handleProcess = async (
     item: WalletWithdrawal,
@@ -76,6 +83,9 @@ export default function AdminWithdrawRequestsPage() {
         <div>
           <h1>Quản lý yêu cầu rút tiền</h1>
           <p>Theo dõi và xử lý yêu cầu rút tiền từ ví shop.</p>
+          <select value={statusFilter} onChange={(event) => changeStatus(event.target.value)} aria-label="Lọc trạng thái yêu cầu rút tiền">
+            <option value="">Tất cả trạng thái</option><option value="PENDING">Đang chờ</option><option value="COMPLETED">Đã hoàn tất</option><option value="REJECTED">Đã từ chối</option>
+          </select>
         </div>
       </div>
 
@@ -139,6 +149,7 @@ export default function AdminWithdrawRequestsPage() {
             </tbody>
           </table>
         ) : null}
+        {!loading && !error && pagination.totalPages > 1 ? <div className="admin-pagination"><button disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Trước</button><span>Trang {page}/{pagination.totalPages}</span><button disabled={page >= pagination.totalPages} onClick={() => setPage((value) => value + 1)}>Sau</button></div> : null}
       </div>
     </div>
   );

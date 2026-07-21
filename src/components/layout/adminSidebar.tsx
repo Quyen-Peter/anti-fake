@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   TicketPercent,
   Users,
-} from "lucide-react";
+  Wallet,
+  } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import "../../css/components/layout/adminSidebar.css";
 import { logout } from "../../services/auth.api";
@@ -50,6 +51,11 @@ const adminMenus = [
     label: "Yêu cầu rút tiền của shop",
     path: "/admin/withdraw-requests",
     icon: Banknote,
+  },
+  {
+    label: "Ví hệ thống",
+    path: "/admin/wallet",
+    icon: Wallet,
   },
   {
     label: "Chat",

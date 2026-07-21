@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   Store,
   User,
+  Wallet,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -39,6 +40,11 @@ const menus = [
     label: "Đơn mua",
     path: "/profile/orders",
     icon: ShoppingBag,
+  },
+  {
+    label: "Ví AntiFake",
+    path: "/profile/wallet",
+    icon: Wallet,
   },
   {
     label: "Lịch sử xác thực QR",

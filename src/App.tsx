@@ -14,6 +14,7 @@ import "../src/App.css";
 import ProductDetail from "./pages/product/productDetail";
 import OrdersPage from "./pages/profile/ordersPage";
 import SettingsPage from "./pages/profile/settingsPage";
+import WalletPage from "./pages/profile/walletPage";
 import UserProfile from "./pages/profile/userProfile";
 import OrderDetailPage from "./components/order/orderDetail";
 import ShopPage from "./pages/shop";
@@ -55,6 +56,7 @@ import AdminChatPage from "./pages/admin/ChatPage";
 import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
 import CategoriesPage from "./pages/categories";
 import AdminCategoriesPage from "./pages/admin/categories";
+import AdminWalletPage from "./pages/admin/wallet";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -107,6 +109,7 @@ function App() {
                 <Route path="address" element={<ProfileAddress />} />
                 <Route path="orders" element={<OrdersPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="wallet" element={<WalletPage />} />
                 <Route
                   path="/profile/orders/:id"
                   element={<OrderDetailPage />}
@@ -209,6 +212,7 @@ function App() {
               />
               <Route path="vouchers" element={<AdminVouchersPage />} />
               <Route path="categories" element={<AdminCategoriesPage />} />
+              <Route path="wallet" element={<AdminWalletPage />} />
               <Route path="chat" element={<AdminChatPage />} />
               <Route path="chat/:roomId" element={<AdminChatPage />} />
               <Route

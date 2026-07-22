@@ -15,7 +15,8 @@ import CheckoutPayment from "../../components/checkout/checkoutPayment";
 import CheckoutSummary from "../../components/checkout/checkoutSummary";
 import CheckoutProducts from "../../components/checkout/checkoutProducts";
 import CheckoutShipping from "../../components/checkout/checkoutShipping";
-import { fetchShippingOptions } from "../../services/cart.api";
+import { fetchShippingOptions, quoteCartCheckout } from "../../services/cart.api";
+import { quoteBuyNowCheckout } from "../../services/product.api";
 import type { Address } from "../../type/address";
 
 export default function CheckoutPage() {
@@ -25,6 +26,9 @@ export default function CheckoutPage() {
   const [shippingLoading, setShippingLoading] = useState(false);
   const [shippingError, setShippingError] = useState("");
   const [shippingAddressKey, setShippingAddressKey] = useState("");
+  const [systemVoucherCode, setSystemVoucherCode] = useState("");
+  const [shopVoucherCodes, setShopVoucherCodes] = useState<Record<string, string>>({});
+  const [quote, setQuote] = useState<{ discountAmount: number; buyerPayableAmount: number } | null>(null);
   const location = useLocation();
   const source: CheckoutSource =
     location.state?.source === "buy-now" ? "buy-now" : "cart";
@@ -119,9 +123,39 @@ export default function CheckoutPage() {
 
   const shippingFee = selectedShipping?.shippingFee ?? 0;
 
-  const discount = 0;
+  useEffect(() => {
+    if (!selectedShippingCode || (source === "cart" && cartItemIds.length === 0) || (source === "buy-now" && !buyNowSelection)) {
+      setQuote(null);
+      return;
+    }
+    const loadQuote = async () => {
+      try {
+        const result = source === "buy-now" && buyNowSelection
+          ? await quoteBuyNowCheckout({
+              ...buyNowSelection,
+              paymentMethod: "PAYOS",
+              shippingOptionCode: selectedShippingCode,
+              systemVoucherCode: systemVoucherCode.trim() || undefined,
+              shopVoucherCode: Object.values(shopVoucherCodes)[0]?.trim() || undefined,
+            })
+          : await quoteCartCheckout({
+              cartItemIds,
+              shippingOptionCode: selectedShippingCode,
+              systemVoucherCode: systemVoucherCode.trim() || undefined,
+              shopVouchers: Object.entries(shopVoucherCodes)
+                .filter(([, code]) => code.trim())
+                .map(([shopId, voucherCode]) => ({ shopId, voucherCode: voucherCode.trim() })),
+            });
+        setQuote(result);
+      } catch {
+        setQuote(null);
+      }
+    };
+    void loadQuote();
+  }, [source, cartItemIds, selectedShippingCode, systemVoucherCode, shopVoucherCodes]);
 
-  const total = subtotal + shippingFee - discount;
+  const discount = quote?.discountAmount ?? 0;
+  const total = quote?.buyerPayableAmount ?? subtotal + shippingFee;
 
   return (
     <div className="checkout-page">
@@ -157,6 +191,11 @@ export default function CheckoutPage() {
           shippingFee={shippingFee}
           discount={discount}
           total={total}
+          shops={shops}
+          systemVoucherCode={systemVoucherCode}
+          setSystemVoucherCode={setSystemVoucherCode}
+          shopVoucherCodes={shopVoucherCodes}
+          setShopVoucherCodes={setShopVoucherCodes}
         />
 
         <div className="security-box">

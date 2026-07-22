@@ -57,6 +57,7 @@ import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
 import CategoriesPage from "./pages/categories";
 import AdminCategoriesPage from "./pages/admin/categories";
 import AdminWalletPage from "./pages/admin/wallet";
+import SellerVoucherManagement from "./seller/voucherManagement";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -183,6 +184,7 @@ function App() {
               <Route path="orders" element={<OrderManagement />} />
               <Route path="orders/:orderId" element={<SellerOrderDetail />} />
               <Route path="wallet" element={<SellerWallet />} />
+              <Route path="vouchers" element={<SellerVoucherManagement />} />
               <Route path="shop-info" element={<SellerShopInfo />} />
               <Route path="business-info" element={<SellerBusinessInfo />} />
               <Route path="chat" element={<SellerChatPage />} />

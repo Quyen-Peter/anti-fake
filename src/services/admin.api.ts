@@ -2,6 +2,35 @@ import { authFetch } from "../ultil/auth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+export type Voucher = {
+  id: string;
+  code: string;
+  name: string;
+  ownerType: 'SYSTEM' | 'SHOP';
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_SHIPPING';
+  percentage?: number | null;
+  fixedAmount?: number | null;
+  maxDiscountAmount?: number | null;
+  minOrderAmount: number;
+  status: string;
+  startsAt: string;
+  endsAt: string;
+};
+
+export const fetchAdminVouchers = async (): Promise<Voucher[]> => {
+  const response = await authFetch(`${BASE_URL}/api/admin/vouchers?page=1&pageSize=100`, { headers: { Accept: 'application/json' } });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Khong the tai voucher');
+  return (data?.items ?? data?.data?.items ?? []).map((item: Voucher) => ({ ...item, minOrderAmount: Number(item.minOrderAmount ?? 0) }));
+};
+
+export const createAdminVoucher = async (payload: Record<string, unknown>) => {
+  const response = await authFetch(`${BASE_URL}/api/admin/vouchers`, { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Khong the tao voucher');
+  return data?.data ?? data;
+};
+
 export type AdminUser = {
   id: string;
   email: string;

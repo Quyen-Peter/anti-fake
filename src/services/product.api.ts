@@ -304,6 +304,25 @@ export const checkoutBuyNow = async (
   return checkout;
 };
 
+export const quoteBuyNowCheckout = async (payload: BuyNowCheckoutRequest): Promise<{ discountAmount: number; buyerPayableAmount: number }> => {
+  const response = await authFetch(`${BASE_URL}/api/offers/buy-now/quote`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      offerId: payload.offerId,
+      variantId: payload.variantId,
+      quantity: payload.quantity,
+      shippingOptionCode: payload.shippingOptionCode,
+      systemVoucherCode: payload.systemVoucherCode,
+      shopVoucherCode: payload.shopVoucherCode,
+      shippingVoucherCode: payload.shippingVoucherCode,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Không thể tính báo giá mua ngay");
+  return data?.data ?? data;
+};
+
 export const updateOffer = async (
   offerId: string,
   payload: UpdateOfferPayload,

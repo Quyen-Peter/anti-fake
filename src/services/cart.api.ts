@@ -2,6 +2,7 @@ import { authFetch } from "../ultil/auth";
 import type {
   CartCheckoutRequest,
   CartCheckoutResponse,
+  CartCheckoutQuote,
   CartResponse,
   ShippingOptionsRequest,
   ShippingOptionsResponse,
@@ -132,6 +133,17 @@ export const checkoutCart = async (
   }
 
   return checkout;
+};
+
+export const quoteCartCheckout = async (payload: Omit<CartCheckoutRequest, "paymentMethod" | "affiliateCode">): Promise<CartCheckoutQuote> => {
+  const response = await authFetch(`${BASE_URL}/api/cart/checkout/quote`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Không thể tính báo giá checkout");
+  return data?.data ?? data;
 };
 
 export const updateCartItemQuantity = async (

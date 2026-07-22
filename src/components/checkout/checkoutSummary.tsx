@@ -1,10 +1,11 @@
 import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { checkoutCart } from "../../services/cart.api";
 import { checkoutBuyNow } from "../../services/product.api";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
-import type { BuyNowSelection, CheckoutSource } from "../../type/checkout";
+import type { BuyNowSelection, CheckoutShop, CheckoutSource } from "../../type/checkout";
 import { formatVnd } from "../../ultil/currency";
 
 interface Props {
@@ -17,6 +18,11 @@ interface Props {
   shippingFee: number;
   discount: number;
   total: number;
+  shops: CheckoutShop[];
+  systemVoucherCode: string;
+  setSystemVoucherCode: (value: string) => void;
+  shopVoucherCodes: Record<string, string>;
+  setShopVoucherCodes: Dispatch<SetStateAction<Record<string, string>>>;
 }
 
 const toPaymentMethod = (payment: string) => {
@@ -35,6 +41,11 @@ export default function CheckoutSummary({
   shippingFee,
   discount,
   total,
+  shops,
+  systemVoucherCode,
+  setSystemVoucherCode,
+  shopVoucherCodes,
+  setShopVoucherCodes,
 }: Props) {
   const navigate = useNavigate();
   const [affiliateCode, setAffiliateCode] = useState("");
@@ -69,12 +80,18 @@ export default function CheckoutSummary({
               ...buyNowSelection,
               paymentMethod,
               shippingOptionCode,
+              systemVoucherCode: systemVoucherCode.trim() || undefined,
+              shopVoucherCode: Object.values(shopVoucherCodes)[0]?.trim() || undefined,
             })
           : await checkoutCart({
               cartItemIds,
               paymentMethod,
               shippingOptionCode,
               affiliateCode: affiliateCode.trim() || undefined,
+              systemVoucherCode: systemVoucherCode.trim() || undefined,
+              shopVouchers: Object.entries(shopVoucherCodes)
+                .filter(([, code]) => code.trim())
+                .map(([shopId, voucherCode]) => ({ shopId, voucherCode: voucherCode.trim() })),
             });
 
       if (paymentMethod === "COD" || paymentMethod === "WALLET") {
@@ -119,6 +136,27 @@ export default function CheckoutSummary({
 
         <button type="button">Áp dụng</button>
       </div>
+
+      <div className="voucher-box">
+        <input
+          placeholder="Mã voucher hệ thống"
+          value={systemVoucherCode}
+          onChange={(event) => setSystemVoucherCode(event.target.value)}
+          aria-label="Mã voucher hệ thống"
+        />
+      </div>
+
+      {shops.map((shop) => (
+        <div className="voucher-box" key={shop.shopId}>
+          <span>{shop.shopName}</span>
+          <input
+            placeholder="Mã voucher shop"
+            value={shopVoucherCodes[shop.shopId] ?? ""}
+            onChange={(event) => setShopVoucherCodes((current) => ({ ...current, [shop.shopId]: event.target.value }))}
+            aria-label={`Mã voucher của ${shop.shopName}`}
+          />
+        </div>
+      ))}
 
       <div className="summary-row">
         <span>Tổng tiền hàng</span>

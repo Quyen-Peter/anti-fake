@@ -61,6 +61,9 @@ export interface CartCheckoutRequest {
   paymentMethod: "COD" | "PAYOS" | "WALLET";
   shippingOptionCode: string;
   affiliateCode?: string;
+  systemVoucherCode?: string;
+  shopVouchers?: Array<{ shopId: string; voucherCode: string }>;
+  shippingVouchers?: Array<{ shopId: string; voucherCode: string }>;
 }
 
 export interface CartCheckoutResponse {
@@ -91,4 +94,21 @@ export interface BuyNowPreview extends BuyNowSelection {
 export interface BuyNowCheckoutRequest extends BuyNowSelection {
   paymentMethod: "COD" | "PAYOS" | "WALLET";
   shippingOptionCode: string;
+  systemVoucherCode?: string;
+  shopVoucherCode?: string;
+  shippingVoucherCode?: string;
+}
+
+export interface CartCheckoutQuote {
+  baseAmount: number;
+  shippingFeeAmount: number;
+  discountAmount: number;
+  buyerPayableAmount: number;
+  groups: Array<{
+    shopId: string;
+    baseAmount: number;
+    discountAmount: number;
+    shippingFeeAmount: number;
+    sellerReceivableAmount: number;
+  }>;
 }

@@ -118,7 +118,10 @@ export default function Header() {
       {/* search  */}
       <div className="search-box">
         <input
+          id="header-search"
+          name="search"
           type="text"
+          aria-label="Tìm sản phẩm"
           placeholder="Tìm sản phẩm..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
@@ -159,25 +162,27 @@ export default function Header() {
         </Link>
       </div>
 
-      <div className="mobile-bottom-nav">
-        {mobileMenus.map((item) => {
-          const Icon = item.icon;
+      {location.pathname !== "/auth" && (
+        <div className="mobile-bottom-nav">
+          {mobileMenus.map((item) => {
+            const Icon = item.icon;
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`mobile-nav-item ${
-                location.pathname === item.path ? "active" : ""
-              }`}
-            >
-              <Icon size={20} />
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`mobile-nav-item ${
+                  location.pathname === item.path ? "active" : ""
+                }`}
+              >
+                <Icon size={20} />
 
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

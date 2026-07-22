@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import HomePage from "./pages/home";
 import CommunityPage from "./pages/community";
@@ -58,6 +58,10 @@ import CategoriesPage from "./pages/categories";
 import AdminCategoriesPage from "./pages/admin/categories";
 import AdminWalletPage from "./pages/admin/wallet";
 import SellerVoucherManagement from "./seller/voucherManagement";
+import {
+  resolveAffiliateAttribution,
+  saveAffiliateAttribution,
+} from "./services/affiliate.api";
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -82,6 +86,36 @@ function ScrollToTop() {
   return null;
 }
 
+function AffiliateAttributionCapture() {
+  const { search } = useLocation();
+  const requestSequence = useRef(0);
+
+  useEffect(() => {
+    const requestId = ++requestSequence.current;
+    const code = new URLSearchParams(search).get("aff")?.trim();
+    if (!code) return;
+
+    const controller = new AbortController();
+    void resolveAffiliateAttribution(code, controller.signal)
+      .then((attribution) => {
+        if (
+          !controller.signal.aborted &&
+          requestId === requestSequence.current
+        ) {
+          saveAffiliateAttribution(attribution);
+        }
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        // Invalid links remain non-blocking; checkout still accepts a manual code.
+      });
+
+    return () => controller.abort();
+  }, [search]);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -89,6 +123,7 @@ function App() {
         <Toaster richColors position="top-center" />
         <GlobalLoadingOverlay />
         <ScrollToTop />
+        <AffiliateAttributionCapture />
         <div className="app-container">
           <Routes>
             

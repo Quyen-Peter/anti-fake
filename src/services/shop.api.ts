@@ -159,6 +159,21 @@ export type UpdateShopProfilePayload = {
   warehouseWardName: string;
 };
 
+export type MyShop = {
+  id: string;
+  ownerUserId: string;
+  shopName: string;
+  shopStatus: string;
+};
+
+export type ShopBrandAuthorization = {
+  id: string;
+  shopId: string;
+  brandId: string;
+  brandName: string | null;
+  verificationStatus: string;
+};
+
 export const fetchShops = async (
   page: number,
   pageSize: number,
@@ -221,7 +236,7 @@ export const getShopDetail = async (
   return data;
 };
 
-export const getMyShop = async () => {
+export const getMyShop = async (): Promise<MyShop[] | null> => {
   const response = await authFetch(`${BASE_URL}/api/shops/mine`, {
     method: "GET",
     headers: {
@@ -240,6 +255,25 @@ export const getMyShop = async () => {
   }
 
   return data;
+};
+
+export const fetchShopBrandAuthorizations = async (
+  shopId: string,
+): Promise<ShopBrandAuthorization[]> => {
+  const response = await authFetch(
+    `${BASE_URL}/api/shops/${shopId}/brand-authorizations`,
+    { headers: { Accept: "application/json" } },
+  );
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Không thể tải thương hiệu được ủy quyền của shop",
+    );
+  }
+
+  const payload = data?.data ?? data;
+  return Array.isArray(payload) ? payload : [];
 };
 
 export const updateShopProfile = async (

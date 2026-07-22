@@ -7,6 +7,11 @@ import { checkoutBuyNow } from "../../services/product.api";
 import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
 import type { BuyNowSelection, CheckoutShop, CheckoutSource } from "../../type/checkout";
 import { formatVnd } from "../../ultil/currency";
+import {
+  getAffiliateAttribution,
+  getAffiliateAttributionToken,
+  resolveAffiliateAttribution,
+} from "../../services/affiliate.api";
 
 interface Props {
   source: CheckoutSource;
@@ -48,10 +53,29 @@ export default function CheckoutSummary({
   setShopVoucherCodes,
 }: Props) {
   const navigate = useNavigate();
+  const [capturedAffiliateCode] = useState(() => getAffiliateAttribution()?.code ?? "");
   const [affiliateCode, setAffiliateCode] = useState("");
+  const [affiliateStatus, setAffiliateStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
   const [loading, setLoading] = useState(false);
   const showLoading = useGlobalLoadingStore((state) => state.showLoading);
   const hideLoading = useGlobalLoadingStore((state) => state.hideLoading);
+
+  const validateAffiliateCode = async () => {
+    const code = affiliateCode.trim();
+    if (!code) {
+      setAffiliateStatus("idle");
+      return;
+    }
+    setAffiliateStatus("checking");
+    try {
+      await resolveAffiliateAttribution(code);
+      setAffiliateStatus("valid");
+      toast.success("Mã affiliate đang hoạt động");
+    } catch (error) {
+      setAffiliateStatus("invalid");
+      toast.error(error instanceof Error ? error.message : "Mã affiliate không hợp lệ");
+    }
+  };
 
   const handleCheckout = async () => {
     if (source === "cart" && cartItemIds.length === 0) {
@@ -74,12 +98,15 @@ export default function CheckoutSummary({
       showLoading("Đang tạo thanh toán...");
 
       const paymentMethod = toPaymentMethod(payment);
+      const attributionToken = getAffiliateAttributionToken();
       const checkout =
         source === "buy-now" && buyNowSelection
           ? await checkoutBuyNow({
               ...buyNowSelection,
               paymentMethod,
               shippingOptionCode,
+              affiliateCode: affiliateCode.trim() || undefined,
+              affiliateAttributionToken: attributionToken,
               systemVoucherCode: systemVoucherCode.trim() || undefined,
               shopVoucherCode: Object.values(shopVoucherCodes)[0]?.trim() || undefined,
             })
@@ -88,6 +115,7 @@ export default function CheckoutSummary({
               paymentMethod,
               shippingOptionCode,
               affiliateCode: affiliateCode.trim() || undefined,
+              affiliateAttributionToken: attributionToken,
               systemVoucherCode: systemVoucherCode.trim() || undefined,
               shopVouchers: Object.entries(shopVoucherCodes)
                 .filter(([, code]) => code.trim())
@@ -131,11 +159,27 @@ export default function CheckoutSummary({
         <input
           placeholder="Nhập mã ưu đãi..."
           value={affiliateCode}
-          onChange={(event) => setAffiliateCode(event.target.value)}
+          onChange={(event) => {
+            setAffiliateCode(event.target.value);
+            setAffiliateStatus("idle");
+          }}
+          aria-invalid={affiliateStatus === "invalid"}
         />
 
-        <button type="button">Áp dụng</button>
+        <button type="button" onClick={validateAffiliateCode} disabled={affiliateStatus === "checking"}>
+          {affiliateStatus === "checking" ? "Đang kiểm tra" : "Áp dụng"}
+        </button>
       </div>
+      {affiliateStatus === "valid" && (
+        <small className="affiliate-code-status">
+          Mã đang hoạt động. Hoa hồng chỉ được ghi nhận cho sản phẩm thuộc phạm vi chương trình; mã nhập tay được ưu tiên.
+        </small>
+      )}
+      {!affiliateCode.trim() && capturedAffiliateCode && (
+        <small className="affiliate-code-status">
+          Đã ghi nhận link affiliate <strong>{capturedAffiliateCode}</strong>. Hệ thống chỉ áp dụng khi sản phẩm thuộc đúng phạm vi chương trình.
+        </small>
+      )}
 
       <div className="voucher-box">
         <input

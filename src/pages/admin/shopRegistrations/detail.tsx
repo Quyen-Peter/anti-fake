@@ -122,6 +122,7 @@ export default function AdminShopVerificationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reviewNote, setReviewNote] = useState("");
+  const [verifiedLegalName, setVerifiedLegalName] = useState("");
   const [reviewingStatus, setReviewingStatus] =
     useState<AdminShopReviewStatus | null>(null);
   const [startingChat, setStartingChat] = useState(false);
@@ -130,14 +131,21 @@ export default function AdminShopVerificationDetailPage() {
     if (!shopId) return;
     const data = await fetchAdminShopVerificationDetail(shopId);
     setDetail(data);
+    setVerifiedLegalName(data.shop.verifiedLegalName ?? "");
   }, [shopId]);
 
   const handleReview = async (reviewStatus: AdminShopReviewStatus) => {
     if (!shopId) return;
 
     const note = reviewNote.trim();
+    const businessType = String(detail?.shop.businessType ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+    const isCompany = ["COMPANY", "DOANH NGHIEP", "ENTERPRISE"].includes(businessType);
     if (reviewStatus === "rejected" && !note) {
       toast.error("Vui lòng nhập lý do từ chối hồ sơ");
+      return;
+    }
+    if (reviewStatus === "approved" && isCompany && !verifiedLegalName.trim()) {
+      toast.error("Vui lòng nhập tên pháp nhân đã đối chiếu trên giấy phép kinh doanh");
       return;
     }
 
@@ -147,6 +155,7 @@ export default function AdminShopVerificationDetailPage() {
       await reviewAdminShopDocuments(shopId, {
         reviewStatus,
         reviewNote: note || "Hồ sơ hợp lệ",
+        ...(verifiedLegalName.trim() ? { verifiedLegalName: verifiedLegalName.trim() } : {}),
       });
       toast.success(
         reviewStatus === "approved"
@@ -154,6 +163,7 @@ export default function AdminShopVerificationDetailPage() {
           : "Đã từ chối hồ sơ shop",
       );
       setReviewNote("");
+      setVerifiedLegalName("");
       await refreshDetail();
     } catch (err: unknown) {
       const message =
@@ -197,6 +207,7 @@ export default function AdminShopVerificationDetailPage() {
       try {
         const data = await fetchAdminShopVerificationDetail(shopId);
         setDetail(data);
+        setVerifiedLegalName(data.shop.verifiedLegalName ?? "");
       } catch (err: unknown) {
         const message =
           err instanceof Error ? err.message : "Không thể tải hồ sơ pháp lý";
@@ -235,6 +246,9 @@ export default function AdminShopVerificationDetailPage() {
   const shopStatus = detail.shop.status ?? detail.shop.shopStatus;
   const isReviewCompleted = ["verified", "approved"].includes(
     String(shopStatus ?? "").toLowerCase(),
+  );
+  const isCompanyBusinessType = ["COMPANY", "DOANH NGHIEP", "ENTERPRISE"].includes(
+    String(detail.shop.businessType ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase(),
   );
   const ownerAvatar = detail.owner.avatarUrl ?? detail.owner.avatar;
   const address = detail.shop.physicalAddress ?? detail.shop.address;
@@ -373,6 +387,26 @@ export default function AdminShopVerificationDetailPage() {
                   Hồ sơ pháp lý và KYC đã được duyệt. Các thao tác duyệt hoặc
                   từ chối đã được khóa.
                 </p>
+                {isCompanyBusinessType ? <>
+                  <label className="admin-review-note">
+                    <span>Tên pháp nhân đã đối chiếu</span>
+                    <input
+                      value={verifiedLegalName}
+                      onChange={(event) => setVerifiedLegalName(event.target.value)}
+                      placeholder="Tên đúng trên giấy phép kinh doanh"
+                      disabled={Boolean(reviewingStatus)}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="admin-review-chat-btn"
+                    disabled={Boolean(reviewingStatus) || !verifiedLegalName.trim()}
+                    onClick={() => handleReview("approved")}
+                  >
+                    {reviewingStatus === "approved" ? <LoaderCircle size={16} /> : <BadgeCheck size={16} />}
+                    {reviewingStatus === "approved" ? "Đang lưu..." : "Lưu tên pháp nhân"}
+                  </button>
+                </> : null}
                 <button
                   type="button"
                   className="admin-review-chat-btn"
@@ -389,6 +423,17 @@ export default function AdminShopVerificationDetailPage() {
               </div>
             ) : (
               <>
+                {isCompanyBusinessType ? (
+                  <label className="admin-review-note">
+                    <span>Tên pháp nhân đã đối chiếu</span>
+                    <input
+                      value={verifiedLegalName}
+                      onChange={(event) => setVerifiedLegalName(event.target.value)}
+                      placeholder="Nhập đúng tên trên giấy phép kinh doanh"
+                      disabled={Boolean(reviewingStatus)}
+                    />
+                  </label>
+                ) : null}
                 <label className="admin-review-note">
                   <span>Ghi chú xét duyệt</span>
                   <textarea

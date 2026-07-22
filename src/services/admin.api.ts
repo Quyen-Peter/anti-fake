@@ -126,6 +126,7 @@ export type AdminShopVerificationDetail = {
     shopName: string;
     registrationType?: string | null;
     businessType?: string | null;
+    verifiedLegalName?: string | null;
     taxCode?: string | null;
     status?: string | null;
     shopStatus?: string | null;
@@ -166,6 +167,7 @@ export type AdminShopReviewStatus = "approved" | "rejected";
 export type ReviewAdminShopDocumentsPayload = {
   reviewStatus: AdminShopReviewStatus;
   reviewNote: string;
+  verifiedLegalName?: string;
 };
 
 export type FetchAdminShopRegistrationsParams = {

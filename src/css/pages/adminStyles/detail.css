@@ -360,7 +360,8 @@
   font-weight: 800;
 }
 
-.admin-review-note textarea {
+.admin-review-note textarea,
+.admin-review-note input {
   width: 100%;
   min-height: 104px;
   border: 1px solid #efd0d0;
@@ -372,7 +373,8 @@
   font: inherit;
 }
 
-.admin-review-note textarea:focus {
+.admin-review-note textarea:focus,
+.admin-review-note input:focus {
   outline: none;
   border-color: #b00020;
   box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);

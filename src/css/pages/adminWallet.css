@@ -1,1 +1,15 @@
 .admin-wallet-page{padding:30px;max-width:1200px;margin:0 auto}.admin-wallet-heading{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}.admin-wallet-heading h1{margin:4px 0;font-size:30px}.admin-wallet-heading p{margin:0;color:#667085}.admin-wallet-heading button{border:0;border-radius:9px;padding:10px 14px;background:#f2e8e8;color:#8c3030;font-weight:700}.admin-wallet-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.admin-platform-card,.admin-reconcile-card{background:#fff;border:1px solid #eadede;border-radius:16px;padding:22px;box-shadow:0 8px 24px #5215150d}.admin-platform-card>span{font-size:12px;color:#667085}.admin-platform-card>strong{display:block;font-size:28px;color:#8c3030;margin:14px 0}.admin-platform-card dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}.admin-platform-card dt,.admin-platform-card dd{font-size:13px;margin:0}.admin-platform-card dt{color:#667085}.admin-platform-card dd{font-weight:700;margin-top:4px}.admin-reconcile-card{margin-top:18px}.admin-reconcile-card h2{margin-top:0}.admin-reconcile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.admin-reconcile-grid div{background:#faf7f7;border-radius:10px;padding:12px}.admin-reconcile-grid span{display:block;color:#667085;font-size:12px}.admin-reconcile-grid strong{display:block;margin-top:6px}.admin-wallet-note{color:#667085;font-size:13px;margin-bottom:0}@media(max-width:700px){.admin-wallet-page{padding:18px 12px}.admin-wallet-heading{flex-direction:column;gap:12px}.admin-wallet-grid{grid-template-columns:1fr}.admin-reconcile-grid{grid-template-columns:1fr 1fr}}
+.admin-payout-review { margin-top: 20px; }
+.admin-payout-review .admin-wallet-heading { margin-bottom: 16px; }
+.admin-payout-review select { align-self: center; border: 1px solid #ddd2d2; border-radius: 10px; padding: 9px 11px; background: #fff; }
+.admin-payout-list { display: grid; gap: 10px; }
+.admin-payout-row { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(130px, .5fr) auto; align-items: center; gap: 14px; padding: 14px; border: 1px solid #eee7e7; border-radius: 12px; }
+.admin-payout-row > div { display: grid; gap: 4px; }
+.admin-payout-row span { color: #584b4b; }
+.admin-payout-row small { color: #817474; }
+.admin-payout-row .admin-table-actions { display: flex; }
+
+@media (max-width: 800px) {
+  .admin-payout-row { grid-template-columns: 1fr; }
+  .admin-payout-row .admin-table-actions { flex-wrap: wrap; }
+}

@@ -5,6 +5,45 @@
   color: #291d1d;
 }
 
+.seller-affiliate-page {
+  min-height: 100vh;
+  padding-top: 82px;
+}
+
+.seller-affiliate-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #eadede;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.seller-affiliate-heading > div,
+.seller-affiliate-heading button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seller-affiliate-heading button {
+  padding: 9px 13px;
+  border: 1px solid #dccccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #762d31;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-affiliate-heading button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .affiliate-hero {
   display: grid;
   grid-template-columns: 1.2fr .8fr;

@@ -164,6 +164,12 @@ export type MyShop = {
   ownerUserId: string;
   shopName: string;
   shopStatus: string;
+  shopAvatar?: string;
+  avatarUrl?: string;
+  logoUrl?: string;
+  registrationType?: string;
+  businessType?: string;
+  taxCode?: string;
 };
 
 export type ShopBrandAuthorization = {

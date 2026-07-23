@@ -34,6 +34,7 @@ import ProductManagement from "./seller/productManagement";
 import SellerProductDetail from "./seller/productManagement/detail";
 import OrderManagement from "./seller/orderManagement";
 import SellerWallet from "./seller/wallet";
+import SellerAffiliatePage from "./seller/affiliate";
 import SellerShopInfo from "./seller/shopInfo";
 import SellerBusinessInfo from "./seller/businessInfo";
 import SellerChatPage from "./seller/ChatPage";
@@ -212,13 +213,21 @@ function App() {
             </Route>
 
             {/* seller */}
-            <Route path="/seller" element={<SellerLayout />}>
+            <Route
+              path="/seller"
+              element={
+                <ProtectedRoute>
+                  <SellerLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<ProductManagement />} />
               <Route path="products/:offerId" element={<SellerProductDetail />} />
               <Route path="orders" element={<OrderManagement />} />
               <Route path="orders/:orderId" element={<SellerOrderDetail />} />
               <Route path="wallet" element={<SellerWallet />} />
+              <Route path="affiliate" element={<SellerAffiliatePage />} />
               <Route path="vouchers" element={<SellerVoucherManagement />} />
               <Route path="shop-info" element={<SellerShopInfo />} />
               <Route path="business-info" element={<SellerBusinessInfo />} />

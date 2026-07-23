@@ -1,4 +1,5 @@
 import {
+  BadgePercent,
   LogOut,
   MapPin,
   Menu,
@@ -45,6 +46,11 @@ const menus = [
     label: "Ví AntiFake",
     path: "/profile/wallet",
     icon: Wallet,
+  },
+  {
+    label: "Affiliate cá nhân",
+    path: "/affiliate?tab=member",
+    icon: BadgePercent,
   },
   {
     label: "Lịch sử xác thực QR",

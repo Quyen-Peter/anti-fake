@@ -9,6 +9,80 @@
   margin-bottom: 20px;
 }
 
+.seller-wallet-state {
+  display: grid;
+  min-height: 420px;
+  place-items: center;
+  align-content: center;
+  padding: 32px;
+  border: 1px solid #ece7e7;
+  border-radius: 18px;
+  background: #fff;
+  color: #746868;
+  text-align: center;
+}
+
+.seller-wallet-state h1 {
+  margin: 14px 0 6px;
+  color: #281f1f;
+  font-size: 24px;
+}
+
+.seller-wallet-state p {
+  margin: 0;
+}
+
+.seller-wallet-state button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #8e2f32;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-wallet-state-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #eadada;
+  border-top-color: #8e2f32;
+  border-radius: 50%;
+  animation: seller-wallet-spin 800ms linear infinite;
+}
+
+.seller-wallet-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #efcccc;
+  border-radius: 12px;
+  background: #fff3f3;
+  color: #9b3437;
+}
+
+.seller-wallet-error button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@keyframes seller-wallet-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .seller-payout-section {
   margin-bottom: 20px;
   padding: 22px;

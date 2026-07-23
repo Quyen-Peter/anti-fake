@@ -4,6 +4,7 @@ import {
   ShoppingCart,
   Wallet,
   BarChart3,
+  BadgePercent,
   Bell,
   Building2,
   CircleHelp,
@@ -17,71 +18,17 @@ import { useEffect, useRef, useState } from "react";
 
 import "../../css/components/layout/sellerHeader.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { getMyShop } from "../../services/shop.api";
+import { useSellerShop } from "../../contexts/sellerShopContext";
+import type { MyShop } from "../../services/shop.api";
 
-const SELLER_SHOP_CACHE_KEY = "sellerShop";
-
-type SellerShop = {
-  id?: string;
-  shopId?: string;
-  shopName?: string;
-  shopAvatar?: string;
-  avatarUrl?: string;
-  logoUrl?: string;
-  registrationType?: string;
-  businessType?: string;
-  taxCode?: string;
-  shopStatus?: string;
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  Boolean(value && typeof value === "object");
-
-const normalizeMyShop = (data: unknown): SellerShop | null => {
-  const payload = isRecord(data)
-    ? data.data ?? data.items ?? data
-    : data;
-  if (Array.isArray(payload)) return (payload[0] as SellerShop | undefined) ?? null;
-  return isRecord(payload) ? (payload as SellerShop) : null;
-};
-
-const readCachedShop = () => {
-  try {
-    const cached = localStorage.getItem(SELLER_SHOP_CACHE_KEY);
-    return cached ? (JSON.parse(cached) as SellerShop) : null;
-  } catch {
-    return null;
-  }
-};
-
-const getShopAvatar = (shop: SellerShop | null) =>
+const getShopAvatar = (shop: MyShop) =>
   shop?.shopAvatar || shop?.avatarUrl || shop?.logoUrl || "";
 
 export default function SellerHeader() {
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [shop, setShop] = useState<SellerShop | null>(() => readCachedShop());
+  const { shop } = useSellerShop();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const loadShop = async () => {
-      try {
-        const data = await getMyShop();
-        const nextShop = normalizeMyShop(data);
-        setShop(nextShop);
-
-        if (nextShop) {
-          localStorage.setItem(SELLER_SHOP_CACHE_KEY, JSON.stringify(nextShop));
-        } else {
-          localStorage.removeItem(SELLER_SHOP_CACHE_KEY);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadShop();
-  }, []);
 
   useEffect(() => {
     const closeMenu = (event: MouseEvent) => {
@@ -187,6 +134,18 @@ export default function SellerHeader() {
           >
             <Wallet size={18} />
             <span>Ví</span>
+          </NavLink>
+
+          <NavLink
+            to="affiliate"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
+            <BadgePercent size={18} />
+            <span>Affiliate</span>
           </NavLink>
 
           <NavLink

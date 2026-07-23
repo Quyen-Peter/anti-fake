@@ -6,9 +6,14 @@ import { formatVnd } from "../../ultil/currency";
 type Props = {
   wallet?: WalletInfo | null;
   onWithdraw?: () => void;
+  disabled?: boolean;
 };
 
-export default function WalletBalance({ wallet, onWithdraw }: Props) {
+export default function WalletBalance({
+  wallet,
+  onWithdraw,
+  disabled = false,
+}: Props) {
   const currency = wallet?.currency ?? "VND";
 
   return (
@@ -29,7 +34,7 @@ export default function WalletBalance({ wallet, onWithdraw }: Props) {
       <div className="wallet-actions">
         <button
           className="withdraw-btn"
-          disabled={!wallet || wallet.status !== "ACTIVE"}
+          disabled={disabled || !wallet || wallet.status !== "ACTIVE"}
           onClick={onWithdraw}
           type="button"
         >

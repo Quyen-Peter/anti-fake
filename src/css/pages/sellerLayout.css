@@ -1,0 +1,56 @@
+.seller-access-state {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  place-items: center;
+  background: #faf7f7;
+}
+
+.seller-access-state > div {
+  width: min(440px, 100%);
+  padding: 28px;
+  border: 1px solid #ece3e3;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(47, 35, 35, 0.08);
+  text-align: center;
+}
+
+.seller-access-state h1 {
+  margin: 14px 0 8px;
+  color: #2e2424;
+  font-size: 24px;
+}
+
+.seller-access-state p {
+  margin: 0;
+  color: #746868;
+  line-height: 1.5;
+}
+
+.seller-access-state button {
+  margin-top: 18px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #8e2f32;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-access-spinner {
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #eadada;
+  border-top-color: #8e2f32;
+  border-radius: 50%;
+  animation: seller-access-spin 800ms linear infinite;
+}
+
+@keyframes seller-access-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

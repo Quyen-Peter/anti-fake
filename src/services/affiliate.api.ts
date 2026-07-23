@@ -158,13 +158,10 @@ export const joinAffiliateProgram = async (programId: string, referralCode?: str
 
 export const createAffiliateProgram = async (payload: {
   ownerShopId: string;
-  scopeType: "SHOP" | "BRAND" | "OFFER";
+  scopeType: "SHOP" | "OFFER";
   name: string;
-  slug: string;
-  brandId?: string;
   offerId?: string;
   attributionWindowDays: number;
-  commissionHoldDays: number;
   tier1Rate: number;
   tier2Rate: number;
 }) => readResponse<AffiliateProgram>(

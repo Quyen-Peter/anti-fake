@@ -10,9 +10,7 @@ import {
   type AffiliateProgramMember,
 } from "../../services/affiliate.api";
 import {
-  fetchShopBrandAuthorizations,
   fetchShopOffers,
-  type ShopBrandAuthorization,
   type ShopOffer,
 } from "../../services/shop.api";
 import "../../css/pages/affiliate.css";
@@ -29,7 +27,6 @@ const statusLabel: Record<string, string> = {
 export default function SellerAffiliatePage() {
   const { shopId } = useSellerShop();
   const [ownedPrograms, setOwnedPrograms] = useState<AffiliateProgram[]>([]);
-  const [brands, setBrands] = useState<ShopBrandAuthorization[]>([]);
   const [offers, setOffers] = useState<ShopOffer[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState("");
   const [members, setMembers] = useState<AffiliateProgramMember[]>([]);
@@ -40,14 +37,11 @@ export default function SellerAffiliatePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [programForm, setProgramForm] = useState({
     name: "",
-    slug: "",
-    scopeType: "SHOP" as "SHOP" | "BRAND" | "OFFER",
-    brandId: "",
+    scopeType: "SHOP" as "SHOP" | "OFFER",
     offerId: "",
     tier1Rate: "6",
     tier2Rate: "2",
     attributionWindowDays: "30",
-    commissionHoldDays: "7",
   });
 
   useEffect(() => {
@@ -55,7 +49,6 @@ export default function SellerAffiliatePage() {
 
     void Promise.all([
       fetchMyAffiliatePrograms(),
-      fetchShopBrandAuthorizations(shopId),
       fetchShopOffers(shopId, {
         page: 1,
         pageSize: 100,
@@ -63,15 +56,9 @@ export default function SellerAffiliatePage() {
         moderationStatus: "approved",
       }),
     ])
-      .then(([programs, authorizations, shopOffers]) => {
+      .then(([programs, shopOffers]) => {
         if (!active) return;
         setOwnedPrograms(programs);
-        setBrands(
-          authorizations.filter(
-            (authorization) =>
-              authorization.verificationStatus.toLowerCase() === "approved",
-          ),
-        );
         setOffers(shopOffers.items);
         if (programs.length === 0) {
           setMembers([]);
@@ -162,11 +149,6 @@ export default function SellerAffiliatePage() {
         ownerShopId: shopId,
         scopeType: programForm.scopeType,
         name: programForm.name,
-        slug: programForm.slug,
-        brandId:
-          programForm.scopeType === "BRAND"
-            ? programForm.brandId
-            : undefined,
         offerId:
           programForm.scopeType === "OFFER"
             ? programForm.offerId
@@ -174,10 +156,9 @@ export default function SellerAffiliatePage() {
         tier1Rate,
         tier2Rate,
         attributionWindowDays: Number(programForm.attributionWindowDays),
-        commissionHoldDays: Number(programForm.commissionHoldDays),
       });
       toast.success("Đã tạo chương trình affiliate");
-      setProgramForm((current) => ({ ...current, name: "", slug: "" }));
+      setProgramForm((current) => ({ ...current, name: "" }));
       refresh();
     } catch (requestError) {
       toast.error(
@@ -255,68 +236,29 @@ export default function SellerAffiliatePage() {
                   setProgramForm((current) => ({
                     ...current,
                     name: event.target.value,
-                    slug: slugify(event.target.value),
                   }))
                 }
               />
             </label>
             <label>
-              Slug
-              <input
-                required
-                pattern="[a-z0-9-]+"
-                value={programForm.slug}
-                onChange={(event) =>
-                  setProgramForm((current) => ({
-                    ...current,
-                    slug: event.target.value,
-                  }))
-                }
-              />
-            </label>
-            <label>
-              Phạm vi
+              Áp dụng cho
               <select
                 value={programForm.scopeType}
                 onChange={(event) =>
                   setProgramForm((current) => ({
                     ...current,
                     scopeType: event.target.value as typeof current.scopeType,
-                    brandId: "",
                     offerId: "",
                   }))
                 }
               >
-                <option value="SHOP">Toàn shop</option>
-                <option value="BRAND">Thương hiệu được duyệt</option>
-                <option value="OFFER">Một sản phẩm đang bán</option>
+                <option value="SHOP">Toàn bộ sản phẩm của shop</option>
+                <option value="OFFER">Một sản phẩm cụ thể</option>
               </select>
+              <small>
+                Chọn những sản phẩm được tính hoa hồng khi đơn hàng hoàn tất.
+              </small>
             </label>
-            {programForm.scopeType === "BRAND" && (
-              <label>
-                Thương hiệu
-                <select
-                  required
-                  value={programForm.brandId}
-                  onChange={(event) =>
-                    setProgramForm((current) => ({
-                      ...current,
-                      brandId: event.target.value,
-                    }))
-                  }
-                >
-                  <option value="">Chọn thương hiệu đã được duyệt</option>
-                  {brands.map((brand) => (
-                    <option value={brand.brandId} key={brand.id}>
-                      {brand.brandName ?? brand.brandId}
-                    </option>
-                  ))}
-                </select>
-                {brands.length === 0 && (
-                  <small>Shop chưa có thương hiệu được duyệt.</small>
-                )}
-              </label>
-            )}
             {programForm.scopeType === "OFFER" && (
               <label>
                 Sản phẩm
@@ -395,23 +337,11 @@ export default function SellerAffiliatePage() {
                   }
                 />
               </label>
-              <label>
-                Giữ hoa hồng (ngày)
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  max="30"
-                  value={programForm.commissionHoldDays}
-                  onChange={(event) =>
-                    setProgramForm((current) => ({
-                      ...current,
-                      commissionHoldDays: event.target.value,
-                    }))
-                  }
-                />
-              </label>
             </div>
+            <p className="affiliate-funding-note">
+              Thời gian giữ hoa hồng do hệ thống quy định để xử lý hoàn tiền
+              hoặc tranh chấp. Shop không cần cấu hình mục này.
+            </p>
             <button className="affiliate-primary" disabled={submitting}>
               {submitting ? "Đang tạo..." : "Tạo và kích hoạt"}
             </button>
@@ -498,13 +428,4 @@ function Pagination({
       </button>
     </div>
   );
-}
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }

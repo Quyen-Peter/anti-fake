@@ -1,7 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Link2, RefreshCw, Store, WalletCards } from "lucide-react";
+import {
+  BadgeDollarSign,
+  CheckCircle2,
+  Clock3,
+  Copy,
+  Link2,
+  MousePointerClick,
+  RefreshCw,
+  Store,
+  WalletCards,
+} from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import {
+  AffiliateKpiGrid,
+  AffiliatePageHeader,
+  AffiliatePagination,
+  AffiliateSectionState,
+  AffiliateStatusBadge,
+} from "../../components/affiliate/dashboardPrimitives";
 import {
   createAffiliateCode,
   fetchActiveAffiliatePrograms,
@@ -18,23 +35,11 @@ import {
 } from "../../services/affiliate.api";
 import { getToken } from "../../ultil/auth";
 import { formatVnd } from "../../ultil/currency";
-import "../../css/pages/affiliate.css";
+import "../../css/pages/affiliateCenter.css";
 
 type Tab = "marketplace" | "member";
-
 const PROGRAM_PAGE_SIZE = 12;
 const COMMISSION_PAGE_SIZE = 15;
-
-const statusLabel: Record<string, string> = {
-  PENDING: "Chờ đơn hoàn tất",
-  APPROVED: "Đã duyệt",
-  LOCKED: "Đang giữ",
-  PAID: "Đã trả",
-  CANCELLED: "Đã hủy",
-  ACTIVE: "Đang hoạt động",
-  SUSPENDED: "Tạm dừng",
-  BLOCKED: "Đã khóa",
-};
 
 const scopeLabel: Record<AffiliateProgram["scopeType"], string> = {
   PLATFORM: "Nền tảng",
@@ -43,57 +48,66 @@ const scopeLabel: Record<AffiliateProgram["scopeType"], string> = {
   OFFER: "Sản phẩm",
 };
 
+const errorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
+
+const formatDate = (value?: string | null) =>
+  value ? new Date(value).toLocaleDateString("vi-VN") : "—";
+
 export default function AffiliatePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const requestedTab = searchParams.get("tab");
-  const tab: Tab = requestedTab === "member" ? "member" : "marketplace";
+  const tab: Tab = searchParams.get("tab") === "member" ? "member" : "marketplace";
   const loggedIn = Boolean(getToken());
   const [programs, setPrograms] = useState<AffiliateProgram[]>([]);
   const [programPage, setProgramPage] = useState(1);
   const [programTotalPages, setProgramTotalPages] = useState(0);
+  const [programLoading, setProgramLoading] = useState(true);
+  const [programError, setProgramError] = useState("");
   const [accounts, setAccounts] = useState<AffiliateAccount[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [accountsLoading, setAccountsLoading] = useState(false);
+  const [accountsError, setAccountsError] = useState("");
   const [summary, setSummary] = useState<AffiliateAccountSummary | null>(null);
   const [codes, setCodes] = useState<AffiliateCode[]>([]);
+  const [workspaceLoading, setWorkspaceLoading] = useState(false);
+  const [workspaceError, setWorkspaceError] = useState("");
   const [commissions, setCommissions] = useState<AffiliateCommission[]>([]);
   const [commissionPage, setCommissionPage] = useState(1);
   const [commissionTotalPages, setCommissionTotalPages] = useState(0);
+  const [commissionLoading, setCommissionLoading] = useState(false);
+  const [commissionError, setCommissionError] = useState("");
   const [referralCodes, setReferralCodes] = useState<Record<string, string>>({});
   const [newCode, setNewCode] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [landingPath, setLandingPath] = useState("");
+  const [submittingId, setSubmittingId] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
   const selectTab = (nextTab: Tab) => {
     const nextParams = new URLSearchParams(searchParams);
-    if (nextTab === "member") {
-      nextParams.set("tab", "member");
-    } else {
-      nextParams.delete("tab");
-    }
+    if (nextTab === "member") nextParams.set("tab", "member");
+    else nextParams.delete("tab");
     setSearchParams(nextParams);
   };
 
   useEffect(() => {
     let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setProgramLoading(true);
+      setProgramError("");
+    });
     void fetchActiveAffiliatePrograms(programPage, PROGRAM_PAGE_SIZE)
       .then((result) => {
         if (!active) return;
         setPrograms(result.items);
         setProgramTotalPages(result.totalPages);
       })
-      .catch((requestError) => {
-        if (active) {
-          toast.error(
-            requestError instanceof Error
-              ? requestError.message
-              : "Không thể tải chương trình affiliate",
-          );
-        }
+      .catch((error) => {
+        if (active) setProgramError(errorMessage(error, "Không thể tải chương trình Affiliate."));
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) setProgramLoading(false);
       });
     return () => {
       active = false;
@@ -101,51 +115,55 @@ export default function AffiliatePage() {
   }, [programPage, refreshKey]);
 
   useEffect(() => {
+    if (!loggedIn) return;
     let active = true;
-    if (!loggedIn) {
-      return () => {
-        active = false;
-      };
-    }
-
+    queueMicrotask(() => {
+      if (!active) return;
+      setAccountsLoading(true);
+      setAccountsError("");
+    });
     void fetchMyAffiliateAccounts()
-      .then((myAccounts) => {
+      .then((result) => {
         if (!active) return;
-        setAccounts(myAccounts);
+        setAccounts(result);
         setSelectedAccountId((current) =>
-          myAccounts.some((account) => account.id === current)
-            ? current
-            : (myAccounts[0]?.id ?? ""),
+          result.some((account) => account.id === current) ? current : (result[0]?.id ?? ""),
         );
-        if (myAccounts.length === 0) {
-          setSummary(null);
-          setCodes([]);
-          setCommissions([]);
-        }
+        const firstProgram = result[0]?.program;
+        setLandingPath((current) =>
+          current ||
+          (firstProgram?.scopeType === "OFFER" && firstProgram.offerId
+            ? `/product/${firstProgram.offerId}`
+            : firstProgram?.ownerShopId
+              ? `/shop/${firstProgram.ownerShopId}`
+              : "/"),
+        );
       })
-      .catch((requestError) => {
-        if (active) {
-          toast.error(
-            requestError instanceof Error
-              ? requestError.message
-              : "Không thể tải Affiliate của bạn",
-          );
-        }
+      .catch((error) => {
+        if (active) setAccountsError(errorMessage(error, "Không thể tải tài khoản Affiliate."));
+      })
+      .finally(() => {
+        if (active) setAccountsLoading(false);
       });
-
     return () => {
       active = false;
     };
   }, [loggedIn, refreshKey]);
 
   useEffect(() => {
-    let active = true;
     if (!selectedAccountId) {
-      return () => {
-        active = false;
-      };
+      queueMicrotask(() => {
+        setSummary(null);
+        setCodes([]);
+      });
+      return;
     }
-
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setWorkspaceLoading(true);
+      setWorkspaceError("");
+    });
     void Promise.all([
       fetchAffiliateAccountSummary(selectedAccountId),
       fetchAffiliateCodes(selectedAccountId),
@@ -155,421 +173,492 @@ export default function AffiliatePage() {
         setSummary(nextSummary);
         setCodes(nextCodes);
       })
-      .catch((requestError) => {
-        if (active) {
-          toast.error(
-            requestError instanceof Error
-              ? requestError.message
-              : "Không thể tải dữ liệu affiliate",
-          );
-        }
+      .catch((error) => {
+        if (active) setWorkspaceError(errorMessage(error, "Không thể tải dữ liệu Affiliate."));
+      })
+      .finally(() => {
+        if (active) setWorkspaceLoading(false);
       });
-
     return () => {
       active = false;
     };
   }, [selectedAccountId, refreshKey]);
 
   useEffect(() => {
-    let active = true;
     if (!selectedAccountId) {
-      return () => {
-        active = false;
-      };
+      queueMicrotask(() => setCommissions([]));
+      return;
     }
-
-    void fetchAffiliateCommissions(
-      selectedAccountId,
-      commissionPage,
-      COMMISSION_PAGE_SIZE,
-    )
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setCommissionLoading(true);
+      setCommissionError("");
+    });
+    void fetchAffiliateCommissions(selectedAccountId, commissionPage, COMMISSION_PAGE_SIZE)
       .then((result) => {
         if (!active) return;
         setCommissions(result.items);
         setCommissionTotalPages(result.totalPages);
       })
-      .catch((requestError) => {
-        if (active) {
-          toast.error(
-            requestError instanceof Error
-              ? requestError.message
-              : "Không thể tải lịch sử hoa hồng",
-          );
-        }
+      .catch((error) => {
+        if (active) setCommissionError(errorMessage(error, "Không thể tải lịch sử hoa hồng."));
+      })
+      .finally(() => {
+        if (active) setCommissionLoading(false);
       });
-
     return () => {
       active = false;
     };
   }, [selectedAccountId, commissionPage, refreshKey]);
 
+  const selectedAccount = useMemo(
+    () => accounts.find((account) => account.id === selectedAccountId),
+    [accounts, selectedAccountId],
+  );
   const joinedProgramIds = useMemo(
     () => new Set(accounts.map((account) => account.programId)),
     [accounts],
   );
 
-  const refresh = () => {
-    setLoading(true);
-    setRefreshKey((current) => current + 1);
-  };
-
-  const selectAccount = (accountId: string) => {
-    setSelectedAccountId(accountId);
-    setCommissionPage(1);
-    setSummary(null);
-    setCodes([]);
-    setCommissions([]);
-  };
+  const refresh = () => setRefreshKey((current) => current + 1);
 
   const joinProgram = async (programId: string) => {
     if (!loggedIn) {
       navigate("/auth");
       return;
     }
-    setSubmitting(true);
+    setSubmittingId(programId);
     try {
       await joinAffiliateProgram(programId, referralCodes[programId]?.trim());
-      toast.success("Đã tham gia chương trình affiliate");
+      toast.success("Đã tham gia chương trình Affiliate.");
       refresh();
       selectTab("member");
-    } catch (requestError) {
-      toast.error(
-        requestError instanceof Error
-          ? requestError.message
-          : "Không thể tham gia chương trình",
-      );
+    } catch (error) {
+      toast.error(errorMessage(error, "Không thể tham gia chương trình."));
     } finally {
-      setSubmitting(false);
+      setSubmittingId("");
     }
   };
 
   const submitCode = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedAccountId || !newCode.trim()) return;
-    setSubmitting(true);
+    setSubmittingId("code");
     try {
-      await createAffiliateCode(
-        selectedAccountId,
-        newCode.trim().toLowerCase(),
-      );
+      const absoluteLandingUrl = new URL(landingPath || "/", window.location.origin).toString();
+      await createAffiliateCode(selectedAccountId, newCode.trim().toLowerCase(), {
+        landingUrl: absoluteLandingUrl,
+        isDefault: codes.length === 0,
+      });
       setCodes(await fetchAffiliateCodes(selectedAccountId));
       setNewCode("");
-      toast.success("Đã tạo mã affiliate");
-    } catch (requestError) {
-      toast.error(
-        requestError instanceof Error
-          ? requestError.message
-          : "Không thể tạo mã",
-      );
+      toast.success("Đã tạo mã Affiliate.");
+    } catch (error) {
+      toast.error(errorMessage(error, "Không thể tạo mã Affiliate."));
     } finally {
-      setSubmitting(false);
+      setSubmittingId("");
     }
   };
 
-  const copyLink = async (code: string) => {
-    await navigator.clipboard.writeText(
-      `${window.location.origin}/?aff=${encodeURIComponent(code)}`,
-    );
-    toast.success("Đã sao chép link affiliate");
+  const copyLink = async (code: AffiliateCode) => {
+    const destination = code.landingUrl || `${window.location.origin}${landingPath || "/"}`;
+    const url = new URL(destination, window.location.origin);
+    url.searchParams.set("aff", code.code);
+    await navigator.clipboard.writeText(url.toString());
+    toast.success("Đã sao chép link Affiliate.");
   };
 
   return (
-    <main className="affiliate-page" style={{ paddingTop: 82 }}>
-      <section className="affiliate-hero">
-        <div>
-          <p className="affiliate-eyebrow">AFFILIATE CENTER</p>
-          <h1>
-            Chia sẻ đúng sản phẩm.
-            <br />
-            Nhận hoa hồng minh bạch.
-          </h1>
-          <p>
-            Shop đã xác minh tạo và chi trả chương trình. Chủ mã nhận Tầng 1;
-            người giới thiệu trực tiếp chủ mã nhận Tầng 2.
-          </p>
-        </div>
-        <div className="affiliate-flow">
-          <span>Khách đặt hàng</span>
-          <b>→</b>
-          <span>Giữ theo cấu hình shop</span>
-          <b>→</b>
-          <span>Ví affiliate</span>
-        </div>
-      </section>
+    <main className="affiliate-dashboard affiliate-center">
+      <div className="affiliate-dashboard-inner">
+        <AffiliatePageHeader
+          eyebrow="AFFILIATE CENTER"
+          title="Quản lý hoạt động giới thiệu"
+          description="Tham gia chương trình, tạo link và theo dõi hoa hồng tại một nơi."
+          actions={
+            <button type="button" className="affiliate-button secondary" onClick={refresh}>
+              <RefreshCw size={16} /> Làm mới
+            </button>
+          }
+        />
 
-      <nav className="affiliate-tabs" aria-label="Khu vực affiliate">
-        <button
-          className={tab === "marketplace" ? "active" : ""}
-          onClick={() => selectTab("marketplace")}
-        >
-          <Store size={17} /> Chương trình
-        </button>
-        <button
-          className={tab === "member" ? "active" : ""}
-          onClick={() => selectTab("member")}
-        >
-          <WalletCards size={17} /> Kiếm tiền
-        </button>
-        <button
-          className="affiliate-refresh"
-          onClick={refresh}
-          aria-label="Làm mới"
-        >
-          <RefreshCw size={17} />
-        </button>
-      </nav>
+        <nav className="affiliate-center-tabs" aria-label="Khu vực Affiliate">
+          <button
+            type="button"
+            className={tab === "marketplace" ? "active" : ""}
+            onClick={() => selectTab("marketplace")}
+          >
+            <Store size={17} /> Khám phá chương trình
+          </button>
+          <button
+            type="button"
+            className={tab === "member" ? "active" : ""}
+            onClick={() => selectTab("member")}
+          >
+            <WalletCards size={17} /> Affiliate của tôi
+          </button>
+        </nav>
 
-      {loading && (
-        <div className="affiliate-empty">Đang tải Affiliate Center...</div>
-      )}
-
-      {!loading && tab === "marketplace" && (
-        <>
-          <section className="affiliate-program-grid">
-            {programs.map((program) => (
-              <article className="affiliate-program-card" key={program.id}>
-                <div className="affiliate-card-top">
-                  <span>{scopeLabel[program.scopeType]}</span>
-                  <small>{program.ownerShopName ?? "Nền tảng"}</small>
-                </div>
-                <h2>{program.name}</h2>
-                <p>
-                  {program.offerTitle ??
-                    program.brandName ??
-                    "Áp dụng cho sản phẩm của shop"}
-                </p>
-                <div className="affiliate-rate-row">
-                  <div>
-                    <strong>{program.tier1Rate}%</strong>
-                    <span>Tầng 1</span>
-                  </div>
-                  <div>
-                    <strong>{program.tier2Rate}%</strong>
-                    <span>Tầng 2</span>
-                  </div>
-                  <div>
-                    <strong>{program.commissionHoldDays} ngày</strong>
-                    <span>Thời gian giữ</span>
-                  </div>
-                </div>
-                {!joinedProgramIds.has(program.id) ? (
-                  <div className="affiliate-join">
-                    <input
-                      value={referralCodes[program.id] ?? ""}
-                      onChange={(event) =>
-                        setReferralCodes((current) => ({
-                          ...current,
-                          [program.id]: event.target.value,
-                        }))
-                      }
-                      placeholder="Mã người giới thiệu (nếu có)"
-                    />
-                    <button
-                      disabled={submitting}
-                      onClick={() => void joinProgram(program.id)}
-                    >
-                      Tham gia
-                    </button>
-                  </div>
-                ) : (
-                  <span className="affiliate-joined">Đã tham gia</span>
-                )}
-              </article>
-            ))}
-            {programs.length === 0 && (
-              <div className="affiliate-empty">
-                Chưa có chương trình đang hoạt động.
-              </div>
-            )}
-          </section>
-          <Pagination
+        {tab === "marketplace" ? (
+          <MarketplacePrograms
+            programs={programs}
+            loading={programLoading}
+            error={programError}
             page={programPage}
             totalPages={programTotalPages}
-            onChange={(page) => {
-              setLoading(true);
-              setProgramPage(page);
-            }}
+            joinedProgramIds={joinedProgramIds}
+            referralCodes={referralCodes}
+            submittingId={submittingId}
+            onReferralCodeChange={(programId, code) =>
+              setReferralCodes((current) => ({ ...current, [programId]: code }))
+            }
+            onJoin={(programId) => void joinProgram(programId)}
+            onPageChange={setProgramPage}
+            onRetry={refresh}
           />
-        </>
-      )}
-
-      {!loading &&
-        tab === "member" &&
-        (!loggedIn ? (
-          <LoginPrompt onLogin={() => navigate("/auth")} />
-        ) : (
-          <section className="affiliate-workspace">
-            <aside className="affiliate-sidebar">
-              <h2>Tài khoản của tôi</h2>
-              {accounts.map((account) => (
-                <button
-                  key={account.id}
-                  className={
-                    selectedAccountId === account.id ? "active" : ""
-                  }
-                  onClick={() => selectAccount(account.id)}
-                >
-                  <strong>{account.programName}</strong>
-                  <span>
-                    {account.parentAccountId
-                      ? "Có người giới thiệu"
-                      : "Tham gia trực tiếp"}
-                  </span>
-                </button>
-              ))}
-              {accounts.length === 0 && (
-                <p>Bạn chưa tham gia chương trình nào.</p>
-              )}
-            </aside>
-            <div className="affiliate-content">
-              {summary && (
-                <div className="affiliate-metrics">
-                  <Metric
-                    label="Lượt ghi nhận"
-                    value={String(summary.totalConversions)}
-                  />
-                  <Metric
-                    label="Chờ hoàn tất"
-                    value={formatVnd(summary.pendingCommissionAmount)}
-                  />
-                  <Metric
-                    label="Đang giữ"
-                    value={formatVnd(summary.lockedCommissionAmount)}
-                  />
-                  <Metric
-                    label="Đã trả"
-                    value={formatVnd(summary.paidCommissionAmount)}
-                  />
-                  <Metric
-                    label="Đã hủy"
-                    value={formatVnd(summary.cancelledCommissionAmount)}
-                  />
-                </div>
-              )}
-              <div className="affiliate-panel">
-                <div className="affiliate-panel-title">
-                  <div>
-                    <h2>Link và mã của bạn</h2>
-                    <p>
-                      Mã của bạn nhận Tầng 1; cha trực tiếp nhận Tầng 2.
-                    </p>
-                  </div>
-                </div>
-                <form className="affiliate-inline-form" onSubmit={submitCode}>
-                  <input
-                    pattern="[a-z0-9-]+"
-                    value={newCode}
-                    onChange={(event) => setNewCode(event.target.value)}
-                    placeholder="vd: minh-anh-01"
-                  />
-                  <button disabled={submitting}>Tạo mã</button>
-                </form>
-                <div className="affiliate-code-list">
-                  {codes.map((code) => (
-                    <div key={code.id}>
-                      <div>
-                        <Link2 size={16} />
-                        <strong>{code.code}</strong>
-                      </div>
-                      <button onClick={() => void copyLink(code.code)}>
-                        <Copy size={15} /> Sao chép link
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="affiliate-panel">
-                <h2>Lịch sử hoa hồng</h2>
-                <div className="affiliate-table">
-                  <div className="affiliate-table-head">
-                    <span>Ghi nhận</span>
-                    <span>Tầng</span>
-                    <span>Trạng thái</span>
-                    <span>Khả dụng</span>
-                    <span>Số tiền</span>
-                  </div>
-                  {commissions.map((entry) => (
-                    <div className="affiliate-table-row" key={entry.id}>
-                      <span>{formatDate(entry.createdAt)}</span>
-                      <span>Tầng {entry.tierLevel ?? "-"}</span>
-                      <span
-                        className={`status-${entry.commissionStatus.toLowerCase()}`}
-                      >
-                        {statusLabel[entry.commissionStatus] ??
-                          entry.commissionStatus}
-                      </span>
-                      <span>
-                        {entry.availableAt
-                          ? formatDate(entry.availableAt)
-                          : "—"}
-                      </span>
-                      <strong>{formatVnd(entry.amount)}</strong>
-                    </div>
-                  ))}
-                  {selectedAccountId && commissions.length === 0 && (
-                    <p>Chưa có hoa hồng.</p>
-                  )}
-                </div>
-                <Pagination
-                  page={commissionPage}
-                  totalPages={commissionTotalPages}
-                  onChange={setCommissionPage}
-                />
-              </div>
-            </div>
+        ) : !loggedIn ? (
+          <section className="affiliate-panel affiliate-login-panel">
+            <WalletCards size={32} />
+            <h2>Đăng nhập để quản lý Affiliate</h2>
+            <p>Theo dõi hoa hồng, chương trình đã tham gia và link giới thiệu của bạn.</p>
+            <button type="button" className="affiliate-button" onClick={() => navigate("/auth")}>
+              Đăng nhập
+            </button>
           </section>
-        ))}
+        ) : (
+          <MemberDashboard
+            accounts={accounts}
+            selectedAccount={selectedAccount}
+            selectedAccountId={selectedAccountId}
+            accountsLoading={accountsLoading}
+            accountsError={accountsError}
+            summary={summary}
+            codes={codes}
+            workspaceLoading={workspaceLoading}
+            workspaceError={workspaceError}
+            commissions={commissions}
+            commissionPage={commissionPage}
+            commissionTotalPages={commissionTotalPages}
+            commissionLoading={commissionLoading}
+            commissionError={commissionError}
+            newCode={newCode}
+            landingPath={landingPath}
+            submitting={submittingId === "code"}
+            onSelectAccount={(accountId) => {
+              setSelectedAccountId(accountId);
+              setCommissionPage(1);
+              const program = accounts.find((account) => account.id === accountId)?.program;
+              setLandingPath(
+                program?.scopeType === "OFFER" && program.offerId
+                  ? `/product/${program.offerId}`
+                  : program?.ownerShopId
+                    ? `/shop/${program.ownerShopId}`
+                    : "/",
+              );
+            }}
+            onExplore={() => selectTab("marketplace")}
+            onNewCodeChange={setNewCode}
+            onSubmitCode={submitCode}
+            onCopyCode={(code) => void copyLink(code)}
+            onCommissionPageChange={setCommissionPage}
+            onRetry={refresh}
+          />
+        )}
+      </div>
     </main>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function Pagination({
+function MarketplacePrograms({
+  programs,
+  loading,
+  error,
   page,
   totalPages,
-  onChange,
+  joinedProgramIds,
+  referralCodes,
+  submittingId,
+  onReferralCodeChange,
+  onJoin,
+  onPageChange,
+  onRetry,
 }: {
+  programs: AffiliateProgram[];
+  loading: boolean;
+  error: string;
   page: number;
   totalPages: number;
-  onChange: (page: number) => void;
+  joinedProgramIds: Set<string>;
+  referralCodes: Record<string, string>;
+  submittingId: string;
+  onReferralCodeChange: (programId: string, code: string) => void;
+  onJoin: (programId: string) => void;
+  onPageChange: (page: number) => void;
+  onRetry: () => void;
 }) {
-  if (totalPages <= 1) return null;
   return (
-    <div className="affiliate-pagination" aria-label="Phân trang">
-      <button disabled={page <= 1} onClick={() => onChange(page - 1)}>
-        Trước
-      </button>
-      <span>
-        Trang {page} / {totalPages}
-      </span>
-      <button
-        disabled={page >= totalPages}
-        onClick={() => onChange(page + 1)}
-      >
-        Sau
-      </button>
-    </div>
+    <section className="affiliate-panel">
+      <div className="affiliate-panel-header">
+        <div>
+          <h2>Chương trình đang mở</h2>
+          <p>So sánh phạm vi, tỷ lệ và thời gian giữ trước khi tham gia.</p>
+        </div>
+      </div>
+      <AffiliateSectionState
+        loading={loading}
+        error={error}
+        empty={!loading && !error && programs.length === 0}
+        emptyTitle="Chưa có chương trình đang hoạt động"
+        emptyDescription="Các chương trình mới sẽ xuất hiện tại đây."
+        onRetry={onRetry}
+      />
+      {!loading && !error && programs.length > 0 && (
+        <div className="affiliate-program-list">
+          {programs.map((program) => {
+            const joined = joinedProgramIds.has(program.id);
+            return (
+              <article className="affiliate-marketplace-row" key={program.id}>
+                <div className="affiliate-program-main">
+                  <div>
+                    <span className="affiliate-scope">{scopeLabel[program.scopeType]}</span>
+                    <small>{program.ownerShopName ?? "Nền tảng"}</small>
+                  </div>
+                  <h3>{program.name}</h3>
+                  <p>{program.offerTitle ?? program.brandName ?? "Áp dụng cho sản phẩm của shop"}</p>
+                </div>
+                <dl className="affiliate-program-rates">
+                  <div><dt>Tầng 1</dt><dd>{program.tier1Rate}%</dd></div>
+                  <div><dt>Tầng 2</dt><dd>{program.tier2Rate}%</dd></div>
+                  <div><dt>Thời gian giữ</dt><dd>{program.commissionHoldDays} ngày</dd></div>
+                </dl>
+                <div className="affiliate-join-control">
+                  {joined ? (
+                    <span className="affiliate-joined"><CheckCircle2 size={16} /> Đã tham gia</span>
+                  ) : (
+                    <>
+                      <input
+                        aria-label={`Mã người giới thiệu cho ${program.name}`}
+                        value={referralCodes[program.id] ?? ""}
+                        onChange={(event) => onReferralCodeChange(program.id, event.target.value)}
+                        placeholder="Mã giới thiệu (nếu có)"
+                      />
+                      <button
+                        type="button"
+                        className="affiliate-button"
+                        disabled={Boolean(submittingId)}
+                        onClick={() => onJoin(program.id)}
+                      >
+                        {submittingId === program.id ? "Đang tham gia..." : "Tham gia"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+      <AffiliatePagination page={page} totalPages={totalPages} onChange={onPageChange} />
+    </section>
   );
 }
 
-function LoginPrompt({ onLogin }: { onLogin: () => void }) {
+function MemberDashboard({
+  accounts,
+  selectedAccount,
+  selectedAccountId,
+  accountsLoading,
+  accountsError,
+  summary,
+  codes,
+  workspaceLoading,
+  workspaceError,
+  commissions,
+  commissionPage,
+  commissionTotalPages,
+  commissionLoading,
+  commissionError,
+  newCode,
+  landingPath,
+  submitting,
+  onSelectAccount,
+  onExplore,
+  onNewCodeChange,
+  onSubmitCode,
+  onCopyCode,
+  onCommissionPageChange,
+  onRetry,
+}: {
+  accounts: AffiliateAccount[];
+  selectedAccount?: AffiliateAccount;
+  selectedAccountId: string;
+  accountsLoading: boolean;
+  accountsError: string;
+  summary: AffiliateAccountSummary | null;
+  codes: AffiliateCode[];
+  workspaceLoading: boolean;
+  workspaceError: string;
+  commissions: AffiliateCommission[];
+  commissionPage: number;
+  commissionTotalPages: number;
+  commissionLoading: boolean;
+  commissionError: string;
+  newCode: string;
+  landingPath: string;
+  submitting: boolean;
+  onSelectAccount: (accountId: string) => void;
+  onExplore: () => void;
+  onNewCodeChange: (value: string) => void;
+  onSubmitCode: (event: React.FormEvent) => void;
+  onCopyCode: (code: AffiliateCode) => void;
+  onCommissionPageChange: (page: number) => void;
+  onRetry: () => void;
+}) {
+  if (accountsLoading || accountsError || accounts.length === 0) {
+    return (
+      <section className="affiliate-panel">
+        <AffiliateSectionState
+          loading={accountsLoading}
+          error={accountsError}
+          empty={!accountsLoading && !accountsError && accounts.length === 0}
+          emptyTitle="Bạn chưa tham gia chương trình nào"
+          emptyDescription="Khám phá chương trình phù hợp để bắt đầu tạo link giới thiệu."
+          onRetry={accountsError ? onRetry : undefined}
+        />
+        {!accountsLoading && !accountsError && accounts.length === 0 && (
+          <div className="affiliate-empty-action">
+            <button type="button" className="affiliate-button" onClick={onExplore}>
+              Khám phá chương trình
+            </button>
+          </div>
+        )}
+      </section>
+    );
+  }
+
   return (
-    <div className="affiliate-empty">
-      <h2>Đăng nhập để tiếp tục</h2>
-      <p>Theo dõi hoa hồng và tạo mã affiliate của bạn.</p>
-      <button onClick={onLogin}>Đăng nhập</button>
+    <div className="affiliate-member-dashboard">
+      <div className="affiliate-account-bar">
+        <label>
+          <span>Chương trình đang xem</span>
+          <select value={selectedAccountId} onChange={(event) => onSelectAccount(event.target.value)}>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>{account.programName}</option>
+            ))}
+          </select>
+        </label>
+        {selectedAccount && (
+          <div>
+            <AffiliateStatusBadge status={selectedAccount.accountStatus} />
+            <span>{selectedAccount.program?.ownerShopName ?? "Chương trình Affiliate"}</span>
+          </div>
+        )}
+      </div>
+
+      <AffiliateSectionState loading={workspaceLoading} error={workspaceError} onRetry={onRetry} />
+      {!workspaceLoading && !workspaceError && summary && (
+        <>
+          <AffiliateKpiGrid
+            items={[
+              { label: "Lượt chuyển đổi", value: String(summary.totalConversions), icon: <MousePointerClick size={19} /> },
+              { label: "Tổng hoa hồng", value: formatVnd(summary.totalCommissionAmount), icon: <BadgeDollarSign size={19} /> },
+              { label: "Chờ hoàn tất", value: formatVnd(summary.pendingCommissionAmount), icon: <Clock3 size={19} /> },
+              { label: "Đang giữ", value: formatVnd(summary.lockedCommissionAmount), icon: <Clock3 size={19} /> },
+              { label: "Đã trả", value: formatVnd(summary.paidCommissionAmount), icon: <WalletCards size={19} /> },
+            ]}
+          />
+
+          <div className="affiliate-member-grid">
+            <section className="affiliate-panel affiliate-program-overview">
+              <div className="affiliate-panel-header">
+                <div><h2>Chương trình đang tham gia</h2><p>Điều kiện thương mại do shop thiết lập.</p></div>
+              </div>
+              <dl>
+                <div><dt>Chương trình</dt><dd>{selectedAccount?.programName}</dd></div>
+                <div><dt>Phạm vi</dt><dd>{selectedAccount?.program ? scopeLabel[selectedAccount.program.scopeType] : "—"}</dd></div>
+                <div><dt>Tầng 1 / Tầng 2</dt><dd>{selectedAccount?.program ? `${selectedAccount.program.tier1Rate}% / ${selectedAccount.program.tier2Rate}%` : "—"}</dd></div>
+                <div><dt>Thời gian giữ</dt><dd>{selectedAccount?.program ? `${selectedAccount.program.commissionHoldDays} ngày` : "—"}</dd></div>
+                <div><dt>Ngày tham gia</dt><dd>{formatDate(selectedAccount?.joinedAt)}</dd></div>
+              </dl>
+            </section>
+
+            <section className="affiliate-panel affiliate-link-tool">
+              <div className="affiliate-panel-header">
+                <div><h2>Công cụ tạo link</h2><p>Tạo mã dễ nhớ và chọn đúng trang đích.</p></div>
+              </div>
+              <form className="affiliate-link-form" onSubmit={onSubmitCode}>
+                <label>
+                  <span>Mã giới thiệu</span>
+                  <input
+                    required
+                    minLength={3}
+                    maxLength={40}
+                    pattern="[a-zA-Z0-9-]+"
+                    value={newCode}
+                    onChange={(event) => onNewCodeChange(event.target.value)}
+                    placeholder="vd: minh-anh-01"
+                  />
+                </label>
+                <label>
+                  <span>Trang đích</span>
+                  <input
+                    required
+                    readOnly
+                    value={landingPath}
+                    placeholder="/product/... hoặc /shop/..."
+                  />
+                </label>
+                <button className="affiliate-button" disabled={submitting}>
+                  <Link2 size={16} /> {submitting ? "Đang tạo..." : "Tạo mã"}
+                </button>
+              </form>
+              <div className="affiliate-code-list">
+                {codes.map((code) => (
+                  <div key={code.id}>
+                    <span><Link2 size={15} /><strong>{code.code}</strong>{code.isDefault && <small>Mặc định</small>}</span>
+                    <button type="button" onClick={() => onCopyCode(code)}><Copy size={15} /> Sao chép</button>
+                  </div>
+                ))}
+                {codes.length === 0 && <p>Chưa có mã giới thiệu. Tạo mã đầu tiên để chia sẻ.</p>}
+              </div>
+            </section>
+          </div>
+        </>
+      )}
+
+      <section className="affiliate-panel affiliate-commission-panel">
+        <div className="affiliate-panel-header">
+          <div><h2>Lịch sử hoa hồng</h2><p>Trạng thái và thời điểm khả dụng do backend đối soát.</p></div>
+        </div>
+        <AffiliateSectionState
+          loading={commissionLoading}
+          error={commissionError}
+          empty={!commissionLoading && !commissionError && commissions.length === 0}
+          emptyTitle="Chưa có hoa hồng"
+          emptyDescription="Chuyển đổi hợp lệ sẽ được ghi nhận tại đây."
+          onRetry={onRetry}
+        />
+        {!commissionLoading && !commissionError && commissions.length > 0 && (
+          <div className="affiliate-table-wrap">
+            <table className="affiliate-data-table">
+              <thead><tr><th>Ghi nhận</th><th>Tầng</th><th>Trạng thái</th><th>Khả dụng</th><th className="numeric">Số tiền</th></tr></thead>
+              <tbody>
+                {commissions.map((entry) => (
+                  <tr key={entry.id}>
+                    <td data-label="Ghi nhận">{formatDate(entry.createdAt)}</td>
+                    <td data-label="Tầng">Tầng {entry.tierLevel ?? "—"}</td>
+                    <td data-label="Trạng thái"><AffiliateStatusBadge status={entry.commissionStatus} /></td>
+                    <td data-label="Khả dụng">{formatDate(entry.availableAt)}</td>
+                    <td data-label="Số tiền" className="numeric"><strong>{formatVnd(entry.amount, entry.currency)}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <AffiliatePagination page={commissionPage} totalPages={commissionTotalPages} onChange={onCommissionPageChange} />
+      </section>
     </div>
   );
-}
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("vi-VN");
 }

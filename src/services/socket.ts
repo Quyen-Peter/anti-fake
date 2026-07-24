@@ -38,3 +38,12 @@ export const connectSocket = (accessToken?: string) => {
 
   return socket;
 };
+
+export const connectLiveSocket = () => {
+  const token = getToken();
+  socket.auth = token ? { accessToken: token } : {};
+  if (!socket.connected) {
+    socket.connect();
+  }
+  return socket;
+};

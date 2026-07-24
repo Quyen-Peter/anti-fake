@@ -1,28 +1,32 @@
-type Props = {
-  product: {
-    id: number;
-    name: string;
-    price: string;
-    image: string;
-  };
-};
+import { Link } from "react-router-dom";
+import type { LiveOffer } from "../../services/live.api";
 
 export default function LiveProductCard({
   product,
-}: Props) {
+  sessionId,
+}: {
+  product: LiveOffer;
+  sessionId: string;
+}) {
   return (
     <div className="live-product-card">
-      <img
-        src={product.image}
-        alt={product.name}
-      />
-
+      {product.thumbnailUrl ? (
+        <img src={product.thumbnailUrl} alt={product.title} />
+      ) : (
+        <div className="live-product-placeholder">Không có ảnh</div>
+      )}
       <div className="product-info">
-        <h4>{product.name}</h4>
-
-        <p>{product.price}</p>
-
-        <button>Mua ngay</button>
+        <h4>{product.title}</h4>
+        <p>
+          {new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: product.currency || "VND",
+          }).format(product.price)}
+        </p>
+        <small>Còn {product.availableQuantity} sản phẩm</small>
+        <Link to={`/product/${product.offerId}?live=${encodeURIComponent(sessionId)}`}>
+          Xem sản phẩm
+        </Link>
       </div>
     </div>
   );

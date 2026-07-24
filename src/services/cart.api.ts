@@ -37,6 +37,7 @@ export const addToCart = async (
   offerId: string,
   quantity: number,
   variantId?: string,
+  sourceLiveSessionId?: string,
 ) => {
   const response = await authFetch(`${BASE_URL}/api/cart/items`, {
     method: "POST",
@@ -48,6 +49,7 @@ export const addToCart = async (
       offerId,
       quantity,
       ...(variantId ? { variantId } : {}),
+      ...(sourceLiveSessionId ? { sourceLiveSessionId } : {}),
     }),
   });
 

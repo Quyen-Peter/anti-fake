@@ -25,6 +25,7 @@ import { Toaster } from "sonner";
 import ProtectedRoute from "./routes/protectedRoute";
 import AuthPage from "./pages/auth";
 import LiveRoomPage from "./pages/live";
+import LiveDiscoveryPage from "./pages/live/list";
 import CheckoutPage from "./pages/checkout";
 import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
@@ -59,6 +60,7 @@ import CategoriesPage from "./pages/categories";
 import AdminCategoriesPage from "./pages/admin/categories";
 import AdminWalletPage from "./pages/admin/wallet";
 import SellerVoucherManagement from "./seller/voucherManagement";
+import SellerLivePage from "./seller/live";
 import {
   resolveAffiliateAttribution,
   saveAffiliateAttribution,
@@ -204,6 +206,7 @@ function App() {
                 <Route path="products" element={<ShopProducts />} />
                 <Route path="categories" element={<ShopCategories />} />
               </Route>
+              <Route path="/live" element={<LiveDiscoveryPage />} />
               <Route path="/live/:id" element={<LiveRoomPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -229,6 +232,7 @@ function App() {
               <Route path="wallet" element={<SellerWallet />} />
               <Route path="affiliate" element={<SellerAffiliatePage />} />
               <Route path="vouchers" element={<SellerVoucherManagement />} />
+              <Route path="live" element={<SellerLivePage />} />
               <Route path="shop-info" element={<SellerShopInfo />} />
               <Route path="business-info" element={<SellerBusinessInfo />} />
               <Route path="chat" element={<SellerChatPage />} />

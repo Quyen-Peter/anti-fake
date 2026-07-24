@@ -7,6 +7,7 @@ import {
   ScanLine,
   Search,
   Shapes,
+  Radio,
   ShoppingCart,
   User,
   UserCircle2,
@@ -54,6 +55,10 @@ export default function Header() {
       path: "/community",
     },
     {
+      label: "Livestream",
+      path: "/live",
+    },
+    {
       label: "Danh mục",
       path: "/categories",
     },
@@ -73,6 +78,11 @@ export default function Header() {
       label: "Cộng đồng",
       path: "/community",
       icon: Users,
+    },
+    {
+      label: "Live",
+      path: "/live",
+      icon: Radio,
     },
     {
       label: "QR",

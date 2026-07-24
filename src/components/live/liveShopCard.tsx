@@ -1,28 +1,39 @@
-import { useNavigate } from "react-router-dom";
+import { CalendarClock, Radio } from "lucide-react";
+import { Link } from "react-router-dom";
+import type { LiveSession } from "../../services/live.api";
 import "../../css/components/live/liveShopCard.css";
-import type { LiveShop } from "../../type/live";
 
-type Props = {
-  live: LiveShop;
-};
-
-export default function LiveShopCard({ live }: Props) {
-  const navigate = useNavigate();
+export default function LiveShopCard({ live }: { live: LiveSession }) {
   return (
-    <div className="live-card">
-      <div
-        className="live-image-wrapper"
-        onClick={() => navigate(`/live/${live.id}`)}
-      >
-        <img
-          src={live.liveThumbnail}
-          alt={live.shopName}
-          className="live-image"
-        />
-
-        <span className="live-badge">Đang diễn ra</span>
-        <p className="live-title">{live.liveTitle}</p>
+    <Link className="live-card" to={`/live/${live.id}`}>
+      <div className="live-image-wrapper">
+        {live.coverUrl ? (
+          <img
+            src={live.coverUrl}
+            alt=""
+            className="live-image"
+          />
+        ) : (
+          <div className="live-image live-image-empty">
+            <Radio size={34} />
+          </div>
+        )}
+        <span className={`live-badge ${live.status.toLowerCase()}`}>
+          {live.status === "LIVE"
+            ? "Đang phát"
+            : live.status === "SCHEDULED"
+              ? "Sắp diễn ra"
+              : "Phát lại"}
+        </span>
+        <p className="live-title">{live.title}</p>
       </div>
-    </div>
+      <div className="live-card-meta">
+        <b>{live.shopName}</b>
+        <span>
+          <CalendarClock size={13} />
+          {new Date(live.startAt).toLocaleString("vi-VN")}
+        </span>
+      </div>
+    </Link>
   );
 }

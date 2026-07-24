@@ -1,63 +1,93 @@
-import { SendHorizonal, Smile } from "lucide-react";
+import { SendHorizonal, Wifi, WifiOff } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import type { LiveComment } from "../../services/live.api";
 
-const messages = [
-  {
-    user: "Minh_Khang92",
-    text: "Check giúp em chiếc Hermes này có chuẩn không?",
-  },
-  {
-    user: "SHOP PHÂN HỒI",
-    text: "Đã chiếc túi này hiện bên mình còn duy nhất size 30.",
-  },
-  {
-    user: "Luxury_Lover",
-    text: "Sản phẩm đẹp quá.",
-  },
-    {
-    user: "Luxury_Lover",
-    text: "Sản phẩm đẹp quá.",
-  },
-    {
-    user: "Luxury_Lover",
-    text: "Sản phẩm đẹp quá.",
-  },
-    {
-    user: "Luxury_Lover",
-    text: "Sản phẩm đẹp quá.",
-  },
-    {
-    user: "Luxury_Lover",
-    text: "Sản phẩm đẹp quá.",
-  },
-];
+type Props = {
+  comments: LiveComment[];
+  connected: boolean;
+  canInteract: boolean;
+  onSend: (body: string) => Promise<void>;
+};
 
-export default function LiveChat() {
+export default function LiveChat({
+  comments,
+  connected,
+  canInteract,
+  onSend,
+}: Props) {
+  const [body, setBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "nearest" });
+  }, [comments.length]);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const message = body.trim();
+    if (!message || sending) return;
+    setSending(true);
+    try {
+      await onSend(message);
+      setBody("");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Không thể gửi bình luận",
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
-    <div className="live-chat">
-      <div className="live-chat-header">
-        <h3>TRÒ CHUYỆN TRỰC TIẾP</h3>
+    <section className="live-chat" aria-label="Trò chuyện trực tiếp">
+      <header className="live-chat-header">
+        <div>
+          <h3>Trò chuyện trực tiếp</h3>
+          <span>
+            {connected ? <Wifi size={13} /> : <WifiOff size={13} />}
+            {connected ? " Đã kết nối" : " Đang kết nối lại"}
+          </span>
+        </div>
+      </header>
+
+      <div className="live-chat-messages" aria-live="polite">
+        {comments.length === 0 ? (
+          <p className="live-chat-empty">
+            Chưa có bình luận. Hãy bắt đầu cuộc trò chuyện.
+          </p>
+        ) : (
+          comments.map((comment) => (
+            <article key={comment.id} className="chat-message">
+              <b>{comment.authorName}</b>
+              <p>{comment.body}</p>
+            </article>
+          ))
+        )}
+        <div ref={endRef} />
       </div>
 
-      <div className="live-chat-messages">
-        {messages.map((msg, index) => (
-          <div key={index} className="chat-message">
-            <b>{msg.user}</b>
-            <p>{msg.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="live-chat-input">
-        <input placeholder="Gửi tin nhắn..." />
-
-        <button>
-          <Smile size={18} />
-        </button>
-
-        <button className="send-btn">
+      <form className="live-chat-input" onSubmit={submit}>
+        <input
+          value={body}
+          maxLength={1000}
+          disabled={!canInteract || sending}
+          onChange={(event) => setBody(event.target.value)}
+          placeholder={
+            canInteract ? "Gửi bình luận..." : "Đăng nhập để bình luận"
+          }
+          aria-label="Bình luận livestream"
+        />
+        <button
+          className="send-btn"
+          disabled={!canInteract || !body.trim() || sending}
+          aria-label="Gửi bình luận"
+        >
           <SendHorizonal size={18} />
         </button>
-      </div>
-    </div>
+      </form>
+    </section>
   );
 }

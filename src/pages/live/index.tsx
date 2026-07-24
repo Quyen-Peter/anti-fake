@@ -1,61 +1,197 @@
-import { MessageCircle, Store } from "lucide-react";
+import {
+  Bell,
+  CalendarClock,
+  Copy,
+  Flame,
+  Heart,
+  MessageCircle,
+  Store,
+  ThumbsUp,
+  Zap,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import LiveChat from "../../components/live/liveChat";
 import LivePlayer from "../../components/live/livePlayer";
 import LiveProducts from "../../components/live/liveProducts";
-import ShopCard from "../../components/shop/shopCard";
+import { useLiveRealtime } from "../../hooks/useLiveRealtime";
+import {
+  getLiveSession,
+  remindLiveSession,
+  type LiveSession,
+} from "../../services/live.api";
+import { getToken } from "../../ultil/auth";
 import "../../css/components/live/liveRoom.css";
-import { useEffect } from "react";
+
+const reactionOptions = [
+  { type: "LIKE" as const, label: "Thích", icon: ThumbsUp },
+  { type: "LOVE" as const, label: "Yêu thích", icon: Heart },
+  { type: "WOW" as const, label: "Wow", icon: Zap },
+  { type: "FIRE" as const, label: "Tuyệt", icon: Flame },
+];
 
 export default function LiveRoomPage() {
-  const mockShop = {
-    shopId: "shop-1",
-    shopName: "TechWorld Official",
-    shopAvatar: "https://i.pravatar.cc/150?img=1",
-    shopBanner: "https://i.pravatar.cc/150?img=1",
-    rating: 4.9,
-    totalReview: 125000,
-    totalOffer: 356,
-    totalSale: 356,
-    verify: true,
-    createdAt: "20/3",
-  };
+  const { id = "" } = useParams();
+  const navigate = useNavigate();
+  const [session, setSession] = useState<LiveSession | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reminding, setReminding] = useState(false);
+  const realtime = useLiveRealtime(id);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    let active = true;
+    setLoading(true);
+    void getLiveSession(id)
+      .then((value) => {
+        if (active) {
+          setSession(value);
+          setError("");
+        }
+      })
+      .catch((requestError) => {
+        if (active) {
+          setError(
+            requestError instanceof Error
+              ? requestError.message
+              : "Không thể tải livestream",
+          );
+        }
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  const setReminder = async () => {
+    if (!getToken()) {
+      navigate(`/auth?redirect=${encodeURIComponent(`/live/${id}`)}`);
+      return;
+    }
+    setReminding(true);
+    try {
+      const updated = await remindLiveSession(id);
+      setSession(updated);
+      toast.success("Đã bật nhắc lịch livestream");
+    } catch (requestError) {
+      toast.error(
+        requestError instanceof Error
+          ? requestError.message
+          : "Không thể bật nhắc lịch",
+      );
+    } finally {
+      setReminding(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="live-page-state">Đang tải livestream...</div>;
+  }
+  if (error || !session) {
+    return (
+      <div className="live-page-state live-page-error">
+        <p>{error || "Không tìm thấy livestream"}</p>
+        <Link to="/live">Xem các livestream khác</Link>
+      </div>
+    );
+  }
+
+  const chat = (
+    <LiveChat
+      comments={realtime.comments}
+      connected={realtime.connected}
+      canInteract={realtime.canInteract}
+      onSend={realtime.sendComment}
+    />
+  );
 
   return (
     <div className="live-room-page">
-      <div className="live-main">
-        <LivePlayer />
-        <div className="live-chat-buttom">
-        <LiveChat />
-      </div>
-        <div
-          className="pd-shop-box"
-          style={{ marginTop: "0px", border: "1px solid #eee" }}
-        >
-          <div className="pd-shop-left">
-            <ShopCard shop={mockShop} />
+      <main className="live-main">
+        <LivePlayer session={session} />
+        <section className="live-session-summary">
+          <div>
+            <p className="live-session-shop">
+              <Store size={16} /> {session.shopName}
+            </p>
+            <h1>{session.title}</h1>
+            {session.description && <p>{session.description}</p>}
+            <span>
+              <CalendarClock size={15} />
+              {new Date(session.startAt).toLocaleString("vi-VN")}
+            </span>
           </div>
-
-          <div className="pd-shop-right">
-            <button className="pd-chat-btn">
-              <MessageCircle size={18} />
-              <span>Nhắn tin</span>
+          {session.status === "SCHEDULED" && (
+            <button
+              className="live-reminder-button"
+              onClick={setReminder}
+              disabled={reminding || session.viewerHasReminder}
+            >
+              <Bell size={17} />
+              {session.viewerHasReminder ? "Đã nhắc lịch" : "Nhắc tôi"}
             </button>
+          )}
+        </section>
 
-            <button className="pd-view-shop-btn">
-              <Store size={18} />
-              <span>Xem Shop</span>
+        <section className="live-reactions" aria-label="Cảm xúc">
+          {reactionOptions.map(({ type, label, icon: Icon }) => (
+            <button
+              key={type}
+              disabled={!realtime.canInteract || !realtime.connected}
+              onClick={() => realtime.sendReaction(type)}
+              title={
+                realtime.canInteract ? label : "Đăng nhập để thả cảm xúc"
+              }
+            >
+              <Icon size={18} />
+              <span>{realtime.reactions.totals[type]}</span>
             </button>
-          </div>
-        </div>
-        <LiveProducts />
-      </div>
-      <div className="live-chat-right">
-        <LiveChat />
-      </div>
+          ))}
+          <span className="live-comment-total">
+            <MessageCircle size={17} /> {realtime.comments.length}
+          </span>
+          {realtime.error && (
+            <span className="live-realtime-error">{realtime.error}</span>
+          )}
+        </section>
+
+        {(session.vouchers ?? []).length > 0 && (
+          <section className="live-vouchers">
+            <h2>Voucher dành cho phiên live</h2>
+            <div>
+              {session.vouchers.map((voucher) => (
+                <article key={voucher.voucherId}>
+                  <div>
+                    <b>{voucher.code}</b>
+                    <span>{voucher.name}</span>
+                    <small>
+                      Đơn tối thiểu{" "}
+                      {new Intl.NumberFormat("vi-VN").format(
+                        voucher.minOrderAmount,
+                      )}
+                      đ
+                    </small>
+                  </div>
+                  <button
+                    onClick={() => {
+                      void navigator.clipboard.writeText(voucher.code);
+                      toast.success("Đã sao chép mã voucher");
+                    }}
+                  >
+                    <Copy size={15} /> Sao chép
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <div className="live-chat-bottom">{chat}</div>
+        <LiveProducts products={session.offers} sessionId={session.id} />
+      </main>
+      <aside className="live-chat-right">{chat}</aside>
     </div>
   );
 }

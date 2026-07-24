@@ -1,66 +1,28 @@
+import { useEffect, useState } from "react";
 import LiveShopCard from "../../components/live/liveShopCard";
+import {
+  listLiveSessions,
+  type LiveSession,
+} from "../../services/live.api";
 
 export default function LiveFeed() {
-  const mockLiveShops = [
-    {
-      id: "1",
-      shopName: "TechWorld Official",
-      shopAvatar: "https://i.pravatar.cc/100?img=1",
-      liveThumbnail: "https://picsum.photos/600/400?random=1",
-      liveTitle: "Flash Sale điện thoại giảm đến 50%",
-      viewerCount: 12400,
-      isVerified: true,
-    },
-    {
-      id: "2",
-      shopName: "Beauty Care VN",
-      shopAvatar: "https://i.pravatar.cc/100?img=2",
-      liveThumbnail: "https://picsum.photos/600/400?random=2",
-      liveTitle: "Livestream mỹ phẩm chính hãng",
-      viewerCount: 8600,
-      isVerified: true,
-    },
-    {
-      id: "3",
-      shopName: "Fresh Food Mart",
-      shopAvatar: "https://i.pravatar.cc/100?img=3",
-      liveThumbnail: "https://picsum.photos/600/400?random=3",
-      liveTitle: "Nông sản sạch giá tốt hôm nay",
-      viewerCount: 5200,
-      isVerified: true,
-    },
-    {
-      id: "9",
-      shopName: "TechWorld Official",
-      shopAvatar: "https://i.pravatar.cc/100?img=1",
-      liveThumbnail: "https://picsum.photos/600/400?random=1",
-      liveTitle: "Flash Sale điện thoại giảm đến 50%",
-      viewerCount: 12400,
-      isVerified: true,
-    },
-    {
-      id: "7",
-      shopName: "Beauty Care VN",
-      shopAvatar: "https://i.pravatar.cc/100?img=2",
-      liveThumbnail: "https://picsum.photos/600/400?random=2",
-      liveTitle: "Livestream mỹ phẩm chính hãng",
-      viewerCount: 8600,
-      isVerified: true,
-    },
-    {
-      id: "6",
-      shopName: "Fresh Food Mart",
-      shopAvatar: "https://i.pravatar.cc/100?img=3",
-      liveThumbnail: "https://picsum.photos/600/400?random=3",
-      liveTitle: "Nông sản sạch giá tốt hôm nay",
-      viewerCount: 5200,
-      isVerified: true,
-    },
-  ];
+  const [sessions, setSessions] = useState<LiveSession[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    void listLiveSessions({ filter: "all" })
+      .then(setSessions)
+      .catch(() => setSessions([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Đang tải livestream...</p>;
+  if (!sessions.length) return <p>Chưa có livestream.</p>;
+
   return (
     <div className="live-grid">
-      {mockLiveShops.map((item) => (
-        <LiveShopCard key={item.id} live={item} />
+      {sessions.map((session) => (
+        <LiveShopCard key={session.id} live={session} />
       ))}
     </div>
   );

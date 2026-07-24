@@ -1,6 +1,6 @@
 import { QrCode, ShieldCheck, ShoppingCart } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { addToCart } from "../../services/cart.api";
 import { fetchBuyNowPreview } from "../../services/product.api";
 import { toast } from "sonner";
@@ -43,6 +43,8 @@ type ProductInfoData = {
 
 export default function ProductInfo({ product }: { product: ProductInfoData }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sourceLiveSessionId = searchParams.get("live") || undefined;
   const minQuantity =
     product.salesMode === "WHOLESALE" ? (product.minWholesaleQty ?? 1) : 1;
   const [quantity, setQuantity] = useState(minQuantity);
@@ -117,6 +119,7 @@ export default function ProductInfo({ product }: { product: ProductInfoData }) {
         String(product.id),
         quantity,
         selectedVariant ? String(selectedVariant.id) : undefined,
+        sourceLiveSessionId,
       );
 
       console.log(result);

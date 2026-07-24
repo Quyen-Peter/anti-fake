@@ -4,6 +4,39 @@
   overflow: hidden;
   border: 1px solid #eee;
   transition: 0.2s;
+  color: inherit;
+  text-decoration: none;
+}
+
+.live-image-empty {
+  display: grid;
+  place-items: center;
+  background: #18181b;
+  color: #fff;
+}
+
+.live-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.live-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #667085;
+  font-size: 11px;
+}
+
+.live-badge.scheduled {
+  background: #175cd3;
+}
+
+.live-badge.ended {
+  background: #475467;
 }
 
 .live-card:hover {

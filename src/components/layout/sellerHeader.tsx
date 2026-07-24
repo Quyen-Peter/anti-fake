@@ -11,6 +11,7 @@ import {
   Info,
   MessageSquareText,
   ReceiptText,
+  Radio,
   Store,
   UserRound,
 } from "lucide-react";
@@ -134,6 +135,18 @@ export default function SellerHeader() {
           >
             <Wallet size={18} />
             <span>Ví</span>
+          </NavLink>
+
+          <NavLink
+            to="live"
+            className={({ isActive }) =>
+              `seller-header-menu-item ${
+                isActive ? "seller-header-menu-item-active" : ""
+              }`
+            }
+          >
+            <Radio size={18} />
+            <span>Livestream</span>
           </NavLink>
 
           <NavLink

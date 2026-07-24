@@ -5,8 +5,8 @@ import {
   fetchShopSubmittedDocuments,
   getMyShop,
   type ShopSubmittedDocument,
-} from "../services/shop.api";
-import { getUserKyc, type UserKyc } from "../services/user.api";
+} from "../../../services/shop.api";
+import { getUserKyc, type UserKyc } from "../../../services/user.api";
 import "../css/pages/sellerShopInfo.css";
 import "../css/components/dataSkeleton.css";
 

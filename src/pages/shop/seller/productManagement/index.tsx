@@ -1,9 +1,9 @@
 import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import ProductTable from "../../components/productManagement/productTable";
+import ProductTable from "../../../../components/productManagement/productTable";
 import "../../css/pages/productManagement.css";
-import ProductCard from "../../components/productManagement/productCard";
-import CreateProduct from "../../components/productManagement/createProduct";
+import ProductCard from "../../../../components/productManagement/productCard";
+import CreateProduct from "../../../../components/productManagement/createProduct";
 import {
   type FetchShopOffersParams,
   fetchShopCategories,
@@ -11,8 +11,8 @@ import {
   getMyShop,
   type ShopCategory,
   type ShopOffer,
-} from "../../services/shop.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/shop.api";
+import { formatVnd } from "../../../../ultil/currency";
 
 type Product = {
   id: string;

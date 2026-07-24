@@ -27,8 +27,8 @@ import {
   type OfferDetail,
   type OfferVariant,
   type UpdateOfferPayload,
-} from "../../services/product.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/product.api";
+import { formatVnd } from "../../../../ultil/currency";
 import "../../css/pages/productManagement.css";
 
 const statusLabels: Record<string, string> = {

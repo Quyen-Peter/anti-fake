@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import SellerRevenueChart from "../../components/dashboard/sellerRevenueChart";
-import SellerStats from "../../components/dashboard/sellerStats";
-import SellerTopProducts from "../../components/dashboard/sellerTopProducts";
-import OrderCard from "../../components/orderManagement/orderCard";
-import OrderTable from "../../components/orderManagement/orderTable";
+import SellerRevenueChart from "../../../../components/dashboard/sellerRevenueChart";
+import SellerStats from "../../../../components/dashboard/sellerStats";
+import SellerTopProducts from "../../../../components/dashboard/sellerTopProducts";
+import OrderCard from "../../../../components/orderManagement/orderCard";
+import OrderTable from "../../../../components/orderManagement/orderTable";
 import "../../css/components/dataSkeleton.css";
 import "../../css/pages/sellerDashboard.css";
 import {
   fetchSellerOrders,
   type SellerOrder,
-} from "../../services/order.api";
-import { getMyShop } from "../../services/shop.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/order.api";
+import { getMyShop } from "../../../../services/shop.api";
+import { formatVnd } from "../../../../ultil/currency";
 
 type ViewOrder = {
   id: string;

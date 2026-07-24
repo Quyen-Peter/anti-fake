@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Building2, Plus, RefreshCw, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import PayoutAccountModal from "../../components/wallet/payoutAccountModal";
-import TransactionTable from "../../components/wallet/transactionTable";
-import WalletBalance from "../../components/wallet/walletBalance";
-import { useSellerShop } from "../../contexts/sellerShopContext";
-import { completeEmailStepUpFromLink } from "../../services/withdrawal-step-up";
+import PayoutAccountModal from "../../../../components/wallet/payoutAccountModal";
+import TransactionTable from "../../../../components/wallet/transactionTable";
+import WalletBalance from "../../../../components/wallet/walletBalance";
+import { useSellerShop } from "../../../../contexts/sellerShopContext";
+import { completeEmailStepUpFromLink } from "../../../../services/withdrawal-step-up";
 import {
   cancelShopWithdrawal,
   fetchShopPayoutAccounts,
@@ -16,8 +16,8 @@ import {
   type Wallet,
   type WalletTransaction,
   type WalletWithdrawal,
-} from "../../services/wallet.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/wallet.api";
+import { formatVnd } from "../../../../ultil/currency";
 import "../../css/pages/sellerWallet.css";
 
 const payoutStatus: Record<string, string> = {

@@ -12,9 +12,9 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import BroadcastCredentialsPanel from "../../components/live/broadcastCredentialsPanel";
-import LiveOperationsPanel from "../../components/live/liveOperationsPanel";
-import { useSellerShop } from "../../contexts/sellerShopContext";
+import BroadcastCredentialsPanel from "../../../../components/live/broadcastCredentialsPanel";
+import LiveOperationsPanel from "../../../../components/live/liveOperationsPanel";
+import { useSellerShop } from "../../../../contexts/sellerShopContext";
 import {
   createLiveSession,
   getBroadcastCredentials,
@@ -24,9 +24,9 @@ import {
   type BroadcastCredentials,
   type LiveSession,
   type LiveSessionStatus,
-} from "../../services/live.api";
-import { fetchShopOffers, type ShopOffer } from "../../services/shop.api";
-import { fetchShopVouchers } from "../../services/voucher.api";
+} from "../../../../services/live.api";
+import { fetchShopOffers, type ShopOffer } from "../../../../services/shop.api";
+import { fetchShopVouchers } from "../../../../services/voucher.api";
 import "../../css/pages/sellerLive.css";
 
 const statusLabel: Record<LiveSessionStatus, string> = {

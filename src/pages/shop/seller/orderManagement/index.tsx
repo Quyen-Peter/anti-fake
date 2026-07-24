@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import OrderFilters from "../../components/orderManagement/orderFilters";
-import OrderPagination from "../../components/orderManagement/orderPagination";
-import OrderStats from "../../components/orderManagement/orderStats";
-import OrderTable from "../../components/orderManagement/orderTable";
+import OrderFilters from "../../../../components/orderManagement/orderFilters";
+import OrderPagination from "../../../../components/orderManagement/orderPagination";
+import OrderStats from "../../../../components/orderManagement/orderStats";
+import OrderTable from "../../../../components/orderManagement/orderTable";
 import "../../css/pages/orderManagement.css";
-import OrderCard from "../../components/orderManagement/orderCard";
+import OrderCard from "../../../../components/orderManagement/orderCard";
 import {
   fetchSellerOrders,
   type SellerOrder,
-} from "../../services/order.api";
-import { getMyShop } from "../../services/shop.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/order.api";
+import { getMyShop } from "../../../../services/shop.api";
+import { formatVnd } from "../../../../ultil/currency";
 
 type ViewOrder = {
   id: string;

@@ -17,12 +17,12 @@ import {
   AffiliatePagination,
   AffiliateSectionState,
   AffiliateStatusBadge,
-} from "../../components/affiliate/dashboardPrimitives";
+} from "../../../../components/affiliate/dashboardPrimitives";
 import {
   AffiliateProgramFormModal,
   type AffiliateProgramFormSubmit,
-} from "../../components/affiliate/programFormModal";
-import { useSellerShop } from "../../contexts/sellerShopContext";
+} from "../../../../components/affiliate/programFormModal";
+import { useSellerShop } from "../../../../contexts/sellerShopContext";
 import {
   createAffiliateProgram,
   fetchAffiliateProgramMembers,
@@ -35,9 +35,9 @@ import {
   type SellerAffiliateCommission,
   type SellerAffiliateSummary,
   type UpdateAffiliateProgramPayload,
-} from "../../services/affiliate.api";
-import { fetchShopOffers, type ShopOffer } from "../../services/shop.api";
-import { formatVnd } from "../../ultil/currency";
+} from "../../../../services/affiliate.api";
+import { fetchShopOffers, type ShopOffer } from "../../../../services/shop.api";
+import { formatVnd } from "../../../../ultil/currency";
 import "../../css/pages/sellerAffiliate.css";
 
 const PAGE_SIZE = 10;

@@ -13,14 +13,14 @@ import { toast } from "sonner";
 import {
   getAddressProvinces,
   getAddressWards,
-} from "../../services/address.api";
+} from "../../../../services/address.api";
 import {
   getMyShop,
   updateShopProfile,
   type UpdateShopProfilePayload,
-} from "../../services/shop.api";
-import type { AddressProvince, AddressWard } from "../../type/address";
-import { useGlobalLoadingStore } from "../../store/globalLoadingStore";
+} from "../../../../services/shop.api";
+import type { AddressProvince, AddressWard } from "../../../../type/address";
+import { useGlobalLoadingStore } from "../../../../store/globalLoadingStore";
 import "../../css/pages/sellerShopInfo.css";
 
 const SELLER_SHOP_CACHE_KEY = "sellerShop";

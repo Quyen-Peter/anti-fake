@@ -30,15 +30,15 @@ import CheckoutPage from "./pages/checkout";
 import MainLayout from "./layouts/mainLayout";
 import SellerLayout from "./layouts/sellerLayout";
 import AdminLayout from "./layouts/adminLayout";
-import SellerDashboard from "./seller/dashboard";
-import ProductManagement from "./seller/productManagement";
-import SellerProductDetail from "./seller/productManagement/detail";
-import OrderManagement from "./seller/orderManagement";
-import SellerWallet from "./seller/wallet";
-import SellerAffiliatePage from "./seller/affiliate";
-import SellerShopInfo from "./seller/shopInfo";
-import SellerBusinessInfo from "./seller/businessInfo";
-import SellerChatPage from "./seller/ChatPage";
+import SellerDashboard from "./pages/shop/seller/dashboard";
+import ProductManagement from "./pages/shop/seller/productManagement";
+import SellerProductDetail from "./pages/shop/seller/productManagement/detail";
+import OrderManagement from "./pages/shop/seller/orderManagement";
+import SellerWallet from "./pages/shop/seller/wallet";
+import SellerAffiliatePage from "./pages/shop/seller/affiliate";
+import SellerShopInfo from "./pages/shop/seller/shopInfo";
+import SellerBusinessInfo from "./pages/shop/seller/businessInfo";
+import SellerChatPage from "./pages/shop/seller/ChatPage";
 import ProfileAddress from "./pages/profile/addressPage";
 import SellerOrderDetail from "./components/orderManagement/orderDetail";
 import SellerRegistration from "./components/sellerRegistration/sellerRegistration";
@@ -59,8 +59,8 @@ import GlobalLoadingOverlay from "./components/common/globalLoadingOverlay";
 import CategoriesPage from "./pages/categories";
 import AdminCategoriesPage from "./pages/admin/categories";
 import AdminWalletPage from "./pages/admin/wallet";
-import SellerVoucherManagement from "./seller/voucherManagement";
-import SellerLivePage from "./seller/live";
+import SellerVoucherManagement from "./pages/shop/seller/voucherManagement";
+import SellerLivePage from "./pages/shop/seller/live";
 import {
   resolveAffiliateAttribution,
   saveAffiliateAttribution,

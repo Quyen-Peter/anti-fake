@@ -501,25 +501,25 @@
   object-fit: cover;
 }
 
-.product-info {
+.live-product-info {
   padding: 12px;
 }
 
-.product-info h4 {
+.live-product-info h4 {
   margin: 0;
   font-size: 14px;
 }
 
-.product-info p {
+.live-product-info p {
   color: #c91c1c;
   font-weight: 700;
 }
 
-.product-info small {
+.live-product-info small {
   color: #667085;
 }
 
-.product-info a {
+.live-product-info a {
   display: block;
   width: 100%;
   margin-top: 10px;

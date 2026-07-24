@@ -15,7 +15,7 @@ export default function LiveProductCard({
       ) : (
         <div className="live-product-placeholder">Không có ảnh</div>
       )}
-      <div className="product-info">
+      <div className="live-product-info">
         <h4>{product.title}</h4>
         <p>
           {new Intl.NumberFormat("vi-VN", {

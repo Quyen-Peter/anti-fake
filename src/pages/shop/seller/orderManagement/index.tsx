@@ -3,7 +3,7 @@ import OrderFilters from "../../../../components/orderManagement/orderFilters";
 import OrderPagination from "../../../../components/orderManagement/orderPagination";
 import OrderStats from "../../../../components/orderManagement/orderStats";
 import OrderTable from "../../../../components/orderManagement/orderTable";
-import "../../css/pages/orderManagement.css";
+import "../../../../css/pages/orderManagement.css";
 import OrderCard from "../../../../components/orderManagement/orderCard";
 import {
   fetchSellerOrders,

@@ -4,8 +4,8 @@ import SellerStats from "../../../../components/dashboard/sellerStats";
 import SellerTopProducts from "../../../../components/dashboard/sellerTopProducts";
 import OrderCard from "../../../../components/orderManagement/orderCard";
 import OrderTable from "../../../../components/orderManagement/orderTable";
-import "../../css/components/dataSkeleton.css";
-import "../../css/pages/sellerDashboard.css";
+import "../../../../css/components/dataSkeleton.css";
+import "../../../../css/pages/sellerDashboard.css";
 import {
   fetchSellerOrders,
   type SellerOrder,

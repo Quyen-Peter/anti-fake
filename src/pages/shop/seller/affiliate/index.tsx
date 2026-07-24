@@ -38,7 +38,7 @@ import {
 } from "../../../../services/affiliate.api";
 import { fetchShopOffers, type ShopOffer } from "../../../../services/shop.api";
 import { formatVnd } from "../../../../ultil/currency";
-import "../../css/pages/sellerAffiliate.css";
+import "../../../../css/pages/sellerAffiliate.css";
 
 const PAGE_SIZE = 10;
 const DETAIL_PAGE_SIZE = 10;

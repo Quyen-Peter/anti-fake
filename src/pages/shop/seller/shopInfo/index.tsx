@@ -21,7 +21,7 @@ import {
 } from "../../../../services/shop.api";
 import type { AddressProvince, AddressWard } from "../../../../type/address";
 import { useGlobalLoadingStore } from "../../../../store/globalLoadingStore";
-import "../../css/pages/sellerShopInfo.css";
+import "../../../../css/pages/sellerShopInfo.css";
 
 const SELLER_SHOP_CACHE_KEY = "sellerShop";
 

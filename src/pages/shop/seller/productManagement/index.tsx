@@ -1,7 +1,7 @@
 import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ProductTable from "../../../../components/productManagement/productTable";
-import "../../css/pages/productManagement.css";
+import "../../../../css/pages/productManagement.css";
 import ProductCard from "../../../../components/productManagement/productCard";
 import CreateProduct from "../../../../components/productManagement/createProduct";
 import {

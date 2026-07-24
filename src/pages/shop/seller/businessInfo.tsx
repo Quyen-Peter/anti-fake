@@ -7,8 +7,8 @@ import {
   type ShopSubmittedDocument,
 } from "../../../services/shop.api";
 import { getUserKyc, type UserKyc } from "../../../services/user.api";
-import "../css/pages/sellerShopInfo.css";
-import "../css/components/dataSkeleton.css";
+import "../../../css/pages/sellerShopInfo.css";
+import "../../../css/components/dataSkeleton.css";
 
 type SellerShop = {
   id?: string;

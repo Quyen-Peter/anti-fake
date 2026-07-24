@@ -29,7 +29,7 @@ import {
   type UpdateOfferPayload,
 } from "../../../../services/product.api";
 import { formatVnd } from "../../../../ultil/currency";
-import "../../css/pages/productManagement.css";
+import "../../../../css/pages/productManagement.css";
 
 const statusLabels: Record<string, string> = {
   active: "Trên kệ",

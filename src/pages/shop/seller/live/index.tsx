@@ -27,7 +27,7 @@ import {
 } from "../../../../services/live.api";
 import { fetchShopOffers, type ShopOffer } from "../../../../services/shop.api";
 import { fetchShopVouchers } from "../../../../services/voucher.api";
-import "../../css/pages/sellerLive.css";
+import "../../../../css/pages/sellerLive.css";
 
 const statusLabel: Record<LiveSessionStatus, string> = {
   SCHEDULED: "Đã lên lịch",

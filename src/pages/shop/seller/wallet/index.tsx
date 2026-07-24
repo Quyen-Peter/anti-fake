@@ -18,7 +18,7 @@ import {
   type WalletWithdrawal,
 } from "../../../../services/wallet.api";
 import { formatVnd } from "../../../../ultil/currency";
-import "../../css/pages/sellerWallet.css";
+import "../../../../css/pages/sellerWallet.css";
 
 const payoutStatus: Record<string, string> = {
   PENDING: "Chờ admin xác minh",
